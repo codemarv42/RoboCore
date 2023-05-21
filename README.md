@@ -41,7 +41,7 @@ To compile your own program and then upload it to the RoboCore, some steps are n
 
 1. First you have to install the kernel of the ESP32 in Arduino: https://docs.espressif.com/projects/arduino-esp32/en/latest/installing.html
 2. Next, the compilation settings must be specified. To do this, first select "ESP32 Dev Module" under Tools --> Board.
-3. In the last step, the parameters of the ESP32 on the NanoBot must be set. To do this, select the following under Tools: 
+3. In the last step, the parameters of the ESP32 on the RoboCore must be set. To do this, select the following under Tools: 
 - Board: "ESP32 Dev Module"
 - Upload Speed: "921600"
 - CPU Frequency: "240MHz (WiFi/BT)"
