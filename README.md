@@ -21,7 +21,7 @@ In some cases, the USB controller is not automatically detected, which means tha
 
 ## Compilation settings
 
-To compile your own program and then upload it to the NanoBot, some steps are necessary:
+To compile your own program and then upload it to the RoboCore, some steps are necessary:
 
 1. First you have to install the kernel of the ESP32 in Arduino: https://docs.espressif.com/projects/arduino-esp32/en/latest/installing.html
 2. Next, the compilation settings must be specified. To do this, first select "ESP32 Dev Module" under Tools --> Board.
