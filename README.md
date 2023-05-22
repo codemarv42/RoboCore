@@ -6,6 +6,18 @@ The RoboCore is basically a dual PCB solution, which is mounted on a chassis and
 
 The hardware of this project consists mainly of the two PCBs and the chassis.
 
+## Arche-RoboCore PCB
+
+![RoboCore light sensor bar V1](https://github.com/codemarv42/RoboCore/blob/main/Hardware/RoboCore%20light%20sensor%20bar%20V1/RoboCore%20Light%20sensor%20bar_4.png?raw=true)
+
+Parameter for PCB (Arche-RoboCore PCB V1):
+
+- Layer: 2
+- Thickness: 1,6mm
+- Length: 72,0mm
+- Height: 15,23mm
+- Minimum Copper Trace Width: 0,15mm
+
 ## Light sensors PCB
 
 ![RoboCore light sensor bar V1](https://github.com/codemarv42/RoboCore/blob/main/Hardware/RoboCore%20light%20sensor%20bar%20V1/RoboCore%20Light%20sensor%20bar_4.png?raw=true)
