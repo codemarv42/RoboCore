@@ -10,7 +10,7 @@ The hardware of this project consists mainly of the two PCBs and the chassis.
 
 ## Arche-RoboCore PCB
 
-![Arche-RoboCore PCB V1](https://github.com/codemarv42/RoboCore/blob/main/Hardware/Arche-RoboCore%20V1/Arche-RoboCore_3_1.png?raw=true)
+![Arche-RoboCore PCB V1](https://github.com/codemarv42/RoboCore/blob/main/Hardware/Arche-RoboCore%20V1/Arche-RoboCore_12.png?raw=true)
 
 Parameter for PCB (Arche-RoboCore PCB V1):
 
