@@ -1,4 +1,4 @@
-# RoboCore
+# RoboCore - Team 3
 
 The RoboCore is basically a dual PCB solution, which is mounted on a chassis and takes over the evaluation and control of sensors and motors. Furthermore, this project was created by several people to develop the best robot for the RoboCup in the Rescue Line division. 
 
