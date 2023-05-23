@@ -64,4 +64,4 @@ To compile your own program and then upload it to the RoboCore, some steps are n
 - Flash Size: "16MB (128Mb)" **4MB if you installed the W25Q32JVZPIQ Flash**
 - Partition Scheme: "Minimal SPIFFS (1.9MB APP with OTA/190KB SPIFFS)" **for smaller code: Default**
 - Programmer: "AVRISP mkll"
-- Erase all flash: "Disabled"
+- Erase all flash: "Disable
