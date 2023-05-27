@@ -4,6 +4,8 @@ The RoboCore is basically a dual PCB solution, which is mounted on a chassis and
 
 ![RoboCore V1](https://github.com/codemarv42/RoboCore/blob/main/Hardware/Arche-RoboCore%20V1/Arche-RoboCore_10.png?raw=true)
 
+![RoboCore Chassis V1](https://github.com/codemarv42/RoboCore/blob/main/Hardware/Chassis%20and%203D%20models/ChassisV1.PNG?raw=true)
+
 # Hardware
 
 The hardware of this project consists mainly of the two PCBs and the chassis.
