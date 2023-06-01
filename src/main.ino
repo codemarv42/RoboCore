@@ -1,7 +1,7 @@
 /*
 copyright (c) ImmernochKeinName, 2023
 
-licensed under CC-BY 3.0
+licensed under GPL v3
 
 view LICENSE.md for details
 */
