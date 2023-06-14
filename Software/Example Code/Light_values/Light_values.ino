@@ -14,7 +14,10 @@ CD74HC4067 ADCMULTI(S0, S1, S2, S3);
 
 //Light measure//
 
-unsigned int RAW_L[7] = { REF_L, L_1, L_0, M, R_0, R_1, REF_R};  //Raw light data 0 - 4096
+unsigned int RAW_W[7] = { REF_L, L_1, L_0, M, R_0, R_1, REF_R };  //Raw light data 0 - 4096
+unsigned int RAW_R[2] = { L_0, R_0 };  //Raw light data 0 - 4096
+unsigned int RAW_G[2] = { L_0, R_0 };  //Raw light data 0 - 4096
+unsigned int RAW_B[2] = { L_0, R_0 };  //Raw light data 0 - 4096
 unsigned int RAW_MIN[7];                            //Raw data 0 - 4096
 unsigned int RAW_MAX[7];                            //Raw data 0 - 4096
 unsigned int CAL_L[7];                              //Raw data 0 - 1000
@@ -59,23 +62,69 @@ int ADCRead(int pin) {  //Reads out the inputs of the analog multiplexer
 
 void MeasureRawLight() {  //Measure the raw light values from the ADC multiplexer
 
-  ShiftRegisterWrite(SR_PT_WHITE, HIGH);
+  unsigned int RAW_TMP1[7];
+  unsigned int RAW_TMP2[7];
+  unsigned int RAW_TMP3[7];
 
-  unsigned int RAW_L_TMP[7];
+  ShiftRegisterWrite(SR_PT_WHITE, HIGH);  //White light
 
-  unsigned int RAW_L_TMP2[7];
-
-  unsigned int RAW_L_TMP3[7];
 
   for (int i = 0; i < 7; i++) {
-    RAW_L_TMP[i] = ADCRead(i);
-    RAW_L_TMP2[i] = ADCRead(i);
-    RAW_L_TMP3[i] = ADCRead(i);
-    RAW_L[i] = (RAW_L_TMP[i] + RAW_L_TMP2[i] + RAW_L_TMP3[i]) / 3;
+    RAW_TMP1[i] = ADCRead(i);
+    RAW_TMP2[i] = ADCRead(i);
+    RAW_TMP3[i] = ADCRead(i);
+    RAW_W[i] = (RAW_TMP1[i] + RAW_TMP2[i] + RAW_TMP3[i]) / 3;
   }
 
 
   ShiftRegisterWrite(SR_PT_WHITE, LOW);
+
+
+  ShiftRegisterWrite(SR_PT_RED, HIGH);  //Red light
+
+  RAW_TMP1[L_0] = ADCRead(L_0);
+  RAW_TMP2[L_0] = ADCRead(L_0);
+  RAW_TMP3[L_0] = ADCRead(L_0);
+  RAW_R[L_0] = (RAW_TMP1[L_0] + RAW_TMP2[L_0] + RAW_TMP3[L_0]) / 3;
+
+  RAW_TMP1[R_0] = ADCRead(R_0);
+  RAW_TMP2[R_0] = ADCRead(R_0);
+  RAW_TMP3[R_0] = ADCRead(R_0);
+  RAW_R[R_0] = (RAW_TMP1[R_0] + RAW_TMP2[R_0] + RAW_TMP3[R_0]) / 3;
+
+
+  ShiftRegisterWrite(SR_PT_RED, LOW);
+
+  ShiftRegisterWrite(SR_PT_GREEN, HIGH);  //Green light
+
+  RAW_TMP1[L_0] = ADCRead(L_0);
+  RAW_TMP2[L_0] = ADCRead(L_0);
+  RAW_TMP3[L_0] = ADCRead(L_0);
+  RAW_G[L_0] = (RAW_TMP1[L_0] + RAW_TMP2[L_0] + RAW_TMP3[L_0]) / 3;
+
+  RAW_TMP1[R_0] = ADCRead(R_0);
+  RAW_TMP2[R_0] = ADCRead(R_0);
+  RAW_TMP3[R_0] = ADCRead(R_0);
+  RAW_G[R_0] = (RAW_TMP1[R_0] + RAW_TMP2[R_0] + RAW_TMP3[R_0]) / 3;
+
+
+  ShiftRegisterWrite(SR_PT_GREEN, LOW);
+
+  ShiftRegisterWrite(SR_PT_BLUE, HIGH);  //Blue light
+
+  RAW_TMP1[L_0] = ADCRead(L_0);
+  RAW_TMP2[L_0] = ADCRead(L_0);
+  RAW_TMP3[L_0] = ADCRead(L_0);
+  RAW_B[L_0] = (RAW_TMP1[L_0] + RAW_TMP2[L_0] + RAW_TMP3[L_0]) / 3;
+
+  RAW_TMP1[R_0] = ADCRead(R_0);
+  RAW_TMP2[R_0] = ADCRead(R_0);
+  RAW_TMP3[R_0] = ADCRead(R_0);
+  RAW_B[R_0] = (RAW_TMP1[R_0] + RAW_TMP2[R_0] + RAW_TMP3[R_0]) / 3;
+
+
+  ShiftRegisterWrite(SR_PT_BLUE, LOW);
+
 }
 
 
@@ -101,27 +150,48 @@ void loop() {
 
   MeasureRawLight();
 
+  Serial.print("RAW_W[REF_L]:");
+  Serial.print(RAW_W[REF_L]);
+  Serial.print(",");
+  Serial.print("RAW_W[L_1]:");
+  Serial.print(RAW_W[L_1]);
+  Serial.print(",");
+  Serial.print("RAW_W[L_0]:");
+  Serial.print(RAW_W[L_0]);
+  Serial.print(",");
+  Serial.print("RAW_W[M]:");
+  Serial.print(RAW_W[M]);
+  Serial.print(",");
+  Serial.print("RAW_W[R_0]:");
+  Serial.print(RAW_W[R_0]);
+  Serial.print(",");
+  Serial.print("RAW_W[R_1]:");
+  Serial.print(RAW_W[R_1]);
+  Serial.print(",");
+  Serial.print("RAW_W[REF_R]:");
+  Serial.println(RAW_W[REF_R]);
 
-  Serial.print("RAW_REF_L:");
-  Serial.print(RAW_L[REF_L]);
+  Serial.println("");
+
+  Serial.print("RAW_R[L_0]:");
+  Serial.print(RAW_R[L_0]);
   Serial.print(",");
-  Serial.print("RAW_L_1:");
-  Serial.print(RAW_L[L_1]);
+  Serial.print("RAW_R[R_0]:");
+  Serial.print(RAW_R[R_0]);
   Serial.print(",");
-  Serial.print("RAW_L_0:");
-  Serial.print(RAW_L[L_0]);
+  Serial.print("RAW_G[L_0]:");
+  Serial.print(RAW_G[L_0]);
   Serial.print(",");
-  Serial.print("RAW_M:");
-  Serial.print(RAW_L[M]);
+  Serial.print("RAW_G[R_0]:");
+  Serial.print(RAW_G[R_0]);
   Serial.print(",");
-  Serial.print("RAW_R_0:");
-  Serial.print(RAW_L[R_0]);
+  Serial.print("RAW_B[L_0]:");
+  Serial.print(RAW_B[L_0]);
   Serial.print(",");
-  Serial.print("RAW_R_1:");
-  Serial.print(RAW_L[R_1]);
-  Serial.print(",");
-  Serial.print("RAW_REF_R:");
-  Serial.println(RAW_L[REF_R]);
+  Serial.print("RAW_B[R_0]:");
+  Serial.println(RAW_B[R_0]);
+
+  Serial.println("");
 
   delay(100);
 }
