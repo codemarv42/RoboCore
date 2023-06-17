@@ -54,11 +54,11 @@ struct SensorData{
   uint16_t max=0xFFFF;
   uint16_t value=0;
 };
+const uint8_t CALIBRATION = 255;
 
 class LightSensor{
   private:
     uint8_t led_pin;
-    SensorData* single_sensors[5] = {&left_outer, &left, &center, &right, &right_outer};
     void led_on(){
       ShiftRegisterWrite(this->led_pin, LOW); // TODO test and make private
     }
@@ -75,18 +75,32 @@ class LightSensor{
     LightSensor(int led_pin){
       this->led_pin = led_pin;
     }
-
-
+    void calibrate_turn(){
+      led_on();
+      uint16_t current_value = ADCRead(ADC_PT_L_1);
+      if (current_value > this->left_outer.max){this->left_outer.max = current_value;}
+      if (current_value < this->left_outer.min){this->left_outer.min = current_value;}
+      current_value = ADCRead(ADC_PT_L_0);
+      if (current_value > this->left.max){this->left.max = current_value;}
+      if (current_value < this->left.min){this->left.min = current_value;}
+      current_value = ADCRead(ADC_PT_M);
+      if (current_value > this->center.max){this->center.max = current_value;}
+      if (current_value < this->center.min){this->center.min = current_value;}
+      current_value = ADCRead(ADC_PT_R_0);
+      if (current_value > this->right.max){this->right.max = current_value;}
+      if (current_value < this->right.min){this->right.min = current_value;}
+      current_value = ADCRead(ADC_PT_R_1);
+      if (current_value > this->right_outer.max){this->right_outer.max = current_value;}
+      if (current_value < this->right_outer.min){this->right_outer.min = current_value;}
+      led_off();
+    }
     void read(){
       led_on();
-      for (auto single_sensor:single_sensors){
-        single_sensor->value = 
-      }
-      this->left_outer.value  = map(ADCRead(ADC_PT_L_0), left_outer.min,  left_outer.max, 0, 100);
+      this->left_outer.value  = map(ADCRead(ADC_PT_L_1), left_outer.min,  left_outer.max, 0, 100);
       this->left.value        = map(ADCRead(ADC_PT_L_0), left.min,        left.max, 0, 100);
-      this->center.value      = map(ADCRead(ADC_PT_L_0), center.min,      center.max, 0, 100);
-      this->right.value       = map(ADCRead(ADC_PT_L_0), right.min,       right.max, 0, 100);
-      this->right_outer.value = map(ADCRead(ADC_PT_L_0), right_outer.min, right_outer.max, 0, 100);
+      this->center.value      = map(ADCRead(ADC_PT_M  ), center.min,      center.max, 0, 100);
+      this->right.value       = map(ADCRead(ADC_PT_R_0), right.min,       right.max, 0, 100);
+      this->right_outer.value = map(ADCRead(ADC_PT_R_1), right_outer.min, right_outer.max, 0, 100);
       led_off();
     }
 
@@ -155,5 +169,3 @@ int ADCRead(int pin) {  //Reads out the inputs of the analog multiplexer
   delayMicroseconds(1);
   return analogRead(ADC_MULTI);
 }
-
-
