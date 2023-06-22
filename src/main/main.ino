@@ -6,7 +6,7 @@
 /*
 copyright (c) ImmernochKeinName, 2023
 
-licensed under GPL v3
+licensed under GPL v3. This applies for ALL files included in this Branch
 
 view LICENSE.md for details
 */
