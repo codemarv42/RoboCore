@@ -5,7 +5,12 @@ Robot robot = Robot();
 
 
 void setup() {
+  Serial.begin(115200);
   robot.run();
 }
 
-void loop() { return; }
+void loop() {
+  Serial.println("This is a test!");
+  // return;
+  delay(1000);
+}
