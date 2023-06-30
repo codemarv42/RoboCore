@@ -7,8 +7,10 @@ class Robot {
     bool running = false;
   
   public:
-    int run();
+    void run();
     void init();
+    void input();
+    void output();
 };
 
 
