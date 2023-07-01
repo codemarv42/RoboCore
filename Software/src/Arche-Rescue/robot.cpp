@@ -1,19 +1,19 @@
 #include "robot.h"
 
-#include "sensor/ButtonSensor.h"
-#include "sensor/GyroSensor.h"
-#include "sensor/LightSensor.h"
-#include "sensor/TOFSensor.h"
-#include "sensor/ElectricSensor.h"
+#include "button_sensor.h"
+#include "gyro_sensor.h"
+#include "light_sensor.h"
+#include "tof_sensor.h"
+#include "electric_sensor.h"
 
-#include "motor/DriveMotor.h"
-#include "motor/ServoMotor.h"
+#include "drive_motor.h"
+#include "servo_motor.h"
 
-#include "led/RGBLed.h"
-#include "led/WhiteLed.h"
+#include "rgb_led.h"
+#include "white_led.h"
 
-#include "show/PCShow.h"
-#include "show/DisplayShow.h"
+#include "pc_show.h"
+#include "display_show.h"
 
 
 
