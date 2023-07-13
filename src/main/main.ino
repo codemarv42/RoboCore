@@ -25,21 +25,21 @@ bool HardwareInit(){
   Wire.begin();
   return true;
 }
-
 LightSensor white = LightSensor(SR_PT_WHITE);
 // PUT LIGHT SENSORS HERE
-LightSensor* all_sensors[4] = {&white,nullptr};
+LightSensor* all_sensors[] = {&white,nullptr,nullptr,nullptr};
+
 void setup(){
-  Serial.begin(9600);
+
+  Serial.begin(115200);
   Serial.println("HardwareInit...");
   HardwareInit();
   Serial.println("Calibration...");
-  calibrate(all_sensors);
+  //calibrate(all_sensors, CALIBRATION, 3);
+  calibrate(all_sensors, 10, 300);
   Serial.print("White Left max: "); Serial.print(white.left.max); Serial.print(" - White Right max: "); Serial.println(white.right.max);
   delay(1000);
 }
-
-
 
 void loop() {
 
@@ -49,5 +49,7 @@ void loop() {
   int diff = white.left.value - white.right.value;
   motor::fwd(A, V + diff);
   motor::fwd(B, V - diff);
+  white.read();
+  Serial.println(white.right.value);
   
 }
