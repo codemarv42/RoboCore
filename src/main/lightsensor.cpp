@@ -3,7 +3,6 @@
 
 #include "lightsensor.h"
 #include "Pins.h"
-#include "shiftregister.h"
 
 void calibrate(LightSensor* sensors[],const int amount = CALIBRATION,const int time_between_read_ms = 3)
 {
@@ -17,12 +16,8 @@ void calibrate(LightSensor* sensors[],const int amount = CALIBRATION,const int t
     }
   }
 }
-void LightSensor::on(){
-  shift_register::write(this->led_pin, HIGH);
-}
-void LightSensor::off(){
-  shift_register::write(this->led_pin, LOW);
-}
+
+
 
 
 

@@ -17,8 +17,13 @@ struct SensorData{
 class LightSensor{
   private:
     uint8_t led_pin;
-    void led_on();
-    void led_off();
+    void led_on(){
+      shift_register::write(this->led_pin, HIGH); // TODO test and make private
+    }
+    void led_off(){
+      shift_register::write(this->led_pin, LOW);
+    }
+
   public:
     SensorData left_outer;
     SensorData left;
