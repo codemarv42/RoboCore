@@ -12,4 +12,5 @@ extern void stop();
 extern void fwd(int, int);
 extern void rev(int, int);
 }
+extern void setupMPU();
 #endif
