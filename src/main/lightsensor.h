@@ -24,11 +24,15 @@ class LightSensor{
     uint8_t led_pin;
     void led_on(){
       shift_register::write(this->led_pin, HIGH); // TODO test and make private
-      delayMicroseconds(40);
+      delayMicroseconds(60);
     }
     void led_off(){
       shift_register::write(this->led_pin, LOW);
       //delayMicroseconds(40);
+    }
+
+    inline int16_t map(int16_t value, int16_t minv, int16_t maxv){
+      return ((value - minv) * 100) / (maxv - minv);
     }
 
   public:
@@ -42,7 +46,7 @@ class LightSensor{
     }
     void calibrate_turn(){
       led_on();
-      delayMicroseconds(20);
+      //delayMicroseconds(20);
       uint16_t current_value = ADCRead(ADC_PT_L_1); // TODO: change part of the ifs to else ifs
       this->left_outer.max = max(this->left_outer.max, current_value);
       this->left_outer.min = min(this->left_outer.min, current_value);
@@ -68,11 +72,11 @@ class LightSensor{
     void read(){
       led_on();
       //Serial.println(ADCRead(ADC_PT_R_0));
-      this->left_outer.value  = map(ADCRead(ADC_PT_L_1), left_outer.min,  left_outer.max, 0, 100);
-      this->left.value        = map(ADCRead(ADC_PT_L_0), left.min,        left.max, 0, 100);
-      this->center.value      = map(ADCRead(ADC_PT_M  ), center.min,      center.max, 0, 100);
-      this->right.value       = map(ADCRead(ADC_PT_R_0), right.min,       right.max, 0, 100);
-      this->right_outer.value = map(ADCRead(ADC_PT_R_1), right_outer.min, right_outer.max, 0, 100);
+      this->left_outer.value  = map(ADCRead(ADC_PT_L_1), left_outer.min,  left_outer.max);
+      this->left.value        = map(ADCRead(ADC_PT_L_0), left.min,        left.max);
+      this->center.value      = map(ADCRead(ADC_PT_M  ), center.min,      center.max);
+      this->right.value       = map(ADCRead(ADC_PT_R_0), right.min,       right.max);
+      this->right_outer.value = map(ADCRead(ADC_PT_R_1), right_outer.min, right_outer.max);
       led_off();
     }
 
