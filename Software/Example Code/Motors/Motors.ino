@@ -99,7 +99,7 @@ void setup() {
 
 void loop() {
 
-  Forward(OUT_AB, 150);
+  Forward(OUT_A, 150);
   delay(1500);
   Backward(OUT_AB, 150);
   delay(1500);
