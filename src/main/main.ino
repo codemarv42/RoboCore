@@ -3,7 +3,7 @@
 #include "hardware.h"
 #include "Wire.h"
 #include <time.h>
-
+//#include "color.h"
 /*
 copyright (c) ImmernochKeinName, 2023
 
@@ -40,6 +40,8 @@ void setup(){
   Serial.begin(115200);
   Serial.println("HardwareInit...");
   HardwareInit();
+  Serial.println("MPU-detection...");
+  setupMPU();
   Serial.println("Calibration...");
   calibrate(all_sensors, 3000, 3);
   Serial.print("White Left max: "); Serial.print(white.left.max); Serial.print(" - White Right max: "); Serial.println(white.right.max);
@@ -69,6 +71,7 @@ void loop() {
   for (auto sensor:all_sensors){ // read light values
     if (sensor != nullptr){sensor->read();}
   }
+  //color::update(&white, &green, &red);
   ////// LINE FOLLOWING //////
   #define diff_outer_factor 2 // Factor for the outer light 
   #define mul 1.5
@@ -76,7 +79,8 @@ void loop() {
   int16_t diff_outer = white.left_outer.value - white.right_outer.value;
   //if (abs(diff_outer) < 25){diff_outer = 0;} // set diff to 0 when no difference is recognised
   int16_t mot_diff = (diff + diff_outer*diff_outer_factor) * mul; 
-  //cache(mot_diff);
+  cache(mot_diff);
+  //if (color::on_black(RIGHT)){shift_register::write(SR_LED_L_RED, LOW);}
   #ifdef DEBUG
     Serial.print(white.left_outer.value);
     Serial.print(" ");
