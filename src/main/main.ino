@@ -16,7 +16,7 @@ view LICENSE.md for details
 // SPEED
 #define V 100
 #define DEBUG
-#define NOMOTORS
+//#define NOMOTORS
 
 bool HardwareInit(){
   /// get the shift register's Pins ///
@@ -29,6 +29,8 @@ bool HardwareInit(){
   return true;
 }
 LightSensor white = LightSensor(SR_PT_WHITE);
+LightSensor red = LightSensor(SR_PT_RED);
+LightSensor green = LightSensor(SR_PT_GREEN);
 // PUT LIGHT SENSORS HERE
 LightSensor* all_sensors[] = {&white,nullptr,nullptr,nullptr};
 
@@ -48,7 +50,7 @@ int16_t diff_cache[10] = {0};
 uint32_t timestamp = millis() + 100;
 uint8_t cache_index = 0;
 
-void clear_cache(){
+inline void clear_cache(){
   std::fill(std::begin(diff_cache), std::end(diff_cache), 0);
 }
 void cache(int16_t value){
@@ -66,13 +68,13 @@ void loop() {
   for (auto sensor:all_sensors){ // read light values
     if (sensor != nullptr){sensor->read();}
   }
- //Serial.print(white.right.value);
-  #define diff_outer_factor 2.5 // Factor for the outer light 
-  #define center_factor 0.1
-  #define mul 2
+  ////// LINE FOLLOWING //////
+  #define diff_outer_factor 1 // Factor for the outer light 
+  #define mul 1
   int16_t diff = white.left.value - white.right.value;
   int16_t diff_outer = white.left_outer.value - white.right_outer.value;
-  int16_t mot_diff = (diff + diff_outer*diff_outer_factor)*mul; //* center_factor * white.center.value;
+  if (abs(diff_outer) < 25){diff_outer = 0;} // set diff to 0 when no difference is recognised
+  int16_t mot_diff = (diff + diff_outer*diff_outer_factor) * mul; 
   cache(mot_diff);
   /*Serial.print(white.left.value);
   Serial.print(" ");
@@ -80,12 +82,8 @@ void loop() {
   Serial.print(" ");
   Serial.println(diff);*/
   #ifndef NOMOTORS
-    motor::fwd(A, V + mot_diff);
+    motor::fwd(A, (V + mot_diff)*1.2); // TODO: change both sides to be equal, when hardware-problem is solved
     motor::fwd(B, V - mot_diff);
-  #endif
-  // white.read();
-  //Serial.println(diff);
-  #ifndef NOMOTORS
-    delayMicroseconds(1000);
+    delayMicroseconds(300 + 180); // 500 Microseconds (320 + 3 * 60 LS) for 1 Loop -> 2000 reads/second
   #endif 
 }

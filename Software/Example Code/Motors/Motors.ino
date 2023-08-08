@@ -74,6 +74,10 @@ void Stop() {  //Stops all motors
   ShiftRegisterWrite(SR_STBY, LOW);
   digitalWrite(PWMA, LOW);
   digitalWrite(PWMB, LOW);
+  ShiftRegisterWrite(SR_AIN1, LOW);
+  ShiftRegisterWrite(SR_AIN2, LOW);
+  ShiftRegisterWrite(SR_BIN1, LOW);
+  ShiftRegisterWrite(SR_BIN2, LOW);
 }
 
 void Left(int v) {  //The robot is rotated to the left at a certain speed

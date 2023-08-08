@@ -8,7 +8,7 @@ void calibrate(LightSensor* sensors[],const int amount = CALIBRATION,const int t
 {
   for(int i = 0; i < amount; i++) {
     for(int j = 0; j < 4; j++) {
-      if (sensors[j] != NULL) {
+      if (sensors[j] != nullptr) {
         sensors[j]->calibrate_turn();
         
       }
