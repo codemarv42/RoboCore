@@ -2,7 +2,9 @@
 #define SHIFTREGISTER_CPP
 #include <Arduino.h>
 #include "Pins.h"
-#include "CD74HC4067.h"
+#include <CD74HC4067.h>
+
+CD74HC4067 ADCMULTI(S0, S1, S2, S3);
 
 namespace shift_register{
   bool shiftregister_bits[24] = {0};
@@ -39,7 +41,6 @@ namespace shift_register{
     }
   }
 }
-CD74HC4067 ADCMULTI(S0, S1, S2, S3);
 int ADCRead(int pin) {  //Reads out the inputs of the analog multiplexer
   ADCMULTI.channel(pin);
   delayMicroseconds(1);
