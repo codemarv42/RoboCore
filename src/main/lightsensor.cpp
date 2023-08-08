@@ -3,16 +3,18 @@
 
 #include "lightsensor.h"
 #include "Pins.h"
+#include "motor.h"
 
 void calibrate(LightSensor* sensors[],const int amount = CALIBRATION,const int time_between_read_ms = 3)
 {
+  //motor::fwd(AB,1);
   for(int i = 0; i < amount; i++) {
     for(int j = 0; j < 4; j++) {
       if (sensors[j] != nullptr) {
         sensors[j]->calibrate_turn();
         
       }
-      delay(time_between_read_ms);
+      //delay(time_between_read_ms);
     }
   }
 }

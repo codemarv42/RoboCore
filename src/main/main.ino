@@ -18,6 +18,7 @@ view LICENSE.md for details
 #define DEBUG
 //#define NOMOTORS
 
+
 bool HardwareInit(){
   /// get the shift register's Pins ///
   pinMode(SHCP, OUTPUT);
@@ -32,7 +33,7 @@ LightSensor white = LightSensor(SR_PT_WHITE);
 LightSensor red = LightSensor(SR_PT_RED);
 LightSensor green = LightSensor(SR_PT_GREEN);
 // PUT LIGHT SENSORS HERE
-LightSensor* all_sensors[] = {&white,nullptr,nullptr,nullptr};
+LightSensor* all_sensors[] = {&white,&green,&red,nullptr};
 
 void setup(){
 
@@ -40,7 +41,7 @@ void setup(){
   Serial.println("HardwareInit...");
   HardwareInit();
   Serial.println("Calibration...");
-  calibrate(all_sensors, 1000, 3);
+  calibrate(all_sensors, 3000, 3);
   Serial.print("White Left max: "); Serial.print(white.left.max); Serial.print(" - White Right max: "); Serial.println(white.right.max);
   Serial.print("White Left min: "); Serial.print(white.left.min); Serial.print(" - White Right min: "); Serial.println(white.right.min);
   delayMicroseconds(1000000);
@@ -69,21 +70,27 @@ void loop() {
     if (sensor != nullptr){sensor->read();}
   }
   ////// LINE FOLLOWING //////
-  #define diff_outer_factor 1 // Factor for the outer light 
-  #define mul 1
+  #define diff_outer_factor 2 // Factor for the outer light 
+  #define mul 1.5
   int16_t diff = white.left.value - white.right.value;
   int16_t diff_outer = white.left_outer.value - white.right_outer.value;
-  if (abs(diff_outer) < 25){diff_outer = 0;} // set diff to 0 when no difference is recognised
+  //if (abs(diff_outer) < 25){diff_outer = 0;} // set diff to 0 when no difference is recognised
   int16_t mot_diff = (diff + diff_outer*diff_outer_factor) * mul; 
-  cache(mot_diff);
-  /*Serial.print(white.left.value);
-  Serial.print(" ");
-  Serial.print(white.right.value);
-  Serial.print(" ");
-  Serial.println(diff);*/
+  //cache(mot_diff);
+  #ifdef DEBUG
+    Serial.print(white.left_outer.value);
+    Serial.print(" ");
+    Serial.print(white.left.value);
+    Serial.print(" ");
+    Serial.print(white.right.value);
+    Serial.print(" ");
+    Serial.print(white.right_outer.value);
+    Serial.print(" ");
+    Serial.println(mot_diff);
+  #endif
   #ifndef NOMOTORS
-    motor::fwd(A, (V + mot_diff)*1.2); // TODO: change both sides to be equal, when hardware-problem is solved
-    motor::fwd(B, V - mot_diff);
-    delayMicroseconds(300 + 180); // 500 Microseconds (320 + 3 * 60 LS) for 1 Loop -> 2000 reads/second
+    motor::fwd(A, ( V + mot_diff)); // TODO: change both sides to be equal, when hardware-problem is solved
+    motor::fwd(B, ( V - mot_diff)*1.2);
+    delayMicroseconds(100); // 
   #endif 
 }

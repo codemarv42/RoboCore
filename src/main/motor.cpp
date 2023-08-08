@@ -29,13 +29,17 @@ namespace motor{
     shift_register::write(SR_STBY, LOW);
     digitalWrite(PWMA, LOW);
     digitalWrite(PWMB, LOW);
+    shift_register::write(SR_AIN1, LOW);
+    shift_register::write(SR_AIN2, LOW);
+    shift_register::write(SR_BIN1, LOW);
+    shift_register::write(SR_BIN2, LOW);
   }
   void fwd(int motor,int v){
     if (v > 255){v = 255;}
     else if (v < -255){v = -255;}
     if (v == 0){stop(); return;}
     shift_register::write(SR_STBY, HIGH);
-    if (v >= 0) {
+    if (v > 0) {
       if (motor & A) {
         shift_register::write(SR_AIN1, LOW);
         shift_register::write(SR_AIN2, HIGH);
