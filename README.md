@@ -1,5 +1,7 @@
 # RoboCore
 
+<img src="https://github.com/codemarv42/RoboCore/blob/ImmernochKeinName/logo2.svg?raw=true" style="display:block; width: 80%; margin-right:auto; margin-left:auto;">
+
 The RoboCore is basically a dual PCB solution, which is mounted on a chassis and takes over the evaluation and control of sensors and motors. Furthermore, this project was created by several people to develop the best robot for the RoboCup in the Rescue Line division. 
 
 ![RoboCore V1](https://github.com/codemarv42/RoboCore/blob/main/Hardware/Arche-RoboCore%20V1/Arche-RoboCore_10.png?raw=true)
