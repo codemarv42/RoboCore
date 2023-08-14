@@ -1,0 +1,15 @@
+<svg width="200" height="50" xmlns="http://www.w3.org/2000/svg">
+	<polygon points="0,0 0,50 10,50 10,0" />
+	<polygon points="40,0 40,50 50,50 50,0" />
+	<polygon points="0,0 0,10 40,50 50,50 50,40 10,0" />
+
+	<polygon points="60,50 140,50 140,38 60,38" />
+	<polygon points="60,0 60,10 100,50 110,50 110,40 70,0" />
+	<polygon points="140,0 130,0 90,40 90,50 100,50 140,10" />
+
+	<polygon points="150,0 150,50 160,50 160,0" />
+	<polygon points="190,0 190,50 200,50 200,0" />
+	<polygon points="200,0 190,0 150,40 150,50 160,50 200,10" />
+
+	<polygon points="80,0 100,20 120,0" style="fill:rgb(0,180,0);"/>
+</svg>
