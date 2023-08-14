@@ -3,6 +3,7 @@
 
 #include <Arduino.h>
 #include "Pins.h"
+#include "gyro.h"
 #include "shiftregister.h"
 #include <MPU6050_light.h>
 #include <Wire.h>
@@ -11,37 +12,6 @@
 #define B 2
 #define AB 3
 
-MPU6050 mpu(Wire);
-
-bool setupMPU(){
-  byte status = mpu.begin();
-  if(status != 0){
-    Serial.println(F("Fail to detect MPU6050!"));
-    return false;
-  }else{
-    Serial.println(F("Found MPU6050"));
-    Serial.println(F("While calculating the offsets value, do not move the MPU6050 sensor!"));
-    delay(500);
-    mpu.calcOffsets();
-    Serial.println("Done!\n");
-    return true;
-  }
-}
-
-inline int limit(int value, int max){
-  if (abs(value) > max){return max - 2*max*int(value < 0);}
-  return value;
-}
-
-inline float limit(float value, float max){
-  if (abs(value) > max){return max - 2*max*int(value < 0);}
-  return value;
-}
-
-inline float limit(float value, int max){
-  if (abs(value) > max){return float(max - 2*max*int(value < 0));}
-  return value;
-}
 
 namespace motor{
   void stop(){

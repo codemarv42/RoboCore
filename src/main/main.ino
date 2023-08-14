@@ -41,7 +41,7 @@ void setup(){
   Serial.println("HardwareInit...");
   HardwareInit();
   Serial.println("MPU-detection...");
-  setupMPU();
+  //setupMPU();
   Serial.println("Calibration...");
   calibrate(all_sensors, 3000, 3);
   Serial.print("White Left max: "); Serial.print(white.left.max); Serial.print(" - White Right max: "); Serial.println(white.right.max);

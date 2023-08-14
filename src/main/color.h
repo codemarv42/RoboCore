@@ -8,7 +8,7 @@
 
 #define GREEN_THRESHOLD 10
 #define BLACK_THRESHOLD 15
-
+/*
 namespace color{
   struct ColorCount{
     uint8_t left = 0;
@@ -54,5 +54,5 @@ namespace color{
     }
     //TODO: Add Red recog
   }
-}
+}*/
 #endif

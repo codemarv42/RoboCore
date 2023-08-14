@@ -25,7 +25,7 @@ bool MPU6050Init() {  //Initalizes the Gyro Sensor (MPU6050)
     Serial.println(F("While calculating the offsets value, do not move the MPU6050 sensor!"));
     delay(500);
     mpu.calcOffsets();
-    Serial.println("Done!\n");
+    Serial.println("...Done!\n");
   }
   return true;
 }
