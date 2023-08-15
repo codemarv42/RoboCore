@@ -1,5 +1,6 @@
 #include <Arduino.h>
 #include "Pins.h"
+#include "gyro.h"
 #include "MPU6050_light.h"
 #include "Wire.h"
 

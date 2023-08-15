@@ -95,6 +95,6 @@ void loop() {
   #ifndef NOMOTORS
     motor::fwd(A, ( V + mot_diff)); // TODO: change both sides to be equal, when hardware-problem is solved
     motor::fwd(B, ( V - mot_diff)*1.2);
-    delayMicroseconds(100); // 
+    delayMicroseconds(100); // about 3000 measurements per second
   #endif 
 }

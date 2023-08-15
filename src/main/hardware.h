@@ -4,7 +4,7 @@
 // This header includes all hardware related code
 #include "lightsensor.h"
 #include "shiftregister.h"
-// #include "gyro.cpp"
+#include "gyro.h"
 #include "motor.h"
 
 #endif
