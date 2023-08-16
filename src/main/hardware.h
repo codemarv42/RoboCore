@@ -6,5 +6,7 @@
 #include "shiftregister.h"
 #include "gyro.h"
 #include "motor.h"
+#include "claw.h"
+
 
 #endif

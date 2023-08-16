@@ -13,21 +13,27 @@ namespace claw{
   }
 
   void down(){
-    lift.write(20);
+    lift.write(180);
+    //lift.writeMicroseconds(2800);
+    delay(2000);
   }
   void up(){
-    lift.write(180);
+    lift.write(70);
+    delay(2000);
   }
   void half(){
-    lift.write(90);
+    lift.write(180);
+    delay(2000);
   }
 
   void close(){
     grab.write(0);
+    delay(1000);
   }
 
   void open(){
     grab.write(180);
+    delay(1000);
   }
 }
 
