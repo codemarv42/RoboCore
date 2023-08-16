@@ -95,4 +95,8 @@
 #define OLED_ADRESS      0x3C
 #define TOF_ADRESS       0x29
 
+#define LEFT 1
+#define RIGHT 2
+
 #endif
+
