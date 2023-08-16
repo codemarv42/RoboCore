@@ -3,7 +3,8 @@
 #include "hardware.h"
 #include "Wire.h"
 #include <time.h>
-//#include "color.h"
+#include "color.h"
+
 /*
 copyright (c) ImmernochKeinName, 2023
 
@@ -14,16 +15,19 @@ view LICENSE.md for details
 
 
 // SPEED
-#define V 100
+#define V 200
 #define DEBUG
-//#define NOMOTORS
-
+#define NOMOTORS
+#define LF_ACTIVE
 
 bool HardwareInit(){
   /// get the shift register's Pins ///
+  claw::setup();
   pinMode(SHCP, OUTPUT);
   pinMode(STCP, OUTPUT);
   pinMode(DS, OUTPUT);
+  pinMode(T_L, INPUT);
+  pinMode(T_R, INPUT);
 
   shift_register::reset(); /// set all values to LOW
   Wire.begin();
@@ -47,6 +51,8 @@ void setup(){
   Serial.print("White Left max: "); Serial.print(white.left.max); Serial.print(" - White Right max: "); Serial.println(white.right.max);
   Serial.print("White Left min: "); Serial.print(white.left.min); Serial.print(" - White Right min: "); Serial.println(white.right.min);
   delayMicroseconds(1000000);
+  motor::gyro(AB, V/2, 90);
+  motor::stop();
 }
 
 int16_t diff_cache[10] = {0};
@@ -71,30 +77,41 @@ void loop() {
   for (auto sensor:all_sensors){ // read light values
     if (sensor != nullptr){sensor->read();}
   }
-  //color::update(&white, &green, &red);
+  color::update(&white, &green, &red);
   ////// LINE FOLLOWING //////
-  #define diff_outer_factor 2 // Factor for the outer light 
-  #define mul 1.5
-  int16_t diff = white.left.value - white.right.value;
-  int16_t diff_outer = white.left_outer.value - white.right_outer.value;
-  //if (abs(diff_outer) < 25){diff_outer = 0;} // set diff to 0 when no difference is recognised
-  int16_t mot_diff = (diff + diff_outer*diff_outer_factor) * mul; 
-  cache(mot_diff);
-  //if (color::on_black(RIGHT)){shift_register::write(SR_LED_L_RED, LOW);}
-  #ifdef DEBUG
-    Serial.print(white.left_outer.value);
-    Serial.print(" ");
-    Serial.print(white.left.value);
-    Serial.print(" ");
-    Serial.print(white.right.value);
-    Serial.print(" ");
-    Serial.print(white.right_outer.value);
-    Serial.print(" ");
-    Serial.println(mot_diff);
+  #ifdef LF_ACTIVE
+    #define diff_outer_factor 2.2 // Factor for the outer light 
+    #define mul 3
+    int16_t diff = white.left.value - white.right.value;
+    int16_t diff_outer = white.left_outer.value - white.right_outer.value;
+    if (abs(diff_outer) < 25){diff_outer = 0;} // set diff to 0 when no difference is recognised
+    int16_t mot_diff = (diff*1.4 + diff_outer*diff_outer_factor) * mul; 
+    cache(mot_diff);
+    //shift_register::write(SR_LED_R_GREEN, !bool(color::on_green(RIGHT)));
+    //shift_register::write(SR_LED_L_GREEN, !bool(color::on_green(LEFT)));
+    #ifdef DEBUG
+      Serial.print(white.left_outer.value);
+      Serial.print(" ");
+      Serial.print(white.left.value);
+      Serial.print(" ");
+      Serial.print(white.right.value);
+      Serial.print(" ");
+      Serial.print(white.right_outer.value);
+      Serial.print(" ");
+      Serial.println(mot_diff);
+    #endif
+    #ifndef NOMOTORS
+      motor::fwd(A, ( V + mot_diff)); // TODO: change both sides to be equal, when hardware-problem is solved
+      motor::fwd(B, ( V - mot_diff)*1.2);
+      delayMicroseconds(100); // about 3000 measurements per second
+    #endif
   #endif
-  #ifndef NOMOTORS
-    motor::fwd(A, ( V + mot_diff)); // TODO: change both sides to be equal, when hardware-problem is solved
-    motor::fwd(B, ( V - mot_diff)*1.2);
-    delayMicroseconds(100); // about 3000 measurements per second
-  #endif 
+  
+  /*claw::down(); 
+  claw::open();
+  claw::close();
+  claw::half();
+  claw::up();*/
+  //shift_register::write(SR_LED_L_RED,bool(digitalRead(T_L)));
+  //shift_register::write(SR_LED_R_RED,bool(digitalRead(T_R)));
 }
