@@ -58,10 +58,17 @@ namespace motor{
     fwd(motor, -v);
   }
   void gyro(int motor, int v, uint16_t deg){
-    mpu.
+    //mpu.
     mpu.calcGyroOffsets();
-    fwd(A, v*(deg/abs(deg)));
-    fwd(B, -v*(deg/abs(deg)));
+    //deg += mpu.getAngleZ(); // 'reset' the Z axis
+    if (deg < 0){
+      fwd(A, v);
+      fwd(B, -v);
+    }
+    else{
+      fwd(A, -v);
+      fwd(B, v);
+    }
     while (mpu.getAngleZ() < deg){
       mpu.update();
       delay(1);
