@@ -18,7 +18,8 @@ view LICENSE.md for details
 #define V 200
 #define DEBUG
 #define NOMOTORS
-#define LF_ACTIVE
+#define LED_TEST
+//#define LF_ACTIVE
 
 bool HardwareInit(){
   /// get the shift register's Pins ///
@@ -40,19 +41,33 @@ LightSensor green = LightSensor(SR_PT_GREEN);
 LightSensor* all_sensors[] = {&white,&green,&red,nullptr};
 
 void setup(){
-
   Serial.begin(115200);
   Serial.println("HardwareInit...");
   HardwareInit();
   Serial.println("MPU-detection...");
-  //setupMPU();
+  gyro::MPU6050Init();
+  Serial.println("Resetting Claw...");
+  claw::up(); // reset the claw
+  claw::close();
   Serial.println("Calibration...");
   calibrate(all_sensors, 3000, 3);
   Serial.print("White Left max: "); Serial.print(white.left.max); Serial.print(" - White Right max: "); Serial.println(white.right.max);
   Serial.print("White Left min: "); Serial.print(white.left.min); Serial.print(" - White Right min: "); Serial.println(white.right.min);
   delayMicroseconds(1000000);
-  motor::gyro(AB, V/2, 90);
+  //motor::gyro(AB, V/2, 90);
   motor::stop();
+
+  #ifdef LED_TEST
+    shift_register::write(SR_PT_WHITE, HIGH);
+    delay(2000);
+    shift_register::write(SR_PT_WHITE, LOW);
+    shift_register::write(SR_PT_GREEN, HIGH);
+    delay(2000);
+    shift_register::write(SR_PT_GREEN, LOW);
+    shift_register::write(SR_PT_RED, HIGH);
+    delay(2000);
+    shift_register::write(SR_PT_RED, LOW);
+  #endif
 }
 
 int16_t diff_cache[10] = {0};
@@ -78,6 +93,8 @@ void loop() {
     if (sensor != nullptr){sensor->read();}
   }
   color::update(&white, &green, &red);
+  shift_register::write(SR_LED_R_GREEN, !bool(color::on_green(RIGHT)));
+  shift_register::write(SR_LED_L_GREEN, !bool(color::on_green(LEFT)));
   ////// LINE FOLLOWING //////
   #ifdef LF_ACTIVE
     #define diff_outer_factor 2.2 // Factor for the outer light 
@@ -86,9 +103,8 @@ void loop() {
     int16_t diff_outer = white.left_outer.value - white.right_outer.value;
     if (abs(diff_outer) < 25){diff_outer = 0;} // set diff to 0 when no difference is recognised
     int16_t mot_diff = (diff*1.4 + diff_outer*diff_outer_factor) * mul; 
-    cache(mot_diff);
-    //shift_register::write(SR_LED_R_GREEN, !bool(color::on_green(RIGHT)));
-    //shift_register::write(SR_LED_L_GREEN, !bool(color::on_green(LEFT)));
+    cache(mot_diff); // cache W.I.P.
+    
     #ifdef DEBUG
       Serial.print(white.left_outer.value);
       Serial.print(" ");
@@ -107,6 +123,7 @@ void loop() {
     #endif
   #endif
   
+  //motor::gyro(AB, V, 90);
   /*claw::down(); 
   claw::open();
   claw::close();
