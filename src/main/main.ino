@@ -49,14 +49,6 @@ void setup(){
   Serial.println("Resetting Claw...");
   claw::up(); // reset the claw
   claw::close();
-  Serial.println("Calibration...");
-  calibrate(all_sensors, 3000, 3);
-  Serial.print("White Left max: "); Serial.print(white.left.max); Serial.print(" - White Right max: "); Serial.println(white.right.max);
-  Serial.print("White Left min: "); Serial.print(white.left.min); Serial.print(" - White Right min: "); Serial.println(white.right.min);
-  delayMicroseconds(1000000);
-  //motor::gyro(AB, V/2, 90);
-  motor::stop();
-
   #ifdef LED_TEST
     shift_register::write(SR_PT_WHITE, HIGH);
     delay(2000);
@@ -68,6 +60,13 @@ void setup(){
     delay(2000);
     shift_register::write(SR_PT_RED, LOW);
   #endif
+  Serial.println("Calibration...");
+  calibrate(all_sensors, 3000, 3);
+  Serial.print("White Left max: "); Serial.print(white.left.max); Serial.print(" - White Right max: "); Serial.println(white.right.max);
+  Serial.print("White Left min: "); Serial.print(white.left.min); Serial.print(" - White Right min: "); Serial.println(white.right.min);
+  delayMicroseconds(1000000);
+  //motor::gyro(AB, V/2, 90);
+  motor::stop();
 }
 
 int16_t diff_cache[10] = {0};

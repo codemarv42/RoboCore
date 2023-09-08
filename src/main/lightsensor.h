@@ -60,7 +60,7 @@ class LightSensor{
       this->center.min = min(this->center.min, current_value);
       
       current_value = ADCRead(ADC_PT_R_0);
-      Serial.println(ADCRead(ADC_PT_R_0));
+      //Serial.println(ADCRead(ADC_PT_R_0));
       this->right.max = max(this->right.max, current_value);
       this->right.min = min(this->right.min, current_value);
       

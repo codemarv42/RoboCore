@@ -4,7 +4,7 @@
 #include <Arduino.h>
 #include "lightsensor.h"
 
-#define GREEN_THRESHOLD 25
+#define GREEN_THRESHOLD 15
 #define BLACK_THRESHOLD 15
 
 namespace color{
@@ -40,7 +40,7 @@ namespace color{
       black.right--;
     }
 
-    if (s_green->left_outer.value - s_red->left_outer.value > GREEN_THRESHOLD){
+    if (s_green->left_outer.value - s_red->left_outer.value*1.2 > GREEN_THRESHOLD){
       if (green.left < check_length){
         green.left++;
       }
