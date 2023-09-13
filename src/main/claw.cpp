@@ -18,7 +18,7 @@ namespace claw{
     delay(2000);
   }
   void up(){
-    lift.write(70);
+    lift.write(30);
     delay(2000);
   }
   void half(){
