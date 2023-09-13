@@ -10,9 +10,9 @@
 
 
 struct SensorData{
-  uint16_t min=0xFFFF; // max value vor a 16-Bit integer in Hexadecimal
-  uint16_t max=0;
-  uint16_t value=0;
+  int16_t min=0xFFFF; // max value vor a 16-Bit integer in Hexadecimal
+  int16_t max=0;
+  int16_t value=0;
 };
 
 /*inline uint16_t map(uint16_t value, uint16_t fromlow, uint16_t tolow, uint16_t tohigh){
@@ -27,8 +27,8 @@ class LightSensor{
       delayMicroseconds(60);
     }
     void led_off(){
+      delayMicroseconds(20);
       shift_register::write(this->led_pin, LOW);
-      //delayMicroseconds(40);
     }
 
     inline int16_t map(int16_t value, int16_t minv, int16_t maxv){
@@ -47,7 +47,7 @@ class LightSensor{
     void calibrate_turn(){
       led_on();
       //delayMicroseconds(20);
-      uint16_t current_value = ADCRead(ADC_PT_L_1); // TODO: change part of the ifs to else ifs
+      int16_t current_value = ADCRead(ADC_PT_L_1); // TODO: change part of the ifs to else ifs
       this->left_outer.max = max(this->left_outer.max, current_value);
       this->left_outer.min = min(this->left_outer.min, current_value);
       
