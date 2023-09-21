@@ -12,7 +12,7 @@ namespace motor {
 extern void stop();
 extern void fwd(int motor, int v);
 extern void rev(int motor, int v);
-extern void gyro(int motor, int v, uint16_t deg);
+extern void gyro(int v, int16_t deg);
 }
 //extern void setupMPU();
 #endif

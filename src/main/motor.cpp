@@ -57,9 +57,10 @@ namespace motor{
   void rev(int motor, int v){
     fwd(motor, -v);
   }
-  void gyro(int motor, int v, uint16_t deg){
+  void gyro(int v, int16_t deg){
     //mpu.
-    mpu.calcGyroOffsets();
+    gyro::ResetZAngle();
+
     //deg += mpu.getAngleZ(); // 'reset' the Z axis
     if (deg < 0){
       fwd(A, v);
