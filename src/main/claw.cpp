@@ -3,6 +3,8 @@
 #include <ESP32Servo.h>
 #include "Pins.h"
 
+// claw pins: grab - 16 lift - 18
+
 namespace claw{
   Servo grab;
   Servo lift;
