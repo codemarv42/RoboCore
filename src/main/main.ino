@@ -29,6 +29,7 @@ bool HardwareInit(){
   pinMode(DS, OUTPUT);
   pinMode(T_L, INPUT);
   pinMode(T_R, INPUT);
+  pinMode(T_M, INPUT);
 
   shift_register::reset(); /// set all values to LOW
   Wire.begin();
@@ -122,8 +123,19 @@ void loop() {
     #endif
   #endif
   
-  //motor::gyro(AB, V, 90);
-  /*claw::down(); 
+  if(digitalRead(T_M) == LOW){ // rescue kit detected
+    motor::rev(AB, V);
+    delay(1000);
+    motor::stop();
+    claw::open();
+    claw::down();
+    motor::fwd(AB, V);
+    delay(600);
+    motor::stop();
+    claw::close();
+    claw::up();
+  }
+  /*
   claw::open();
   claw::close();
   claw::half();
