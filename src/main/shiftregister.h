@@ -8,4 +8,5 @@ namespace shift_register{
   extern void write(int pin,bool state);
 }
 extern int ADCRead(int pin);
+extern bool ADCDigitalRead(int pin);
 #endif

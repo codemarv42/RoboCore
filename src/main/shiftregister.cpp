@@ -43,10 +43,14 @@ namespace shift_register{
 }
 int ADCRead(int pin) {  //Reads out the inputs of the analog multiplexer
   ADCMULTI.channel(pin);
-  delayMicroseconds(1);
+  delayMicroseconds(2);
   return analogRead(ADC_MULTI);
 }
-
+bool ADCDigitalRead(int pin){
+  ADCMULTI.channel(pin);
+  delayMicroseconds(2);
+  return digitalRead(ADC_MULTI);
+}
 
 
 #endif
