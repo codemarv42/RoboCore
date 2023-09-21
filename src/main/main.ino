@@ -16,10 +16,10 @@ view LICENSE.md for details
 
 // SPEED
 #define V 200
-#define DEBUG
-#define NOMOTORS
-#define LED_TEST
-//#define LF_ACTIVE
+//#define DEBUG
+//#define NOMOTORS
+//#define LED_TEST
+#define LF_ACTIVE
 
 bool HardwareInit(){
   /// get the shift register's Pins ///
@@ -27,7 +27,7 @@ bool HardwareInit(){
   pinMode(SHCP, OUTPUT);
   pinMode(STCP, OUTPUT);
   pinMode(DS, OUTPUT);
-  pinMode(T_L, INPUT);
+  pinMode(T_L, INPUT_PULLUP);
   pinMode(T_R, INPUT);
   pinMode(T_M, INPUT);
 
@@ -36,10 +36,10 @@ bool HardwareInit(){
   return true;
 }
 LightSensor white = LightSensor(SR_PT_WHITE);
-LightSensor red = LightSensor(SR_PT_RED);
+LightSensor red   = LightSensor(SR_PT_RED);
 LightSensor green = LightSensor(SR_PT_GREEN);
 // PUT LIGHT SENSORS HERE
-LightSensor* all_sensors[] = {&white,&green,&red,nullptr};
+LightSensor* all_sensors[] = {&white,&green,&red,nullptr};  // nullptr is placeholder for an (optional) blue LightSensor
 
 void setup(){
   Serial.begin(115200);
@@ -92,7 +92,7 @@ void loop() {
   for (auto sensor:all_sensors){ // read light values
     if (sensor != nullptr){sensor->read();}
   }
-  color::update(&white, &green, &red);
+  color::update(&white, &green, &red);  // update color checking
   shift_register::write(SR_LED_R_GREEN, !bool(color::on_green(RIGHT)));
   shift_register::write(SR_LED_L_GREEN, !bool(color::on_green(LEFT)));
   ////// LINE FOLLOWING //////
@@ -102,10 +102,11 @@ void loop() {
     int16_t diff = white.left.value - white.right.value;
     int16_t diff_outer = white.left_outer.value - white.right_outer.value;
     if (abs(diff_outer) < 25){diff_outer = 0;} // set diff to 0 when no difference is recognised
-    int16_t mot_diff = (diff*1.4 + diff_outer*diff_outer_factor) * mul; 
+    int16_t mot_diff = (diff*1.4 + diff_outer*diff_outer_factor) * mul;  // calculate inner to outer mult 
     cache(mot_diff); // cache W.I.P.
     
-    #ifdef DEBUG
+    #ifdef DEBUG  // Debug light values
+      Serial.print("White: ");
       Serial.print(white.left_outer.value);
       Serial.print(" ");
       Serial.print(white.left.value);
@@ -114,7 +115,26 @@ void loop() {
       Serial.print(" ");
       Serial.print(white.right_outer.value);
       Serial.print(" ");
+      Serial.print("Green: ");
+      Serial.print(green.left_outer.value);
+      Serial.print(" ");
+      Serial.print(green.left.value);
+      Serial.print(" ");
+      Serial.print(green.right.value);
+      Serial.print(" ");
+      Serial.print(green.right_outer.value);
+      Serial.print(" ");
+      Serial.print("Red: ");
+      Serial.print(red.left_outer.value);
+      Serial.print(" ");
+      Serial.print(red.left.value);
+      Serial.print(" ");
+      Serial.print(red.right.value);
+      Serial.print(" ");
+      Serial.print(red.right_outer.value);
+      Serial.print(" ");
       Serial.println(mot_diff);
+      //delay(200);
     #endif
     #ifndef NOMOTORS
       motor::fwd(A, ( V + mot_diff)); // TODO: change both sides to be equal, when hardware-problem is solved
@@ -123,6 +143,7 @@ void loop() {
     #endif
   #endif
   
+  ////// RESCUE-KIT //////
   if(digitalRead(T_M) == LOW){ // rescue kit detected
     motor::rev(AB, V);
     delay(1000);
@@ -135,11 +156,16 @@ void loop() {
     claw::close();
     claw::up();
   }
-  /*
-  claw::open();
-  claw::close();
-  claw::half();
-  claw::up();*/
+
   //shift_register::write(SR_LED_L_RED,bool(digitalRead(T_L)));
   //shift_register::write(SR_LED_R_RED,bool(digitalRead(T_R)));
+  ////// OBSTACLE HANDLING //////
+  if (!(bool(digitalRead(T_L)) || bool(digitalRead(T_R)))){
+    motor::rev(AB, V);
+    delay(500);
+    motor::stop();
+    delay(500);
+    motor::gyro(V, 90);
+    // TODO MAKE THIS READY
+  }
 }
