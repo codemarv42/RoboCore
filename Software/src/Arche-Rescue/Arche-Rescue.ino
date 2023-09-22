@@ -7,7 +7,7 @@ Robot robot = Robot();
 
 void setup() {
   Serial.begin(115200);
-  robot.run();
+  robot.init();
 }
 
 void loop() {

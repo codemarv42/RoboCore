@@ -1,3 +1,4 @@
+#include "Arduino.h"
 #include "robot.h"
 
 #include "button_sensor.h"
@@ -15,7 +16,11 @@
 #include "pc_show.h"
 #include "display_show.h"
 
-
+void Robot::init() {
+  pinMode(2, OUTPUT);
+  digitalWrite(2, HIGH);
+  return;
+}
 
 void Robot::run() {
 
@@ -27,10 +32,6 @@ void Robot::run() {
 
   Robot::running = false;
   
-  return;
-}
-
-void Robot::init() {
   return;
 }
 
