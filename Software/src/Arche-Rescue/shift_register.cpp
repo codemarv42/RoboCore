@@ -1,4 +1,5 @@
-#include "Pins.h"
+#include <my_pins.h>
+
 
 bool ShiftRegisterBits[24] = { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 };
 
@@ -30,38 +31,8 @@ void ShiftRegisterReset() {  //Sets all pins of the shift register to LOW
   digitalWrite(STCP, HIGH);
 }
 
-void setup() {
-
+void ShiftRegisterInit() {
   pinMode(SHCP, OUTPUT);
   pinMode(STCP, OUTPUT);
   pinMode(DS, OUTPUT);
-}
-
-void loop() {
-
-  ShiftRegisterWrite(SR_LED_L_RED, HIGH);
-  delay(500);
-  ShiftRegisterWrite(SR_LED_L_GREEN, HIGH);
-  delay(500);
-  ShiftRegisterWrite(SR_LED_L_BLUE, HIGH);
-  delay(500);
-  ShiftRegisterWrite(SR_LED_R_RED, HIGH);
-  delay(500);
-  ShiftRegisterWrite(SR_LED_R_GREEN, HIGH);
-  delay(500);
-  ShiftRegisterWrite(SR_LED_R_BLUE, HIGH);
-  delay(500);
-
-  ShiftRegisterWrite(SR_LED_L_RED, LOW);
-  delay(500);
-  ShiftRegisterWrite(SR_LED_L_GREEN, LOW);
-  delay(500);
-  ShiftRegisterWrite(SR_LED_L_BLUE, LOW);
-  delay(500);
-  ShiftRegisterWrite(SR_LED_R_RED, LOW);
-  delay(500);
-  ShiftRegisterWrite(SR_LED_R_GREEN, LOW);
-  delay(500);
-  ShiftRegisterWrite(SR_LED_R_BLUE, LOW);
-  delay(500);
 }
