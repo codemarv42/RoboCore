@@ -3,11 +3,11 @@
         {
             "name": "Win32",
             "includePath": [
+                "D:/Users/Zockni/AppData/Local/Arduino15/packages/esp32/hardware/esp32/2.0.11/cores/esp32",
                 "${workspaceFolder}/**",
                 "D:/Users/Zockni/AppData/Local/Arduino15/packages/esp32/hardware/esp32/2.0.11/libraries/EEPROM/src",
                 "D:/Users/Zockni/AppData/Local/Arduino15/packages/esp32/hardware/esp32/2.0.11/libraries/SPI/src",
-                "D:/Users/Zockni/AppData/Local/Arduino15/packages/esp32/hardware/esp32/2.0.11/libraries/Wire/src",
-                "D:/Users/Zockni/AppData/Local/Arduino15/packages/esp32/hardware/esp32/2.0.11/cores/esp32"
+                "D:/Users/Zockni/AppData/Local/Arduino15/packages/esp32/hardware/esp32/2.0.11/libraries/Wire/src"
             ],
             "defines": [
                 "_DEBUG",
