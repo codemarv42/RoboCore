@@ -17,7 +17,7 @@ view LICENSE.md for details
 // SPEED
 #define V 200
 //#define DEBUG
-//#define NOMOTORS
+#define NOMOTORS
 //#define LED_TEST
 #define LF_ACTIVE
 
@@ -45,6 +45,7 @@ void setup(){
   Serial.begin(115200);
   Serial.println("HardwareInit...");
   HardwareInit();
+  DisplayInit();
   Serial.println("MPU-detection...");
   gyro::MPU6050Init();
   Serial.println("Resetting Claw...");
@@ -85,6 +86,7 @@ void cache(int16_t value){
     #ifdef DEBUG
       Serial.println("Cached");
     #endif
+    showDifference(value, "D", true);
   }
 }
 
@@ -168,4 +170,5 @@ void loop() {
     motor::gyro(V, 90);
     // TODO MAKE THIS READY
   }
+  //showDifference(diff, "D", true);
 }

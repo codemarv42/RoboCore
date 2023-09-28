@@ -7,6 +7,7 @@
 #include "gyro.h"
 #include "motor.h"
 #include "claw.h"
+#include "menu.h"
 
 
 #endif
