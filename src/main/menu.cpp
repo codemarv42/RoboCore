@@ -15,5 +15,17 @@ Adafruit_SSD1306 display(SCREEN_WIDTH, SCREEN_HEIGHT, &Wire, OLED_RESET);
 #define _ 0x00
 #define Q 0xFF
 
+void DisplayInit(){
+if (!display.begin(SSD1306_SWITCHCAPVCC, OLED_ADRESS)) {
+    Serial.println(F("SSD1306 allocation failed!"));
+  }
+  display.display();
+  display.clearDisplay();
 
+  display.setTextSize(2);
+  display.setTextColor(SSD1306_WHITE);
+  display.setCursor(18, 19);
+  display.println(F("RoboCore"));
+  display.display();
+}
 
