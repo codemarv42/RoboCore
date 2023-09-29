@@ -19,6 +19,8 @@
 
 #include "shift_register.h"
 
+#include <CD74HC4067.h>
+
 
 Button_sensor Button_sensor_L = Button_sensor(T_L);
 Button_sensor Button_sensor_M = Button_sensor(T_M);
