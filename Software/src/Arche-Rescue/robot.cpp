@@ -20,9 +20,9 @@
 #include "shift_register.h"
 
 
-ButtonSensor ButtonL = ButtonSensor(T_L);
-ButtonSensor ButtonM = ButtonSensor(T_M);
-ButtonSensor ButtonR = ButtonSensor(T_R);
+Button_sensor Button_sensor_L = Button_sensor(T_L);
+Button_sensor Button_sensor_M = Button_sensor(T_M);
+Button_sensor Button_sensor_R = Button_sensor(T_R);
 
 
 void Robot::init() {
