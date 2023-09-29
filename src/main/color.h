@@ -40,7 +40,7 @@ namespace color{
       black.right--;
     }
 
-    if (s_green->left_outer.value - s_red->left_outer.value*1.2 > GREEN_THRESHOLD){
+    if (s_green->left.value - s_red->left.value*1.2 > GREEN_THRESHOLD){
       if (green.left < check_length){
         green.left++;
       }
@@ -49,7 +49,7 @@ namespace color{
       green.left--;
     }
 
-    if (s_green->right_outer.value - s_red->right_outer.value > GREEN_THRESHOLD){
+    if (s_green->right.value - s_red->right.value > GREEN_THRESHOLD){
       if (green.right < check_length){
         green.right++;
       }
