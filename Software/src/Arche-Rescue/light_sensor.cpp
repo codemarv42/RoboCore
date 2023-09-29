@@ -22,6 +22,6 @@ void Light_sensor::on(){
 }
 
 int Light_sensor::measure(){
-    raw = 0;
+    raw = analogRead(pin);
     return raw;
 }
