@@ -4,14 +4,14 @@
 #include <Arduino.h>
 
 
-class Button {
+class ButtonSensor {
     
     private:
         int pinButton;
         bool stateButton = LOW;
 
     public:
-        Button(int pinButton);
+        ButtonSensor(int pinButton);
 
         void init();
         bool state();

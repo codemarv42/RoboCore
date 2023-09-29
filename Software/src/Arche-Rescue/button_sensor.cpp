@@ -3,15 +3,15 @@
 #include "button_sensor.h"
 
 
-Button::Button(int pinButton) {
+ButtonSensor::ButtonSensor(int pinButton) {
     this->pinButton = pinButton;
 }
 
-void Button::init() {
+void ButtonSensor::init() {
     pinMode(pinButton, INPUT);
 }
 
-bool Button::state() {
+bool ButtonSensor::state() {
     stateButton = digitalRead(pinButton);
     return stateButton;
 }

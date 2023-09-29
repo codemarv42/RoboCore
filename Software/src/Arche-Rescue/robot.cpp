@@ -19,10 +19,21 @@
 
 #include "shift_register.h"
 
+
+ButtonSensor ButtonL = ButtonSensor(T_L);
+ButtonSensor ButtonM = ButtonSensor(T_M);
+ButtonSensor ButtonR = ButtonSensor(T_R);
+
+
 void Robot::init() {
+
   ShiftRegisterInit();
   ShiftRegisterReset();
-  // ShiftRegisterWrite(SR_PT_WHITE, HIGH);
+
+  ButtonL.init();
+  ButtonM.init();
+  ButtonR.init();
+
   return;
 }
 
@@ -30,8 +41,13 @@ void Robot::run() {
 
   Robot::running = true;
 
+
+
   while (true) {
-    
+
+    if (ButtonL.state()) ShiftRegisterWrite(SR_PT_WHITE, 1);
+    else ShiftRegisterWrite(SR_PT_WHITE, 0);
+
   }
 
   Robot::running = false;
