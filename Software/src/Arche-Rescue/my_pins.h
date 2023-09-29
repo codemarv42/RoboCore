@@ -10,11 +10,11 @@
 #define ADC_MULTI        39
 
 #define ADC_PT_REF_L     0
-#define ADC_PT_L_1       1
-#define ADC_PT_L_0       2
+#define ADC_PT_L1       1
+#define ADC_PT_L0       2
 #define ADC_PT_M         3
-#define ADC_PT_R_0       4
-#define ADC_PT_R_1       5
+#define ADC_PT_R0       4
+#define ADC_PT_R1       5
 #define ADC_PT_REF_R     6
 #define ADC_PT_RGB       7
 #define ADC_AE1          8  //External Analog Input

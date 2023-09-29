@@ -9,7 +9,7 @@ class  Light_sensor{
     int raw;
   
   public:
-    LightSensor(int pin, int upper_limit);
+    Light_sensor(int pin, int upper_limit);
     int upper_limit;
 
     void init();

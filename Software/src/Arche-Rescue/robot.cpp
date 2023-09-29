@@ -24,6 +24,15 @@ ButtonSensor ButtonL = ButtonSensor(T_L);
 ButtonSensor ButtonM = ButtonSensor(T_M);
 ButtonSensor ButtonR = ButtonSensor(T_R);
 
+Light_sensor Light_sensor_REF_L = Light_sensor(ADC_PT_REF_L);
+Light_sensor Light_sensor_L1 = Light_sensor(ADC_PT_L1);
+Light_sensor Light_sensor_L0 = Light_sensor(ADC_PT_L0);
+Light_sensor Light_sensor_M = Light_sensor(ADC_PT_M);
+Light_sensor Light_sensor_R0 = Light_sensor(ADC_PT_R0);
+Light_sensor Light_sensor_R1 = Light_sensor(ADC_PT_R1);
+Light_sensor Light_sensor_REF_R = Light_sensor(ADC_PT_REF_R);
+Light_sensor Light_sensor_RGB = Light_sensor(ADC_PT_RGB);
+
 
 void Robot::init() {
 
@@ -33,6 +42,8 @@ void Robot::init() {
   ButtonL.init();
   ButtonM.init();
   ButtonR.init();
+
+  Light_sensor_M.init();
 
   return;
 }
@@ -47,7 +58,12 @@ void Robot::run() {
 
     if (ButtonL.state()) ShiftRegisterWrite(SR_PT_WHITE, 1);
     else ShiftRegisterWrite(SR_PT_WHITE, 0);
-
+    if (Light_sensor_M.measure() > 300) {
+      ShiftRegisterWrite(SR_PT_BLUE, 1);
+    }
+    else {
+      ShiftRegisterWrite(SR_PT_BLUE, 0);
+    }
   }
 
   Robot::running = false;
