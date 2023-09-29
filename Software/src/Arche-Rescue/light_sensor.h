@@ -1,15 +1,21 @@
 #ifndef LIGHT_SENSOR_H
 #define LIGHT_SENSOR_H
 
-class  {
+class  Light_sensor{
   private:
-    bool running = false;
+    int pin;
+    int min;
+    int max;
+    int raw;
   
   public:
+    LightSensor(int pin, int upper_limit);
+    int upper_limit;
+
     void init();
-    void run();
-    void input();
-    void output();
+    int measure();
+    void on();
+    void off();
 };
 
 #endif
