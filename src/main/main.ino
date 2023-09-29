@@ -17,7 +17,7 @@ view LICENSE.md for details
 // SPEED
 #define V 200
 //#define DEBUG
-#define NOMOTORS
+//#define NOMOTORS
 //#define LED_TEST
 #define LF_ACTIVE
 
@@ -86,7 +86,7 @@ void cache(int16_t value){
     #ifdef DEBUG
       Serial.println("Cached");
     #endif
-    showDifference(value, "D", true);
+    //showDifference(value, "D", true);
   }
 }
 
@@ -99,12 +99,12 @@ void loop() {
   shift_register::write(SR_LED_L_GREEN, !bool(color::on_green(LEFT)));
   ////// LINE FOLLOWING //////
   #ifdef LF_ACTIVE
-    #define diff_outer_factor 2.2 // Factor for the outer light 
+    #define diff_outer_factor 2 // Factor for the outer light 
     #define mul 3
     int16_t diff = white.left.value - white.right.value;
     int16_t diff_outer = white.left_outer.value - white.right_outer.value;
     if (abs(diff_outer) < 25){diff_outer = 0;} // set diff to 0 when no difference is recognised
-    int16_t mot_diff = (diff*1.4 + diff_outer*diff_outer_factor) * mul;  // calculate inner to outer mult 
+    int16_t mot_diff = (diff*1.5 + diff_outer*diff_outer_factor) * mul;  // calculate inner to outer mult 
     cache(mot_diff); // cache W.I.P.
     
     #ifdef DEBUG  // Debug light values
@@ -153,7 +153,7 @@ void loop() {
     claw::open();
     claw::down();
     motor::fwd(AB, V);
-    delay(600);
+    delay(700);
     motor::stop();
     claw::close();
     claw::up();
@@ -170,5 +170,4 @@ void loop() {
     motor::gyro(V, 90);
     // TODO MAKE THIS READY
   }
-  //showDifference(diff, "D", true);
 }
