@@ -19,6 +19,8 @@
 
 #include "shift_register.h"
 
+#include <CD74HC4067.h>
+
 
 Button_sensor Button_sensor_L = Button_sensor(T_L);
 Button_sensor Button_sensor_M = Button_sensor(T_M);
@@ -33,6 +35,7 @@ Light_sensor Light_sensor_R1 = Light_sensor(ADC_PT_R1, 1024);
 Light_sensor Light_sensor_REF_R = Light_sensor(ADC_PT_REF_R, 1024);
 Light_sensor Light_sensor_RGB = Light_sensor(ADC_PT_RGB, 1024);
 
+CD74HC4067 ADC_multiplexer = ADCMULTI(S0, S1, S2, S3);
 
 void Robot::init() {
   Serial.begin(115200);

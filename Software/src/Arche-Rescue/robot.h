@@ -14,5 +14,6 @@ class Robot {
     void output();
 };
 
+extern ADCMULTI ADC_multiplexer();
 
 #endif
