@@ -1,4 +1,5 @@
-#include <my_pins.h>
+#include <Arduino.h>
+#include "my_pins.h"
 
 
 bool ShiftRegisterBits[24] = { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 };

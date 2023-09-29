@@ -1,4 +1,5 @@
 #include "Arduino.h"
+#include "my_pins.h"
 #include "robot.h"
 
 #include "button_sensor.h"
@@ -16,9 +17,12 @@
 #include "pc_show.h"
 #include "display_show.h"
 
+#include "shift_register.h"
+
 void Robot::init() {
-  pinMode(2, OUTPUT);
-  digitalWrite(2, HIGH);
+  ShiftRegisterInit();
+  ShiftRegisterReset();
+  // ShiftRegisterWrite(SR_PT_WHITE, HIGH);
   return;
 }
 
