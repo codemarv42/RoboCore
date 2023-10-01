@@ -1,9 +1,17 @@
 #ifndef COLOR_H
 #define COLOR_H
-#define check_length 10
 #include <Arduino.h>
+#include "Pins.h"
+//#include "color.cpp"
 #include "lightsensor.h"
+/*
+namespace color{
+  extern void update(LightSensor* s_white, LightSensor* s_green, LightSensor* s_red);
+  extern inline bool on_green(int side);
+  extern inline bool on_black(int side);
+}*/
 
+#define check_length 1
 #define GREEN_THRESHOLD 15
 #define BLACK_THRESHOLD 15
 
@@ -60,4 +68,5 @@ namespace color{
     //TODO: Add Red recog
   }
 }
+
 #endif
