@@ -110,12 +110,19 @@ void loop() {
       bool right = color::on_green(RIGHT);
       shift_register::write(SR_LED_R_GREEN, !right); // show side on LED
       shift_register::write(SR_LED_L_GREEN, !left);
-      if (motor::sensorFwd(AB, V/2, &white, 90, 1500)){
+      if (motor::sensorFwd(AB, V/2, &white, 90, 1500)){ // check for black line
         delay(1000);
-      } // check for black line
-      /*if (white.left_outer.value <= 20 || white.right_outer.value <= 20){
+        int16_t turn = 0;
+        if(left){ turn += 90;};
+        if(right){ turn += 90;};
+        if (right && (!left)){turn = -turn;}
+        motor::gyro(V, turn);
+        motor::fwd(AB, V);
         delay(1000);
-      }*/
+        motor::stop();
+      }
+      shift_register::write(SR_LED_R_GREEN, HIGH); // LEDs off
+      shift_register::write(SR_LED_L_GREEN, HIGH);
     }
   #endif
   ////// LINE FOLLOWING //////
