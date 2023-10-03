@@ -92,7 +92,7 @@ namespace motor{
   bool sensorFwd(int motor, int v, LightSensor* s, int diff, int time){
     fwd(motor, v);
     const int timestamp = millis() + time;
-    while (s->left.value >= diff && s->right.value >= diff){
+    while (s->left.value >= diff || s->right.value >= diff){
       s->read();
       if (millis() > timestamp){motor::stop(); return false;}
 

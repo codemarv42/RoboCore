@@ -1,5 +1,6 @@
 #include "Pins.h"
 #include <Arduino.h>
+
 #include "hardware.h"
 #include "Wire.h"
 #include <time.h>
@@ -33,6 +34,7 @@ bool HardwareInit(){
 
   shift_register::reset(); /// set all values to LOW
   Wire.begin();
+  //StartBLE();
   return true;
 }
 LightSensor white = LightSensor(SR_PT_WHITE);
@@ -94,9 +96,28 @@ void loop() {
   for (auto sensor:all_sensors){ // read light values
     if (sensor != nullptr){sensor->read();}
   }
+  //BLELoop(white.left.value);
   color::update(&white, &green, &red);  // update color checking
-  shift_register::write(SR_LED_R_GREEN, !bool(color::on_green(RIGHT)));
-  shift_register::write(SR_LED_L_GREEN, !bool(color::on_green(LEFT)));
+  #ifndef NOMOTORS
+    if (color::on_green(RIGHT | LEFT)){
+      #ifdef DEBUG
+        Serial.println("Green Detected!");
+      #endif
+      motor::fwd(AB, V); // go fwd a litle bit, to confirm green values
+      delay(200);
+      motor::stop();
+      bool left = color::on_green(LEFT);
+      bool right = color::on_green(RIGHT);
+      shift_register::write(SR_LED_R_GREEN, !right); // show side on LED
+      shift_register::write(SR_LED_L_GREEN, !left);
+      if (motor::sensorFwd(AB, V/2, &white, 90, 1500)){
+        delay(1000);
+      } // check for black line
+      /*if (white.left_outer.value <= 20 || white.right_outer.value <= 20){
+        delay(1000);
+      }*/
+    }
+  #endif
   ////// LINE FOLLOWING //////
   #ifdef LF_ACTIVE
     #define diff_outer_factor 2 // Factor for the outer light 
