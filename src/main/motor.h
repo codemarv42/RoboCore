@@ -3,6 +3,7 @@
 #include <Arduino.h>
 #include "gyro.h"
 #include "lightsensor.h"
+#include "color.h"
 
 #define A 1 // Motors A = Left; B = Right
 #define B 2
@@ -13,7 +14,7 @@ extern void stop();
 extern void fwd(int motor, int v);
 extern void rev(int motor, int v);
 extern void gyro(int v, int16_t deg);
-extern bool sensorFwd(int motor, int v, LightSensor* s, LightSensor* s2, int diff, int time); 
+extern bool sensorFwd(int motor, int v, int time, LightSensor* all[4]); 
 extern bool sensorFwd(int motor, int v, LightSensor* s, int diff, int time); 
 }
 //extern void setupMPU();

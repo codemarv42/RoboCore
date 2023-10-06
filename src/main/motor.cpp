@@ -5,6 +5,7 @@
 #include "Pins.h"
 #include "gyro.h"
 #include "motor.h"
+#include "color.h"
 #include "shiftregister.h"
 #include "lightsensor.h"
 #include <MPU6050_light.h>
@@ -59,7 +60,7 @@ namespace motor{
   void rev(int motor, int v){
     fwd(motor, -v);
   }
-  void gyro(int v, int16_t deg){
+  void gyro(int v, int16_t deg){ //negative angle -> right
     //mpu.
     gyro::ResetZAngle();
 
@@ -67,22 +68,30 @@ namespace motor{
     if (deg < 0){
       fwd(A, v);
       fwd(B, -v);
+      
+      while (mpu.getAngleZ() > deg){
+      mpu.update();
+      delay(1);
+      }
     }
     else{
       fwd(A, -v);
       fwd(B, v);
-    }
-    while (mpu.getAngleZ() < deg){
-      mpu.update();
-      delay(1);
+    
+      while (mpu.getAngleZ() < deg){
+        mpu.update();
+        delay(1);
+      }
     }
   }
-  bool sensorFwd(int motor, int v, LightSensor* s, LightSensor* s2, int diff, int time){
+  bool sensorFwd(int motor, int v, int time, LightSensor* all[4]){
     fwd(motor, v);
     const int timestamp = millis() + time;
-    while (s->left.value-s2->left.value >= diff && s->right.value-s2->right.value >= diff){
-      s->read();
-      s2->read();
+    while (color::on_green(LEFT | RIGHT)){
+      for (int i = 0; i < 4; i++){
+        if (all[i] != nullptr){all[i]->read();}
+      }
+      color::update(all[0], all[1], all[2]);
       if (millis() > timestamp){motor::stop(); return false;}
 
     }
@@ -92,7 +101,7 @@ namespace motor{
   bool sensorFwd(int motor, int v, LightSensor* s, int diff, int time){
     fwd(motor, v);
     const int timestamp = millis() + time;
-    while (s->left.value >= diff || s->right.value >= diff){
+    while (!(s->left_outer.value >= diff && s->right_outer.value >= diff)){
       s->read();
       if (millis() > timestamp){motor::stop(); return false;}
 

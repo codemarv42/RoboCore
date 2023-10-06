@@ -39,7 +39,7 @@ void ResetZAngle() {  //The Z axis is reset
 }
 
 void setup() {
-  Serial.begin(9600);
+  Serial.begin(115200);
   Wire.begin();
 
   MPU6050Init();

@@ -4,7 +4,7 @@
 #include "hardware.h"
 #include "Wire.h"
 #include <time.h>
-#include "color.h"
+//#include "color.h"
 
 /*
 copyright (c) ImmernochKeinName, 2023
@@ -110,9 +110,10 @@ void loop() {
       bool right = color::on_green(RIGHT);
       shift_register::write(SR_LED_R_GREEN, !right); // show side on LED
       shift_register::write(SR_LED_L_GREEN, !left);
-      if (motor::sensorFwd(AB, V/2, &white, 90, 1500)){ // check for black line
+      motor::sensorFwd(AB, V/2, 1500, all_sensors); // go fwd, until there is no green
+      if(color::on_black(LEFT | RIGHT)){ // check for black line
         delay(1000);
-        int16_t turn = 0;
+        int16_t turn = 0; // choose turn side W.I.P.
         if(left){ turn += 90;};
         if(right){ turn += 90;};
         if (right && (!left)){turn = -turn;}

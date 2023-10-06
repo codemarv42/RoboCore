@@ -48,7 +48,7 @@ void showDifference(int16_t value, const char descr[1], bool clear=false){
   }
   int16_t xShift = value;
   display.drawFastVLine(xShift + 64, 32-8, 16, SSD1306_WHITE);
-  display.drawFastHLine(64, 32, xShift, uint16_t color)
+  //display.drawFastHLine(xShift, 64, 32, uint16_t color);
   //display.setCursor(xShift, 16);
   //display.println(F(descr));
   display.display();

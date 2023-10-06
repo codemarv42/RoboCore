@@ -2,6 +2,8 @@
 
 #include <Arduino.h>
 
+#include <sstream>
+
 #include <BLEDevice.h>
 #include <BLEServer.h>
 #include <BLEUtils.h>
@@ -81,44 +83,45 @@ class MyServerCallbacks : public BLEServerCallbacks {
   }
 };
 
-void BLELoop() {
+void BLELoop(int16_t v) {
+  //char c[] = F(v);
 
   if (BLEStat >= 1) {
 
     // notify changed value
     if (deviceConnected) {
 
-      pCharacteristic->setValue(GEIGEROS_VERSION);
+      pCharacteristic->setValue("0");
       pCharacteristic->notify();
 
-      pCharacteristic_2->setValue(GEIGEROS_VERSION);
+      pCharacteristic_2->setValue("0");
       pCharacteristic_2->notify();
 
-      pCharacteristic_3->setValue(GEIGEROS_VERSION);
+      pCharacteristic_3->setValue("0");
       pCharacteristic_3->notify();
 
-      pCharacteristic_4->setValue(GEIGEROS_VERSION);
+      pCharacteristic_4->setValue("0");
       pCharacteristic_4->notify();
 
-      pCharacteristic_5->setValue(GEIGEROS_VERSION);
+      pCharacteristic_5->setValue("0");
       pCharacteristic_5->notify();
 
-      pCharacteristic_6->setValue(GEIGEROS_VERSION);
+      pCharacteristic_6->setValue("0");
       pCharacteristic_6->notify();
 
-      pCharacteristic_7->setValue(GEIGEROS_VERSION);
+      pCharacteristic_7->setValue("0");
       pCharacteristic_7->notify();
 
-      pCharacteristic_8->setValue(GEIGEROS_VERSION);
+      pCharacteristic_8->setValue("0");
       pCharacteristic_8->notify();
 
-      pCharacteristic_9->setValue(GEIGEROS_VERSION);
+      pCharacteristic_9->setValue("0");
       pCharacteristic_9->notify();
 
-      pCharacteristic_10->setValue(GEIGEROS_VERSION);
+      pCharacteristic_10->setValue("0");
       pCharacteristic_10->notify();
 
-      pCharacteristic_11->setValue(GEIGEROS_VERSION);
+      pCharacteristic_11->setValue("Deine Mudda");
       pCharacteristic_11->notify();
     }
     // disconnecting
