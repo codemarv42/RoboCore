@@ -1,6 +1,7 @@
 #include "light_sensor.h"
 #include "robot.h"
 #include "shift_register.h"
+#include "adc_multiplexer.h"
 
 
 Light_sensor::Light_sensor(int pin, int upper_limit){
@@ -22,6 +23,6 @@ void Light_sensor::on(){
 }
 
 int Light_sensor::measure(){
-    raw = analogRead(pin);
+    raw = ADCMultiplexerRead(pin);
     return raw;
 }

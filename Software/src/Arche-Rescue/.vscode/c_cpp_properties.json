@@ -7,7 +7,10 @@
                 "${workspaceFolder}/**",
                 "D:/Users/Zockni/AppData/Local/Arduino15/packages/esp32/hardware/esp32/2.0.11/libraries/EEPROM/src",
                 "D:/Users/Zockni/AppData/Local/Arduino15/packages/esp32/hardware/esp32/2.0.11/libraries/SPI/src",
-                "D:/Users/Zockni/AppData/Local/Arduino15/packages/esp32/hardware/esp32/2.0.11/libraries/Wire/src"
+                "D:/Users/Zockni/AppData/Local/Arduino15/packages/esp32/hardware/esp32/2.0.11/libraries/Wire/src",
+                "D:/Users/Zockni/AppData/Local/Arduino15/packages/esp32/hardware/esp32/2.0.11/libraries/CD74HC4067-1.0.2/src",
+                "D:/Users/Zockni/AppData/Local/Arduino15/libraries",
+                "D:/Users/Zockni/AppData/Local/Arduino15/libraries/CD74HC4067-1.0.2/src"
             ],
             "defines": [
                 "_DEBUG",

@@ -1,6 +1,7 @@
 #ifndef ROBOT_H
 #define ROBOT_H
 #include "Arduino.h"
+#include <CD74HC4067.h>
 
 
 class Robot {
@@ -14,6 +15,6 @@ class Robot {
     void output();
 };
 
-extern ADCMULTI ADC_multiplexer();
+extern CD74HC4067 ADC_multiplexer();
 
 #endif
