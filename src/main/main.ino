@@ -98,6 +98,15 @@ void loop() {
   }
   //BLELoop(white.left.value);
   color::update(&white, &green, &red);  // update color checking
+  if (color::on_red(RIGHT | LEFT)){
+    motor::stop();
+    shift_register::write(SR_LED_R_RED, LOW);
+    shift_register::write(SR_LED_L_RED, LOW);
+    delay(7000);
+    shift_register::write(SR_LED_R_RED, HIGH);
+    shift_register::write(SR_LED_L_RED, HIGH);
+  }
+
   #ifndef NOMOTORS
     if (color::on_green(RIGHT | LEFT)){
       #ifdef DEBUG
