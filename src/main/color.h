@@ -9,6 +9,7 @@ namespace color{
   extern void update(LightSensor* s_white, LightSensor* s_green, LightSensor* s_red);
   extern bool on_green(int side);
   extern bool on_black(int side);
+  extern bool on_red(int side);
 }
 
 #endif
