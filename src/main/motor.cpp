@@ -84,10 +84,22 @@ namespace motor{
       }
     }
   }
-  bool sensorFwd(int motor, int v, int time, LightSensor* all[4]){
-    fwd(motor, v);
+  void readFwd(int motor, int v, int time, LightSensor* all[4]){
     const int timestamp = millis() + time;
-    while (color::on_green(LEFT | RIGHT)){
+    while (true){
+      for (int i = 0; i < 4; i++){
+        if (all[i] != nullptr){all[i]->read();}
+      }
+      color::update(all[0], all[1], all[2]);
+      if (millis() > timestamp){motor::stop(); return;}
+    }
+  }
+
+  bool sensorFwd(int va, int vb, int time, LightSensor* all[4]){
+    fwd(A, va);
+    fwd(B, vb);
+    const int timestamp = millis() + time;
+    while (!color::on_black(LEFT | RIGHT)){
       for (int i = 0; i < 4; i++){
         if (all[i] != nullptr){all[i]->read();}
       }

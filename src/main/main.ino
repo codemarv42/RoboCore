@@ -25,6 +25,8 @@ view LICENSE.md for details
 bool HardwareInit(){
   /// get the shift register's Pins ///
   claw::setup();
+  claw::up();
+  claw::open();
   pinMode(SHCP, OUTPUT);
   pinMode(STCP, OUTPUT);
   pinMode(DS, OUTPUT);
@@ -112,27 +114,31 @@ void loop() {
       #ifdef DEBUG
         Serial.println("Green Detected!");
       #endif
-      motor::fwd(AB, V); // go fwd a litle bit, to confirm green values
-      delay(200);
-      motor::stop();
       bool left = color::on_green(LEFT);
       bool right = color::on_green(RIGHT);
       shift_register::write(SR_LED_R_GREEN, !right); // show side on LED
       shift_register::write(SR_LED_L_GREEN, !left);
-      motor::sensorFwd(AB, V/2, 1500, all_sensors); // go fwd, until there is no green
-      if(color::on_black(LEFT | RIGHT)){ // check for black line
-        delay(1000);
-        int16_t turn = 0; // choose turn side W.I.P.
-        if(left){ turn += 90;};
-        if(right){ turn += 90;};
-        if (right && (!left)){turn = -turn;}
-        motor::gyro(V, turn);
-        motor::fwd(AB, V);
-        delay(1000);
+      motor::stop();
+      delay(1000);
+      if(right || left){
+        motor::sensorFwd(V/2, V/2 , 2000, all_sensors); // go fwd, until there is no green
         motor::stop();
+        //motor::readFwd(AB, V, 1000, all_sensors);
+        white.read();
+        if(white.left_outer.value < 50 || white.right_outer.value < 50){ // check for black line
+          delay(1000);
+          int16_t turn = 0; // choose turn side W.I.P.
+          if (left){ turn += 80;}
+          if (right){ turn += 80;}
+          if (right && (!left)){turn = -turn;}
+          motor::gyro(V, turn);
+          motor::fwd(AB, V);
+          delay(300);
+          motor::stop();
+        }
+        shift_register::write(SR_LED_R_GREEN, HIGH); // LEDs off
+        shift_register::write(SR_LED_L_GREEN, HIGH);
       }
-      shift_register::write(SR_LED_R_GREEN, HIGH); // LEDs off
-      shift_register::write(SR_LED_L_GREEN, HIGH);
     }
   #endif
   ////// LINE FOLLOWING //////
@@ -141,8 +147,9 @@ void loop() {
     #define mul 3
     int16_t diff = white.left.value - white.right.value;
     int16_t diff_outer = white.left_outer.value - white.right_outer.value;
+    int16_t diff_green = (green.left.value-red.left.value)-(green.right.value-red.right.value); // difference to ignore green value
     if (abs(diff_outer) < 25){diff_outer = 0;} // set diff to 0 when no difference is recognised
-    int16_t mot_diff = (diff*1.5 + diff_outer*diff_outer_factor) * mul;  // calculate inner to outer mult 
+    int16_t mot_diff = ((diff+diff_green*2)*1.5 + diff_outer*diff_outer_factor) * mul;  // calculate inner to outer mult 
     cache(mot_diff); // cache W.I.P.
     
     #ifdef DEBUG  // Debug light values
@@ -179,7 +186,7 @@ void loop() {
     #ifndef NOMOTORS
       motor::fwd(A, ( V + mot_diff)); // TODO: change both sides to be equal, when hardware-problem is solved
       motor::fwd(B, ( V - mot_diff)*1.2);
-      delayMicroseconds(100); // about 3000 measurements per second
+      //delayMicroseconds(100); // about 3000 measurements per second
     #endif
   #endif
   

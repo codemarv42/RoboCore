@@ -6,9 +6,9 @@
 #include <Arduino.h>
 #include "lightsensor.h"
 
-#define check_length 1
-#define GREEN_THRESHOLD 15
-#define BLACK_THRESHOLD 15
+#define check_length 7
+#define GREEN_THRESHOLD 10
+#define BLACK_THRESHOLD 50
 
 namespace color{
   struct ColorCount{
@@ -64,7 +64,7 @@ namespace color{
       green.right--;
     }
 
-    if (-s_green->left.value + s_red->left.value > GREEN_THRESHOLD){
+    if (-s_green->left.value + s_red->left.value*1.2 > GREEN_THRESHOLD){
       if (green.left < check_length){
         green.left++;
       }
