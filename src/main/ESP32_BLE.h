@@ -3,7 +3,7 @@
 
 extern unsigned int BLEStat;
 
-extern void BLELoop(int16_t);
+extern void BLELoop(int, int, int, int, int, int, int, int, int, int, int);
 
 extern void StopBLE();
 extern void StartBLE();

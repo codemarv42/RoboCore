@@ -17,10 +17,20 @@ view LICENSE.md for details
 
 // SPEED
 #define V 200
-//#define DEBUG
-//#define NOMOTORS
+//#define BLE
+#define DEBUG
+#define NOMOTORS
 //#define LED_TEST
-#define LF_ACTIVE
+//#define LF_ACTIVE
+
+  
+// Init Light Sesnsors
+LightSensor white = LightSensor(SR_PT_WHITE);
+LightSensor red   = LightSensor(SR_PT_RED);
+LightSensor green = LightSensor(SR_PT_GREEN);
+  
+LightSensor* all_sensors[] = {&white,&green,&red,nullptr};  // nullptr is placeholder for an (optional) blue LightSensor
+Servo rottof;
 
 bool HardwareInit(){
   /// get the shift register's Pins ///
@@ -34,21 +44,18 @@ bool HardwareInit(){
   pinMode(T_R, INPUT);
   pinMode(T_M, INPUT);
 
+
   shift_register::reset(); /// set all values to LOW
   Wire.begin();
-  //StartBLE();
   return true;
 }
-LightSensor white = LightSensor(SR_PT_WHITE);
-LightSensor red   = LightSensor(SR_PT_RED);
-LightSensor green = LightSensor(SR_PT_GREEN);
-// PUT LIGHT SENSORS HERE
-LightSensor* all_sensors[] = {&white,&green,&red,nullptr};  // nullptr is placeholder for an (optional) blue LightSensor
 
 void setup(){
   Serial.begin(115200);
   Serial.println("HardwareInit...");
   HardwareInit();
+  
+  // Init Display
   DisplayInit();
   Serial.println("MPU-detection...");
   gyro::MPU6050Init();
@@ -65,6 +72,9 @@ void setup(){
     shift_register::write(SR_PT_RED, HIGH);
     delay(2000);
     shift_register::write(SR_PT_RED, LOW);
+  #endif
+  #ifdef BLE
+    StartBLE();
   #endif
   Serial.println("Calibration...");
   calibrate(all_sensors, 3000, 3);
@@ -98,7 +108,21 @@ void loop() {
   for (auto sensor:all_sensors){ // read light values
     if (sensor != nullptr){sensor->read();}
   }
-  //BLELoop(white.left.value);
+  #ifdef BLE
+    BLELoop(
+      int(white.left_outer.value),
+      int(white.left.value),
+      int(white.center.value),
+      int(white.right.value),
+      int(white.right_outer.value),
+      0,
+      0,
+      int(red.left.value),
+      int(red.right.value),
+      int(green.left.value),
+      int(green.right.value)
+      );
+  #endif
   color::update(&white, &green, &red);  // update color checking
   if (color::on_red(RIGHT | LEFT)){
     motor::stop();

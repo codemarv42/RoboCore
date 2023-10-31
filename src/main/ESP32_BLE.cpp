@@ -3,6 +3,7 @@
 #include <Arduino.h>
 
 #include <sstream>
+#include <string>
 
 #include <BLEDevice.h>
 #include <BLEServer.h>
@@ -66,7 +67,6 @@ unsigned int BLEStat = 0;  //0 - OFF, 1 - ON, 2 - connected
 
 bool deviceConnected = false;
 bool oldDeviceConnected = false;
-
 /////////////////////////////////////////////
 
 ////////////////////Code/////////////////////
@@ -83,52 +83,51 @@ class MyServerCallbacks : public BLEServerCallbacks {
   }
 };
 
-void BLELoop(int16_t v) {
-  //char c[] = F(v);
+void BLELoop(int wlo, int wli, int wc, int wri, int wro, int rl, int rr, int redl, int redr, int gl, int gr) {
 
   if (BLEStat >= 1) {
 
     // notify changed value
     if (deviceConnected) {
 
-      pCharacteristic->setValue("0");
+      pCharacteristic->setValue(wlo);
       pCharacteristic->notify();
 
-      pCharacteristic_2->setValue("0");
+      pCharacteristic_2->setValue(wli);
       pCharacteristic_2->notify();
 
-      pCharacteristic_3->setValue("0");
+      pCharacteristic_3->setValue(wc);
       pCharacteristic_3->notify();
 
-      pCharacteristic_4->setValue("0");
+      pCharacteristic_4->setValue(wri);
       pCharacteristic_4->notify();
 
-      pCharacteristic_5->setValue("0");
+      pCharacteristic_5->setValue(wro);
       pCharacteristic_5->notify();
 
-      pCharacteristic_6->setValue("0");
+      pCharacteristic_6->setValue(rl);
       pCharacteristic_6->notify();
 
-      pCharacteristic_7->setValue("0");
+      pCharacteristic_7->setValue(rr);
       pCharacteristic_7->notify();
 
-      pCharacteristic_8->setValue("0");
+      pCharacteristic_8->setValue(redl);
       pCharacteristic_8->notify();
 
-      pCharacteristic_9->setValue("0");
+      pCharacteristic_9->setValue(redr);
       pCharacteristic_9->notify();
 
-      pCharacteristic_10->setValue("0");
+      pCharacteristic_10->setValue(gl);
       pCharacteristic_10->notify();
 
-      pCharacteristic_11->setValue("Deine Mudda");
+      pCharacteristic_11->setValue(gr);
       pCharacteristic_11->notify();
     }
     // disconnecting
     if (!deviceConnected && oldDeviceConnected) {
       delay(500);                   // give the bluetooth stack the chance to get things ready
       pServer->startAdvertising();  // restart advertising
-      Serial.println("Start advertising");
+      Serial.println("BLE - Start advertising");
       oldDeviceConnected = deviceConnected;
     }
     // connecting
@@ -233,7 +232,7 @@ void StartBLE() {
   pAdvertising->setMinPreferred(0x06);  // functions that help with iPhone connections issue
   pAdvertising->setMinPreferred(0x12);
   BLEDevice::startAdvertising();
-  Serial.println("Waiting a client connection to notify...");
+  Serial.println("BLE - Waiting a client connection to notify...");
 }
 
 void StopBLE() {
