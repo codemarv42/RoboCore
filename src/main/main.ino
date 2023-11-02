@@ -18,10 +18,10 @@ view LICENSE.md for details
 // SPEED
 #define V 200
 //#define BLE
-#define DEBUG
+//#define DEBUG
 #define NOMOTORS
 //#define LED_TEST
-//#define LF_ACTIVE
+#define LF_ACTIVE
 
   
 // Init Light Sesnsors
@@ -31,6 +31,8 @@ LightSensor green = LightSensor(SR_PT_GREEN);
   
 LightSensor* all_sensors[] = {&white,&green,&red,nullptr};  // nullptr is placeholder for an (optional) blue LightSensor
 Servo rottof;
+
+TaskHandle_t loop0; //used for handling the second main loop
 
 bool HardwareInit(){
   /// get the shift register's Pins ///
@@ -43,25 +45,30 @@ bool HardwareInit(){
   pinMode(T_L, INPUT_PULLUP);
   pinMode(T_R, INPUT);
   pinMode(T_M, INPUT);
-
+  rottof.attach(19);
 
   shift_register::reset(); /// set all values to LOW
-  Wire.begin();
   return true;
 }
 
+
 void setup(){
   Serial.begin(115200);
+
+  ///// start core 0 //////
+  Serial.print("Loop running on core:");
+  Serial.println(xPortGetCoreID());
+  xTaskCreatePinnedToCore(core0, "Core0MainLoop", 10000, NULL, 0, &loop0, 0);
+
   Serial.println("HardwareInit...");
   HardwareInit();
   
-  // Init Display
-  DisplayInit();
   Serial.println("MPU-detection...");
   gyro::MPU6050Init();
   Serial.println("Resetting Claw...");
   claw::up(); // reset the claw
   claw::close();
+  //rottof.write(20);
   #ifdef LED_TEST
     shift_register::write(SR_PT_WHITE, HIGH);
     delay(2000);
@@ -72,9 +79,6 @@ void setup(){
     shift_register::write(SR_PT_RED, HIGH);
     delay(2000);
     shift_register::write(SR_PT_RED, LOW);
-  #endif
-  #ifdef BLE
-    StartBLE();
   #endif
   Serial.println("Calibration...");
   calibrate(all_sensors, 3000, 3);
@@ -101,6 +105,21 @@ void cache(int16_t value){
       Serial.println("Cached");
     #endif
     //showDifference(value, "D", true);
+    #ifdef BLE
+      BLELoop(
+        int(white.left_outer.value),
+        int(white.left.value),
+        int(white.center.value),
+        int(white.right.value),
+        int(white.right_outer.value),
+        0,
+        0,
+        int(red.left.value),
+        int(red.right.value),
+        int(green.left.value),
+        int(green.right.value)
+        );
+    #endif
   }
 }
 
@@ -108,21 +127,6 @@ void loop() {
   for (auto sensor:all_sensors){ // read light values
     if (sensor != nullptr){sensor->read();}
   }
-  #ifdef BLE
-    BLELoop(
-      int(white.left_outer.value),
-      int(white.left.value),
-      int(white.center.value),
-      int(white.right.value),
-      int(white.right_outer.value),
-      0,
-      0,
-      int(red.left.value),
-      int(red.right.value),
-      int(green.left.value),
-      int(green.right.value)
-      );
-  #endif
   color::update(&white, &green, &red);  // update color checking
   if (color::on_red(RIGHT | LEFT)){
     motor::stop();
@@ -228,8 +232,6 @@ void loop() {
     claw::up();
   }
 
-  //shift_register::write(SR_LED_L_RED,bool(digitalRead(T_L)));
-  //shift_register::write(SR_LED_R_RED,bool(digitalRead(T_R)));
   ////// OBSTACLE HANDLING //////
   if (!(bool(digitalRead(T_L)) || bool(digitalRead(T_R)))){
     motor::rev(AB, V);
@@ -238,5 +240,26 @@ void loop() {
     delay(500);
     motor::gyro(V, 90);
     // TODO MAKE THIS READY
+  }
+}
+
+////// CORE 0 LOOP //////
+void core0(void * pvParameters){
+  // Begin I2C
+  Wire.begin();
+  Serial.print("WIRE on Core");
+  Serial.println(xPortGetCoreID());
+
+  // Start BLE
+  #ifdef BLE
+    StopBLE();
+    StartBLE();
+  #endif
+
+  // Init Display
+  DisplayInit();
+  
+  while (true){
+    delay(10);
   }
 }
