@@ -33,6 +33,7 @@ LightSensor* all_sensors[] = {&white,&green,&red,nullptr};  // nullptr is placeh
 Servo rottof;
 
 TaskHandle_t loop0; //used for handling the second main loop
+int16_t diff_interchange;
 
 bool HardwareInit(){
   /// get the shift register's Pins ///
@@ -85,8 +86,8 @@ void setup(){
   Serial.print("White Left max: "); Serial.print(white.left.max); Serial.print(" - White Right max: "); Serial.println(white.right.max);
   Serial.print("White Left min: "); Serial.print(white.left.min); Serial.print(" - White Right min: "); Serial.println(white.right.min);
   delayMicroseconds(1000000);
-  //motor::gyro(AB, V/2, 90);
   motor::stop();
+  claw::unload_victims(false);
 }
 
 int16_t diff_cache[10] = {0};
@@ -104,22 +105,6 @@ void cache(int16_t value){
     #ifdef DEBUG
       Serial.println("Cached");
     #endif
-    //showDifference(value, "D", true);
-    #ifdef BLE
-      BLELoop(
-        int(white.left_outer.value),
-        int(white.left.value),
-        int(white.center.value),
-        int(white.right.value),
-        int(white.right_outer.value),
-        0,
-        0,
-        int(red.left.value),
-        int(red.right.value),
-        int(green.left.value),
-        int(green.right.value)
-        );
-    #endif
   }
 }
 
@@ -127,7 +112,6 @@ void loop() {
   for (auto sensor:all_sensors){ // read light values
     if (sensor != nullptr){sensor->read();}
   }
-  color::update(&white, &green, &red);  // update color checking
   if (color::on_red(RIGHT | LEFT)){
     motor::stop();
     shift_register::write(SR_LED_R_RED, LOW);
@@ -177,7 +161,8 @@ void loop() {
     int16_t diff_outer = white.left_outer.value - white.right_outer.value;
     int16_t diff_green = (green.left.value-red.left.value)-(green.right.value-red.right.value); // difference to ignore green value
     if (abs(diff_outer) < 25){diff_outer = 0;} // set diff to 0 when no difference is recognised
-    int16_t mot_diff = ((diff+diff_green*2)*1.5 + diff_outer*diff_outer_factor) * mul;  // calculate inner to outer mult 
+    int16_t mot_diff = ((diff+diff_green*2)*1.5 + diff_outer*diff_outer_factor) * mul;  // calculate inner to outer mult
+    diff_interchange = mot_diff;
     cache(mot_diff); // cache W.I.P.
     
     #ifdef DEBUG  // Debug light values
@@ -219,7 +204,7 @@ void loop() {
   #endif
   
   ////// RESCUE-KIT //////
-  if(digitalRead(T_M) == LOW){ // rescue kit detected
+  /*if(digitalRead(T_M) == LOW){ // rescue kit detected
     motor::rev(AB, V);
     delay(1000);
     motor::stop();
@@ -230,7 +215,7 @@ void loop() {
     motor::stop();
     claw::close();
     claw::up();
-  }
+  }*/
 
   ////// OBSTACLE HANDLING //////
   if (!(bool(digitalRead(T_L)) || bool(digitalRead(T_R)))){
@@ -260,6 +245,23 @@ void core0(void * pvParameters){
   DisplayInit();
   
   while (true){
-    delay(10);
+    //delay(100);
+    color::update(&white, &green, &red);  // update color checking
+    showDifference(diff_interchange, "D", true);
+    #ifdef BLE
+      BLELoop(
+        int(white.left_outer.value),
+        int(white.left.value),
+        int(white.center.value),
+        int(white.right.value),
+        int(white.right_outer.value),
+        0,
+        0,
+        int(red.left.value),
+        int(red.right.value),
+        int(green.left.value),
+        int(green.right.value)
+        );
+    #endif
   }
 }
