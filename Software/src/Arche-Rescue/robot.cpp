@@ -26,14 +26,23 @@ Button_sensor Button_sensor_L = Button_sensor(T_L);
 Button_sensor Button_sensor_M = Button_sensor(T_M);
 Button_sensor Button_sensor_R = Button_sensor(T_R);
 
-Light_sensor Light_sensor_REF_L = Light_sensor(ADC_PT_REF_L, 1024);
-Light_sensor Light_sensor_L1 = Light_sensor(ADC_PT_L1, 1024);
-Light_sensor Light_sensor_L0 = Light_sensor(ADC_PT_L0, 1024);
-Light_sensor Light_sensor_M = Light_sensor(ADC_PT_M, 1024);
-Light_sensor Light_sensor_R0 = Light_sensor(ADC_PT_R0, 1024);
-Light_sensor Light_sensor_R1 = Light_sensor(ADC_PT_R1, 1024);
-Light_sensor Light_sensor_REF_R = Light_sensor(ADC_PT_REF_R, 1024);
-Light_sensor Light_sensor_RGB = Light_sensor(ADC_PT_RGB, 1024);
+Light_sensor Light_sensor_REF_L = Light_sensor(ADC_PT_REF_L, 1024, SR_PT_WHITE);
+Light_sensor Light_sensor_L1 = Light_sensor(ADC_PT_L1, 1024, SR_PT_WHITE);
+Light_sensor Light_sensor_L0_w = Light_sensor(ADC_PT_L0, 1024, SR_PT_WHITE);
+Light_sensor Light_sensor_L0_r = Light_sensor(ADC_PT_L0, 1024, SR_PT_RED);
+Light_sensor Light_sensor_L0_g = Light_sensor(ADC_PT_L0, 1024, SR_PT_GREEN);
+Light_sensor Light_sensor_L0_b = Light_sensor(ADC_PT_L0, 1024, SR_PT_BLUE);
+Light_sensor Light_sensor_M = Light_sensor(ADC_PT_M, 1024, SR_PT_WHITE);
+Light_sensor Light_sensor_R0_w = Light_sensor(ADC_PT_R0, 1024, SR_PT_WHITE);
+Light_sensor Light_sensor_R0_r = Light_sensor(ADC_PT_R0, 1024, SR_PT_RED);
+Light_sensor Light_sensor_R0_g = Light_sensor(ADC_PT_R0, 1024, SR_PT_GREEN);
+Light_sensor Light_sensor_R0_b = Light_sensor(ADC_PT_R0, 1024, SR_PT_BLUE);
+Light_sensor Light_sensor_R1 = Light_sensor(ADC_PT_R1, 1024, SR_PT_WHITE);
+Light_sensor Light_sensor_REF_R = Light_sensor(ADC_PT_REF_R, 1024, SR_PT_WHITE);
+Light_sensor Light_sensor_RGB_w = Light_sensor(ADC_PT_RGB, 1024, SR_PT_WHITE);
+Light_sensor Light_sensor_RGB_r = Light_sensor(ADC_PT_RGB, 1024, SR_PT_RED);
+Light_sensor Light_sensor_RGB_g = Light_sensor(ADC_PT_RGB, 1024, SR_PT_GREEN);
+Light_sensor Light_sensor_RGB_b = Light_sensor(ADC_PT_RGB, 1024, SR_PT_BLUE);
 
 CD74HC4067 ADC_multiplexer = CD74HC4067(S0, S1, S2, S3);
 
@@ -49,9 +58,15 @@ void Robot::init() {
 
   Light_sensor_REF_L.init();
   Light_sensor_L1.init();
-  Light_sensor_L0.init();
+  Light_sensor_L0_w.init();
+  Light_sensor_L0_r.init();
+  Light_sensor_L0_g.init();
+  Light_sensor_L0_b.init();
   Light_sensor_M.init();
-  Light_sensor_R0.init();
+  Light_sensor_R0_w.init();
+  Light_sensor_R0_r.init();
+  Light_sensor_R0_g.init();
+  Light_sensor_R0_b.init();
   Light_sensor_R1.init();
   Light_sensor_REF_R.init();
 
@@ -93,7 +108,6 @@ void Robot::output(){
 void Robot::measureRaw(){
   int pause = 50;
 
-  ShiftRegisterWrite(SR_PT_WHITE, HIGH);
   
 
 }

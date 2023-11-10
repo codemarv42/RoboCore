@@ -96,4 +96,8 @@
 #define TOF_ADRESS       0x29
 
 
+////////////////////////////////////////////////////
+
+#define PAUSE_MESSEN    50
+
 #endif
