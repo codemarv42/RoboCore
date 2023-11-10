@@ -1,4 +1,23 @@
 #include "rgb_led"
+#include "shift_register" 
+
+
+void RGB_Led::RGB_Led(byte pinR, byte pinG, byte pinG)
+{
+  this->pinR=pinR;
+  this->pinG=pinG;
+  this->pinG=pinG;
+}
+
+void RGB_Led::red()
+{
+  ShiftRegisterWrite(pinR);
+}
+
+void RGB_Led::green()
+{
+  ShiftRegisterWrite(pinG);
+}
 
 
 void RGB_Led::RGB_Led(byte pinR, byte pinG, byte pinG)
