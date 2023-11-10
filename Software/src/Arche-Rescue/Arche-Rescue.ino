@@ -1,7 +1,7 @@
 #include "Arduino.h"
 #include "robot.h"
 
-TaskHandle_t sensorLoop;
+TaskHandle_t sensorLoopHandle;
 Robot robot = Robot();
 
 
@@ -13,7 +13,7 @@ void setup() {
     10000,                  /* Stack size of task */
     NULL,                   /* parameter of the task */
     0,                      /* priority of the task */
-    &Loop1,                 /* Task handle to keep track of created task */
+    &sensorLoopHandle,      /* Task handle to keep track of created task */
     0);                     /* pin task to core 0 */
 
   robot.init();
