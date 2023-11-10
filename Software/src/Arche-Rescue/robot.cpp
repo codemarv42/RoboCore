@@ -47,7 +47,13 @@ void Robot::init() {
   Button_sensor_M.init();
   Button_sensor_R.init();
 
+  Light_sensor_REF_L.init();
+  Light_sensor_L1.init();
+  Light_sensor_L0.init();
   Light_sensor_M.init();
+  Light_sensor_R0.init();
+  Light_sensor_R1.init();
+  Light_sensor_REF_R.init();
 
   return;
 }
@@ -82,4 +88,12 @@ void Robot::input(){
 
 void Robot::output(){
   return;
+}
+
+void Robot::measureRaw(){
+  int pause = 50;
+
+  ShiftRegisterWrite(SR_PT_WHITE, HIGH);
+  
+
 }
