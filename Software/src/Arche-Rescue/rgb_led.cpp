@@ -64,3 +64,27 @@ void RGB_led::off()
   ShiftRegisterWrite(pinG, 1);
   ShiftRegisterWrite(pinB, 1);
 }
+
+void RGB_led::_test()
+{
+  int pause = 500;
+
+  this->red();
+  delay(pause);
+  this->green();
+  delay(pause);
+  this->blue();
+  delay(pause);
+
+  this->yellow();
+  delay(pause);
+  this->magenta();
+  delay(pause);
+  this->cyan();
+  delay(pause);
+
+  this->white();
+  delay(pause);
+  this->off();
+  delay(pause);
+}
