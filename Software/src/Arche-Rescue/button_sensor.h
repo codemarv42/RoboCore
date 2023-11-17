@@ -5,16 +5,16 @@
 
 
 class Button_sensor {
-    
-    private:
-        int pinButton;
-        bool stateButton = LOW;
+  
+  private:
+    int pinButton;
+    bool stateButton = LOW;
 
-    public:
-        Button_sensor(int pinButton);
+  public:
+    Button_sensor(int pinButton);
 
-        void init();
-        bool state();
+    void init();
+    bool state();
 };
 
 #endif

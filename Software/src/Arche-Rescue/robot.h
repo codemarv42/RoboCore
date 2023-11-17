@@ -10,11 +10,14 @@ class Robot {
   
   public:
     void init();
-    void run();
+    void actionLoop();
     void input();
     void output();
+    void kalibriere_LS(int anz);
     void messeLicht();
 };
+
+extern Robot robot;
 
 extern CD74HC4067 ADC_multiplexer;
 

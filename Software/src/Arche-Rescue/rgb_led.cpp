@@ -1,5 +1,6 @@
+#include "Arduino.h"
 #include "rgb_led.h"
-#include "shift_register.h" 
+#include "shift_register.h"
 
 
 RGB_led::RGB_led(int pinR, int pinG, int pinB)
@@ -63,4 +64,28 @@ void RGB_led::off()
   ShiftRegisterWrite(pinR, 1);
   ShiftRegisterWrite(pinG, 1);
   ShiftRegisterWrite(pinB, 1);
+}
+
+void RGB_led::_test()
+{
+  int pause = 500;
+
+  this->red();
+  delay(pause);
+  this->green();
+  delay(pause);
+  this->blue();
+  delay(pause);
+
+  this->yellow();
+  delay(pause);
+  this->magenta();
+  delay(pause);
+  this->cyan();
+  delay(pause);
+
+  this->white();
+  delay(pause);
+  this->off();
+  delay(pause);
 }

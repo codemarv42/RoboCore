@@ -2,13 +2,12 @@
 #include "robot.h"
 
 TaskHandle_t sensorLoopHandle;
-Robot robot = Robot();
 
 
 void setup() {
 
- xTaskCreatePinnedToCore(   //Task is assigned to a processor core
-    sensorLoop,       /* Task function. */
+  xTaskCreatePinnedToCore(   //Task is assigned to a processor core
+    sensorLoop,             /* Task function. */
     "SensorLoop",           /* name of task. */
     10000,                  /* Stack size of task */
     NULL,                   /* parameter of the task */
@@ -17,7 +16,7 @@ void setup() {
     0);                     /* pin task to core 0 */
 
   robot.init();
-  robot.run();
+  robot.actionLoop();
 }
 
 void loop() {

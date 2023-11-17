@@ -22,6 +22,8 @@ class RGB_led {
     void white(); 
 
     void off();
+
+    void _test();
 };
 
 #endif
