@@ -98,7 +98,7 @@
 
 ////////////////////////////////////////////////////
 
-#define PAUSE_MESSEN    100
+#define PAUSE_MESSEN    150
 
 #define ANZ_KAL         200
 
