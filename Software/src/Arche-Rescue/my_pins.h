@@ -98,8 +98,8 @@
 
 ////////////////////////////////////////////////////
 
-#define PAUSE_MESSEN    150
+#define PAUSE_MESSEN    150 //anpassen nach unten?
 
-#define ANZ_KAL         200
+#define ANZ_KAL         200 //anpassen zusammen mit delay in kali?
 
 #endif
