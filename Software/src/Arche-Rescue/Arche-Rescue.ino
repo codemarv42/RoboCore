@@ -8,7 +8,7 @@ Robot robot = Robot();
 void setup() {
 
  xTaskCreatePinnedToCore(   //Task is assigned to a processor core
-    sensorLoop,             /* Task function. */
+    sensorLoop,       /* Task function. */
     "SensorLoop",           /* name of task. */
     10000,                  /* Stack size of task */
     NULL,                   /* parameter of the task */
@@ -21,7 +21,7 @@ void setup() {
 }
 
 void loop() {
-   
+
 }
 
-void sensorLoop(void* pvParameters) {}
+

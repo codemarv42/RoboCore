@@ -18,4 +18,6 @@ class Robot {
 
 extern CD74HC4067 ADC_multiplexer;
 
+extern void sensorLoop(void* pvParameters);
+
 #endif

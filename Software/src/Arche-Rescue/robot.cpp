@@ -81,15 +81,13 @@ void Robot::run() {
 
   while (true) {
 
-    if (Button_sensor_L.state()) ShiftRegisterWrite(SR_PT_WHITE, 1);
-    else ShiftRegisterWrite(SR_PT_WHITE, 0);
-    Serial.println(Light_sensor_M.measure());
-    if (Light_sensor_M.measure() > 300) {
-      ShiftRegisterWrite(SR_PT_WHITE, 1);
+    if (Light_sensor_M.val > 1000){
+      ShiftRegisterWrite();
     }
-    else {
-      ShiftRegisterWrite(SR_PT_WHITE, 0);
+    else{
+      ShiftRegisterWrite();
     }
+    delay(10);
   }
 
   Robot::running = false;
@@ -110,4 +108,17 @@ void Robot::measureRaw(){
 
   
 
+}
+
+void sensorLoop(void* pvParameters) {
+  while (1) {
+    Serial.println(Light_sensor_M.measure());
+    if (Light_sensor_M.measure() > 600){
+      ShiftRegisterWrite(SR_PT_WHITE, 1);
+    }
+    else{
+      ShiftRegisterWrite(SR_PT_WHITE, 0);
+    }
+    delay(100);
+  }
 }
