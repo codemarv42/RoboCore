@@ -16,10 +16,23 @@ void Light_sensor::init(){
     min = upper_limit;
 }
 
-int Light_sensor::measure(){
+int Light_sensor::measure_raw(){
     ShiftRegisterWrite(pin, 1);
     delayMicroseconds(PAUSE_MESSEN);
     raw = ADCMultiplexerRead(pin);
     ShiftRegisterWrite(pin, 0);
     return raw;
+}
+
+int Light_sensor::measure(){
+    ShiftRegisterWrite(pin, 1);
+    delayMicroseconds(PAUSE_MESSEN);
+    raw = ADCMultiplexerRead(pin);
+    ShiftRegisterWrite(pin, 0);
+    val = map(raw, min, max, 0, 100);
+    return val;
+}
+
+void Light_sensor::calibrate(){
+    
 }

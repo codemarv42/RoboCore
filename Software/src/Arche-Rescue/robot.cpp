@@ -84,7 +84,7 @@ void Robot::run() {
 
   while (true) {
 
-    if (Light_sensor_M.val > 1000){
+    if (Light_sensor_M.measure() > 1000){
       RGB_led_L.cyan();
     }
     else{
@@ -106,10 +106,19 @@ void Robot::output(){
   return;
 }
 
-void Robot::measureRaw(){
-  int pause = 50;
-
+void Robot::messeLicht(){
   
+  Light_sensor_L1.measure();
+  Light_sensor_L0_w.measure();
+  Light_sensor_L0_r.measure();
+  Light_sensor_L0_g.measure();
+  Light_sensor_L0_b.measure();
+  Light_sensor_M.measure();
+  Light_sensor_R0_w.measure();
+  Light_sensor_R0_r.measure();
+  Light_sensor_R0_g.measure();
+  Light_sensor_R0_b.measure();
+  Light_sensor_R1.measure();
 
 }
 

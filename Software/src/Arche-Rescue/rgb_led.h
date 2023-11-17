@@ -4,12 +4,12 @@
 class RGB_led {
     
   private:
-    byte pinR;
-    byte pinG;
-    byte pinB;
+    int pinR;
+    int pinG;
+    int pinB;
 
   public:
-    RGB_led(byte pinR, byte pinG, byte pinB);
+    RGB_led(int pinR, int pinG, int pinB);
 
     void red();
     void green();
@@ -19,7 +19,9 @@ class RGB_led {
     void magenta(); // red plus blue
     void cyan(); // green plus blue
 
-    void white();
+    void white(); 
+
+    void off();
 };
 
 #endif

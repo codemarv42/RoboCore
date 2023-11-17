@@ -13,7 +13,7 @@ class Robot {
     void run();
     void input();
     void output();
-    void measureRaw();
+    void messeLicht();
 };
 
 extern CD74HC4067 ADC_multiplexer;

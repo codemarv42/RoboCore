@@ -15,9 +15,9 @@ class  Light_sensor{
     int val;
 
     void init();
+    int measure_raw();
     int measure();
-    void on();
-    void off();
+    void calibrate();
 };
 
 #endif
