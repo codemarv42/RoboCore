@@ -19,7 +19,7 @@ class RGB_led {
     void magenta(); // red plus blue
     void cyan(); // green plus blue
 
-    void white(); 
-}
+    void white();
+};
 
 #endif

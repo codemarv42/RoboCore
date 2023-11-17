@@ -85,10 +85,10 @@ void Robot::run() {
   while (true) {
 
     if (Light_sensor_M.val > 1000){
-      ShiftRegisterWrite();
+      RGB_led_L.cyan();
     }
     else{
-      ShiftRegisterWrite();
+      RGB_led_L.magenta();
     }
     delay(10);
   }

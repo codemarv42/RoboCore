@@ -2,11 +2,11 @@
 #include "shift_register.h" 
 
 
-void RGB_led::RGB_led(byte pinR, byte pinG, byte pinG)
+RGB_led::RGB_led(byte pinR, byte pinG, byte pinB)
 {
-  this->pinR=pinR;
-  this->pinG=pinG;
-  this->pinG=pinG;
+  this->pinR = pinR;
+  this->pinG = pinG;
+  this->pinB = pinB;
 }
 
 void RGB_led::red()
