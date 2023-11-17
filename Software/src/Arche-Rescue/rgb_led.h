@@ -20,6 +20,8 @@ class RGB_led {
     void cyan(); // green plus blue
 
     void white(); 
+
+    void off();
 }
 
 #endif
