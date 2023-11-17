@@ -9,5 +9,6 @@
 #include "claw.h"
 #include "menu.h"
 #include "ESP32_BLE.h"
+#include "tof.h"
 
 #endif

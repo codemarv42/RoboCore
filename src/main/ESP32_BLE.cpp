@@ -1,9 +1,7 @@
 ///////////////////Includes//////////////////
 
 #include <Arduino.h>
-
-#include <sstream>
-#include <string>
+#include <stdlib.h>
 
 #include <BLEDevice.h>
 #include <BLEServer.h>
@@ -89,38 +87,49 @@ void BLELoop(int wlo, int wli, int wc, int wri, int wro, int rl, int rr, int red
 
     // notify changed value
     if (deviceConnected) {
-
-      pCharacteristic->setValue(wlo);
+      char a[6];
+      itoa(wlo, a, 10);
+      pCharacteristic->setValue(a);
       pCharacteristic->notify();
 
-      pCharacteristic_2->setValue(wli);
+      itoa(wli,a,10);
+      pCharacteristic_2->setValue(a);
       pCharacteristic_2->notify();
 
-      pCharacteristic_3->setValue(wc);
+      itoa(wc,a,10);
+      pCharacteristic_3->setValue(a);
       pCharacteristic_3->notify();
 
-      pCharacteristic_4->setValue(wri);
+      itoa(wri,a,10);
+      pCharacteristic_4->setValue(a);
       pCharacteristic_4->notify();
 
-      pCharacteristic_5->setValue(wro);
+      itoa(wro,a,10);
+      pCharacteristic_5->setValue(a);
       pCharacteristic_5->notify();
 
-      pCharacteristic_6->setValue(rl);
+      itoa(rl,a,10);
+      pCharacteristic_6->setValue(a);
       pCharacteristic_6->notify();
 
-      pCharacteristic_7->setValue(rr);
+      itoa(rr,a,10);
+      pCharacteristic_7->setValue(a);
       pCharacteristic_7->notify();
 
-      pCharacteristic_8->setValue(redl);
+      itoa(redl,a,10);
+      pCharacteristic_8->setValue(a);
       pCharacteristic_8->notify();
 
-      pCharacteristic_9->setValue(redr);
+      itoa(redr,a,10);
+      pCharacteristic_9->setValue(a);
       pCharacteristic_9->notify();
 
-      pCharacteristic_10->setValue(gl);
+      itoa(gl,a,10);
+      pCharacteristic_10->setValue(a);
       pCharacteristic_10->notify();
 
-      pCharacteristic_11->setValue(gr);
+      itoa(gr,a,10);
+      pCharacteristic_11->setValue(a);
       pCharacteristic_11->notify();
     }
     // disconnecting

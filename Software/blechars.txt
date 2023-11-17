@@ -1,0 +1,13 @@
+  CHAR Value:
+
+  -CHAR1 - WhiteLeftOut
+  -CHAR2 - WhiteLeftInner
+  -CHAR3 - WhiteCenter
+  -CHAR4 - WhiteRightInner
+  -CHAR5 - WhiteRightOut
+  -CHAR6 - ReflectLeft
+  -CHAR7 - ReflectRight
+  -CHAR8 - RedLeftInner
+  -CHAR9 - RedRightInner
+  -CHAR10 - GreenLeftInner
+  -CHAR11 - GreenRightInner

@@ -69,7 +69,7 @@
 #define SR_XSHT4         18
 #define SR_DE1           19
 #define SR_DE2           20
-#define SR_DE3           21 //External Digital Pins
+#define SR_SOLONOID      21 //External Digital Pins
 
 /////////////////Rotary Encoder/////////////////////
 

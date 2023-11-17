@@ -2,16 +2,24 @@
 #include <Arduino.h>
 #include <ESP32Servo.h>
 #include "Pins.h"
+#include "shiftregister.h"
 
 // claw pins: grab - 16 lift - 18
 
 namespace claw{
   Servo grab;
   Servo lift;
+  Servo push;
   
   void setup(){
     grab.attach(16);
     lift.attach(18);
+    push.attach(17);
+  }
+  void unload_victims(bool push=false){
+    shift_register::write(SR_SOLONOID, HIGH);
+    delay(2000);
+    shift_register::write(SR_SOLONOID, LOW);
   }
 
   void down(){

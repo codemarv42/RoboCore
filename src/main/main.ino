@@ -69,7 +69,8 @@ void setup(){
   Serial.println("Resetting Claw...");
   claw::up(); // reset the claw
   claw::close();
-  //rottof.write(20);
+  //tof::init();
+  rottof.write(20);
   #ifdef LED_TEST
     shift_register::write(SR_PT_WHITE, HIGH);
     delay(2000);
@@ -81,6 +82,13 @@ void setup(){
     delay(2000);
     shift_register::write(SR_PT_RED, LOW);
   #endif
+
+  delay(2000);
+  while (in_menu){
+    delay(10);
+  }
+
+
   Serial.println("Calibration...");
   calibrate(all_sensors, 3000, 3);
   Serial.print("White Left max: "); Serial.print(white.left.max); Serial.print(" - White Right max: "); Serial.println(white.right.max);
@@ -230,19 +238,26 @@ void loop() {
 
 ////// CORE 0 LOOP //////
 void core0(void * pvParameters){
+  pinMode(ENC_SW, INPUT);
+  
   // Begin I2C
   Wire.begin();
   Serial.print("WIRE on Core");
   Serial.println(xPortGetCoreID());
+
+  // Init Display
+  DisplayInit();
+  delay(1000);
+  showGyroWaiting();
+
+  delay(2000);
+  menu();
 
   // Start BLE
   #ifdef BLE
     StopBLE();
     StartBLE();
   #endif
-
-  // Init Display
-  DisplayInit();
   
   while (true){
     //delay(100);

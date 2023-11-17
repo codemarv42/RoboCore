@@ -12,6 +12,7 @@ namespace claw{
 
   void open();
   void close();
+  void unload_victims(bool);
 }
 
 #endif
