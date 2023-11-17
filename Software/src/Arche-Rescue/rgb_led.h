@@ -1,7 +1,7 @@
 #ifndef RGB_LED
 #define RGB_LED
 
-class RGB_Led {
+class RGB_led {
     
   private:
     byte pinR;
@@ -9,7 +9,7 @@ class RGB_Led {
     byte pinB;
 
   public:
-    RGB_Led(byte pinR, byte pinG, byte pinB);
+    RGB_led(byte pinR, byte pinG, byte pinB);
 
     void red();
     void green();
