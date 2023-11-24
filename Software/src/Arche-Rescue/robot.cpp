@@ -50,6 +50,8 @@ Light_sensor Light_sensor_RGB_b = Light_sensor(ADC_PT_RGB, 4096, SR_PT_BLUE);
 RGB_led RGB_led_L = RGB_led(SR_LED_L_RED, SR_LED_L_GREEN, SR_LED_L_BLUE);
 RGB_led RGB_led_R = RGB_led(SR_LED_R_RED, SR_LED_R_GREEN, SR_LED_R_BLUE);
 
+Encoder Rotary_encoder()
+
 CD74HC4067 ADC_multiplexer = CD74HC4067(S0, S1, S2, S3);
 
 void Robot::init() {
