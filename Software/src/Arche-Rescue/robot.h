@@ -7,6 +7,10 @@
 class Robot {
   private:
     bool running = false;
+    int his_wL1[10] = {100, 100, 100, 100, 100, 100, 100, 100, 100, 100};
+    int his_wR1[10] = {100, 100, 100, 100, 100, 100, 100, 100, 100, 100};
+    int schwarz_quer_rich = 0;
+    unsigned long schwarz_quer_time = 0;
   
   public:
     void init();
@@ -15,6 +19,12 @@ class Robot {
     void output();
     void kalibriere_LS(int anz);
     void messeLicht();
+    void linienFolger();
+    void gruenerPunkt();
+    void pruefeQuerschwarz();
+    int pruefeGruen();
+    void abbiegenGruen();
+    void kehrtwende();
 };
 
 extern Robot robot;

@@ -2,12 +2,14 @@
 #include "robot.h"
 
 TaskHandle_t sensorLoopHandle;
+// SemaphoreHandle_t xMutex_GYRO = NULL;
 
 
 void setup() {
 
   robot.init();
 
+  // xMutex_GYRO = xSemaphoreCreateMutex()
   xTaskCreatePinnedToCore(   //Task is assigned to a processor core
     sensorLoop,             /* Task function. */
     "SensorLoop",           /* name of task. */

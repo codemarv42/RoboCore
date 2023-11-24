@@ -102,4 +102,9 @@
 
 #define ANZ_KAL         200 //anpassen zusammen mit delay in kali?
 
+#define SCHNELL         150
+#define SOLL            100
+#define LANGSAM         50
+#define FAKTOR          3
+
 #endif

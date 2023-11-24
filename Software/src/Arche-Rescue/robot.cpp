@@ -22,6 +22,8 @@
 
 Robot robot = Robot();
 
+Motor Motor_L = Motor(PWMA, SR_AIN1, SR_AIN2, SR_STBY);
+Motor Motor_R = Motor(PWMB, SR_BIN1, SR_BIN2, SR_STBY);
 
 Button_sensor Button_sensor_L = Button_sensor(T_L);
 Button_sensor Button_sensor_M = Button_sensor(T_M);
@@ -55,6 +57,9 @@ void Robot::init() {
 
   ShiftRegisterInit();
   ShiftRegisterReset();
+
+  Motor_L.init();
+  Motor_R.init();
 
   Button_sensor_L.init();
   Button_sensor_M.init();
@@ -145,4 +150,30 @@ void Robot::messeLicht(){
   Light_sensor_R0_b.measure();
   Light_sensor_R1.measure();
 
+}
+
+void Robot::linienFolger(){
+  int diff = 0;
+  diff = (int) ((Light_sensor_L0_w.val - Light_sensor_R0_w.val) * FAKTOR);
+  diff = (int) diff + ((Light_sensor_L1.val - Light_sensor_R1.val) * FAKTOR * 2);
+  Motor_L.Fwd(SOLL + diff);
+  Motor_R.Fwd(SOLL - diff);
+  return;
+}
+
+void Robot::pruefeQuerschwarz(){
+  int mwL = his_wL1[0];
+  int mwR = his_wR1[0];
+  for (i = 0; i < 10;i++){
+    his_wL1[i] = his_wL1[i+1];
+    his_wR1[i] = his_wR1[i+1];
+    mwL = (int) mwL + his_wL1[i];
+    mwR = (int) mwR + his_wR1[i];
+  }
+  his_wL1[9] = (int) (Light_sensor_L1 + Light_sensor_R1) / 2;
+  his_wR1[9] = (int) (Light_sensor_L1 + Light_sensor_R1) / 2;
+  mwL  = (int) mwL/10;
+  mwR  = (int) mwR/10;
+  if (mwL < SCHWARZ)
+  return;
 }
