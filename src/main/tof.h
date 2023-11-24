@@ -6,4 +6,5 @@
 //extern VL53L1X left, claw, turnable_upper, turnable_lower;
 namespace tof{
   extern void init();
+  extern VL53L1X left, claw, turnable_upper, turnable_lower;
 }

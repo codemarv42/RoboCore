@@ -18,10 +18,10 @@ view LICENSE.md for details
 // SPEED
 #define V 200
 //#define BLE
-//#define DEBUG
-#define NOMOTORS
+#define DEBUG
+//#define NOMOTORS
 //#define LED_TEST
-#define LF_ACTIVE
+//#define LF_ACTIVE
 
   
 // Init Light Sesnsors
@@ -57,6 +57,7 @@ void setup(){
   Serial.begin(115200);
 
   ///// start core 0 //////
+  //Serial.println("Hallo");
   Serial.print("Loop running on core:");
   Serial.println(xPortGetCoreID());
   xTaskCreatePinnedToCore(core0, "Core0MainLoop", 10000, NULL, 0, &loop0, 0);
@@ -69,7 +70,7 @@ void setup(){
   Serial.println("Resetting Claw...");
   claw::up(); // reset the claw
   claw::close();
-  //tof::init();
+  tof::init();
   rottof.write(20);
   #ifdef LED_TEST
     shift_register::write(SR_PT_WHITE, HIGH);
@@ -211,6 +212,12 @@ void loop() {
     #endif
   #endif
   
+  #ifdef DEBUG
+    if (tof::left.dataReady()){
+      Serial.println(tof::left.read());
+    }
+  #endif
+
   ////// RESCUE-KIT //////
   /*if(digitalRead(T_M) == LOW){ // rescue kit detected
     motor::rev(AB, V);
