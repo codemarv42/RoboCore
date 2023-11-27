@@ -9,17 +9,19 @@ CD74HC4067 ADCMULTI(S0, S1, S2, S3);
 namespace shift_register{
   bool shiftregister_bits[24] = {0};
 
-  void write(int pin, bool state) {  //Sets the individual pins of the shift register to HIGH or LOW. Pin table is located in Pins.h
+  void write(int pin, bool state, bool pause_flush = false) {  //Sets the individual pins of the shift register to HIGH or LOW. Pin table is located in Pins.h
 
     if (shiftregister_bits[pin] != state) {
 
       shiftregister_bits[pin] = state;
 
       digitalWrite(STCP, LOW);
-      for (int i = 23; i >= 0; i--) {
-        digitalWrite(SHCP, LOW);
-        digitalWrite(DS, shiftregister_bits[i]);
-        digitalWrite(SHCP, HIGH);
+      if (!pause_flush){
+        for (int i = 23; i >= 0; i--) {
+          digitalWrite(SHCP, LOW);
+          digitalWrite(DS, shiftregister_bits[i]);
+          digitalWrite(SHCP, HIGH);
+        }
       }
 
       digitalWrite(STCP, HIGH);
