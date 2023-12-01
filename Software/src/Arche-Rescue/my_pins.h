@@ -107,4 +107,16 @@
 #define LANGSAM         50
 #define FAKTOR          3
 
+//Werte messen und anpassen!
+#define WEISS           80
+#define GRAU            40
+#define SCHWARZ         10
+#define SILBER          0
+#define GRUEN_MAX       50
+#define GRUEN_MIN       50
+#define ROT_MAX         50
+#define ROT_MIN         50
+
+#define TIME_SCHWARZ    3000
+
 #endif

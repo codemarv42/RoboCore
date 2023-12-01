@@ -9,6 +9,13 @@ class Robot {
     bool running = false;
     int his_wL1[10] = {100, 100, 100, 100, 100, 100, 100, 100, 100, 100};
     int his_wR1[10] = {100, 100, 100, 100, 100, 100, 100, 100, 100, 100};
+    int his_gL1[10] = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
+    int his_gR1[10] = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
+    int his_rL1[10] = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
+    int his_rR1[10] = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
+    int his_sL1[10] = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
+    int his_sR1[10] = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
+    int gruen_rich = 0;
     int schwarz_quer_rich = 0;
     unsigned long schwarz_quer_time = 0;
   
@@ -22,9 +29,12 @@ class Robot {
     void linienFolger();
     void gruenerPunkt();
     void pruefeQuerschwarz();
-    int pruefeGruen();
-    void abbiegenGruen();
+    void pruefeGruen();
+    void pruefeRot();
+    void pruefeSilber();
+    void abbiegenGruen(int rich);
     void kehrtwende();
+    void secureLoop();
 };
 
 extern Robot robot;
