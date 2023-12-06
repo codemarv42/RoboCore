@@ -1,3 +1,5 @@
+#include <sys/_stdint.h>
+#include "esp32-hal.h"
 #include <Arduino.h>
 #include "Pins.h"
 #include "gyro.h"
@@ -13,8 +15,8 @@ unsigned long timer = 0;
 float XAngle;
 float YAngle;
 float ZAngle;
-float CorrectionValueZAngle = 0.00;
 float XAccel;
+uint32_t timestamp;
 
 bool MPU6050Init() {  //Initalizes the Gyro Sensor (MPU6050)
   byte status = mpu.begin();
@@ -32,16 +34,29 @@ bool MPU6050Init() {  //Initalizes the Gyro Sensor (MPU6050)
 }
 
 void UpdateMPU6050() {  //Reads out the values of the gyro sensor via I2C
+  
   mpu.update();
-
-  XAngle = mpu.getAngleX();
-  YAngle = mpu.getAngleY();
-  ZAngle = mpu.getAngleZ();
-  XAccel = mpu.getAccAngleX();
+  if (timestamp == 0){ // -> first measurement
+    timestamp = micros();
+    return;
+  }
+  timestamp = micros() - timestamp;
+  float mult = 1000000 / timestamp;
+  
+  
+  XAngle += mpu.getAngleX() * mult;
+  YAngle += mpu.getAngleY() * mult;
+  ZAngle += mpu.getAngleZ() * mult;
+  XAccel += mpu.getAccAngleX() * mult;
 }
 
 void ResetZAngle() {  //The Z axis is reset
-  CorrectionValueZAngle = ZAngle;
+  mpu.calcOffsets();
+  timestamp = 0;
+  XAngle = 0;
+  YAngle = 0;
+  ZAngle = 0;
+  XAccel = 0;
 }
 
 

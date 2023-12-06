@@ -61,17 +61,16 @@ namespace motor{
     fwd(motor, -v);
   }
   void gyro(int v, int16_t deg){ //negative angle -> right
-    //mpu.
+    motor::stop();
     gyro::ResetZAngle();
-
-    //deg += mpu.getAngleZ(); // 'reset' the Z axis
+    Serial.println("motor::gyro");
+    delay(10);
     if (deg < 0){
       fwd(A, v);
       fwd(B, -v);
       
-      while (mpu.getAngleZ() > deg){
-      mpu.update();
-      delay(1);
+      while (gyro::ZAngle > deg){
+        gyro::UpdateMPU6050();
       }
     }
     else{
@@ -79,10 +78,10 @@ namespace motor{
       fwd(B, v);
     
       while (mpu.getAngleZ() < deg){
-        mpu.update();
-        delay(1);
+        gyro::UpdateMPU6050();
       }
     }
+    stop();
   }
   void readFwd(int motor, int v, int time, LightSensor* all[4]){
     const int timestamp = millis() + time;
