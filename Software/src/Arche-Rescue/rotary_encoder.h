@@ -3,11 +3,13 @@
 
 class Rotary_encoder {
 
+  public:
+    int counter = 0;
+
   private:
     int pin_a;
     int pin_b;
     int last_state_a;
-    int counter = 0;
     
     int pin_sw;
     int last_state_sw = 0;
