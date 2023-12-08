@@ -5,11 +5,13 @@
 
 class Rotary_encoder {
 
+  public:
+    int counter = 0;
+
   private:
     int pin_a = ENC_A;
     int pin_b = ENC_B;
     int last_state_a;
-    int counter = 0;
     
     int pin_sw = ENC_SW;
     int last_state_sw = 0;
