@@ -18,6 +18,7 @@
 
 #include "shift_register.h"
 
+#include "Wire.h"
 #include "CD74HC4067.h"
 
 Robot robot = Robot();
@@ -54,8 +55,11 @@ Encoder Rotary_encoder()
 
 CD74HC4067 ADC_multiplexer = CD74HC4067(S0, S1, S2, S3);
 
+Gyro_sensor MPU = Gyro_sensor();
+
 void Robot::init() {
   Serial.begin(115200);
+  Wire.begin();
 
   ShiftRegisterInit();
   ShiftRegisterReset();
@@ -114,7 +118,7 @@ void sensorLoop(void* pvParameters){
 }
 
 void secureLoop(){
-  continue;
+  return;
 }
 
 void Robot::input(){
@@ -281,9 +285,9 @@ void Robot::pruefeSilber(){
 }
 
 void Robot::abbiegenGruen(int rich){
-  continue;
+  return;
 }
 
 void Robot::kehrtwende(){
-  continue;
+  return;
 }
