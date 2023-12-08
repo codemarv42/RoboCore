@@ -1,9 +1,6 @@
 #include "Arduino.h"
 #include "rotary_encoder.h"
 
-// Rotary_encoder::Rotary_encoder(){
-//   return;
-// }
 
 void Rotary_encoder::measure()
 {
