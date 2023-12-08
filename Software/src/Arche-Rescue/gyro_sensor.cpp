@@ -2,9 +2,7 @@
 #include "Wire.h"
 #include "MPU6050_light.h"
 
-Gyro_sensor :: Gyro_sensor(){
-    return;
-}
+MPU6050 mpu(Wire);
 
 void Gyro_sensor :: init(){
     Serial.println("Stand clear for MPU6050 calibration");
@@ -13,7 +11,7 @@ void Gyro_sensor :: init(){
         Serial.println("No Connection to MPU6050");
     }
     else{
-        delay(500);
+        delay(500); // 1000?
         mpu.calcOffsets();
         Serial.println("Completed MPU6050 calibration");
     }

@@ -2,10 +2,10 @@
 #define GYRO_SENSOR_H
 
 #include "Arduino.h"
+#include "Wire.h"
+#include "MPU6050_light.h"
 
 class Gyro_sensor{
-    private:
-        MPU6050 mpu(Wire);
     public:
         void init();
         void update();
@@ -14,6 +14,6 @@ class Gyro_sensor{
         float AngleZ;
         float AccelY;
         float RefZ = 0.0;
-}
+};
 
 #endif

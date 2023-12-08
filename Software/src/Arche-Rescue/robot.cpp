@@ -3,6 +3,7 @@
 #include "robot.h"
 
 #include "button_sensor.h"
+#include "rotary_encoder.h"
 #include "gyro_sensor.h"
 #include "light_sensor.h"
 #include "tof_sensor.h"
@@ -51,7 +52,7 @@ Light_sensor Light_sensor_RGB_b = Light_sensor(ADC_PT_RGB, 4096, SR_PT_BLUE);
 RGB_led RGB_led_L = RGB_led(SR_LED_L_RED, SR_LED_L_GREEN, SR_LED_L_BLUE);
 RGB_led RGB_led_R = RGB_led(SR_LED_R_RED, SR_LED_R_GREEN, SR_LED_R_BLUE);
 
-Encoder Rotary_encoder()
+Rotary_encoder Rotary = Rotary_encoder();
 
 CD74HC4067 ADC_multiplexer = CD74HC4067(S0, S1, S2, S3);
 
@@ -87,6 +88,8 @@ void Robot::init() {
 
   kalibriere_LS(ANZ_KAL);
 
+  MPU.init();
+
   return;
 }
 
@@ -112,12 +115,25 @@ void Robot::actionLoop(){
 
 void sensorLoop(void* pvParameters){
   while (1) {
+	if (!robot.running){
+		continue;
+	}
     robot.messeLicht();
-    Serial.println(Light_sensor_M.val);
+    // Serial.println(Light_sensor_M.val);
+    MPU.update();
+    Serial.print("X : ");
+    Serial.println(MPU.AngleX);
+    Serial.print("Y : ");
+    Serial.println(MPU.AngleY);
+    Serial.print("Z : ");
+    Serial.println(MPU.AngleZ);
+    Serial.print("AccY : ");
+    Serial.println(MPU.AccelY);
+    Serial.println("");
   }
 }
 
-void secureLoop(){
+void Robot::secureLoop(){
   return;
 }
 
@@ -198,14 +214,14 @@ void Robot::gruenerPunkt(){
 void Robot::pruefeQuerschwarz(){
   int mwL = his_wL1[0];
   int mwR = his_wR1[0];
-  for (i = 0; i < 10;i++){
+  for (int i = 0; i < 10;i++){
     his_wL1[i] = his_wL1[i+1];
     his_wR1[i] = his_wR1[i+1];
     mwL = (int) mwL + his_wL1[i];
     mwR = (int) mwR + his_wR1[i];
   }
-  his_wL1[9] = (int) (Light_sensor_L1);
-  his_wR1[9] = (int) (Light_sensor_R1);
+  his_wL1[9] = (int) (Light_sensor_L1.val);
+  his_wR1[9] = (int) (Light_sensor_R1.val);
   mwL  = (int) mwL/10;
   mwR  = (int) mwR/10;
   if (mwL < SCHWARZ){
@@ -222,14 +238,14 @@ void Robot::pruefeQuerschwarz(){
 void Robot::pruefeGruen(){
   int mwL = his_gL1[0];
   int mwR = his_gR1[0];
-  for (i = 0; i < 10;i++){
+  for (int i = 0; i < 10;i++){
     his_gL1[i] = his_gL1[i+1];
     his_gR1[i] = his_gR1[i+1];
     mwL = (int) mwL + his_gL1[i];
     mwR = (int) mwR + his_gR1[i];
   }
-  his_gL1[9] = (int) (Light_sensor_L0_g - Light_sensor_L0_r);
-  his_gR1[9] = (int) (Light_sensor_R0_g - Light_sensor_R0_r);
+  his_gL1[9] = (int) (Light_sensor_L0_g.val - Light_sensor_L0_r.val);
+  his_gR1[9] = (int) (Light_sensor_R0_g.val - Light_sensor_R0_r.val);
   mwL  = (int) mwL/10;
   mwR  = (int) mwR/10;
   gruen_rich = 0;
@@ -245,14 +261,14 @@ void Robot::pruefeGruen(){
 void Robot::pruefeRot(){
   int mwL = his_rL1[0];
   int mwR = his_rR1[0];
-  for (i = 0; i < 10;i++){
+  for (int i = 0; i < 10;i++){
     his_rL1[i] = his_rL1[i+1];
     his_rR1[i] = his_rR1[i+1];
     mwL = (int) mwL + his_rL1[i];
     mwR = (int) mwR + his_rR1[i];
   }
-  his_rL1[9] = (int) (Light_sensor_L0_r - Light_sensor_L0_g);
-  his_rR1[9] = (int) (Light_sensor_R0_r - Light_sensor_R0_g);
+  his_rL1[9] = (int) (Light_sensor_L0_r.val - Light_sensor_L0_g.val);
+  his_rR1[9] = (int) (Light_sensor_R0_r.val - Light_sensor_R0_g.val);
   mwL  = (int) mwL/10;
   mwR  = (int) mwR/10;
   if (((mwL > ROT_MIN)&&(mwL < ROT_MAX))&&((mwR > ROT_MIN)&&(mwR < ROT_MAX))){
@@ -267,14 +283,14 @@ void Robot::pruefeRot(){
 void Robot::pruefeSilber(){
   int mwL = his_sL1[0];
   int mwR = his_sR1[0];
-  for (i = 0; i < 10;i++){
+  for (int i = 0; i < 10;i++){
     his_sL1[i] = his_sL1[i+1];
     his_sR1[i] = his_sR1[i+1];
     mwL = (int) mwL + his_sL1[i];
     mwR = (int) mwR + his_sR1[i];
   }
-  his_sL1[9] = (int) (Light_sensor_REF_L);
-  his_sR1[9] = (int) (Light_sensor_REF_R);
+  his_sL1[9] = (int) (Light_sensor_REF_L.val);
+  his_sR1[9] = (int) (Light_sensor_REF_R.val);
   mwL  = (int) mwL/10;
   mwR  = (int) mwR/10;
   if ((mwL > SILBER)&&(mwR > SILBER)){

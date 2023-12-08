@@ -1,10 +1,9 @@
+#include "Arduino.h"
 #include "rotary_encoder.h"
 
-Rotary_encoder::Rotary_encoder(int pin_a, int pin_b)
-{
-  this->pin_a = pin_a;
-  this->pin_b = pin_b;
-}
+// Rotary_encoder::Rotary_encoder(){
+//   return;
+// }
 
 void Rotary_encoder::measure()
 {
