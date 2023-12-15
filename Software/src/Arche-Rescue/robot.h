@@ -6,7 +6,6 @@
 
 class Robot {
   private:
-    bool running = false;
     int his_wL1[10] = {100, 100, 100, 100, 100, 100, 100, 100, 100, 100};
     int his_wR1[10] = {100, 100, 100, 100, 100, 100, 100, 100, 100, 100};
     int his_gL1[10] = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
@@ -20,6 +19,7 @@ class Robot {
     unsigned long schwarz_quer_time = 0;
   
   public:
+    bool running = false;
     void init();
     void actionLoop();
     void input();

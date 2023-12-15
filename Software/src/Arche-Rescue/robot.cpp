@@ -86,7 +86,11 @@ void Robot::init() {
 
   kalibriere_LS(ANZ_KAL);
 
+  Serial.println("vor MPU");
+
   MPU.init();
+
+  Serial.println("nach MPU");
 
   return;
 }
@@ -103,6 +107,7 @@ void Robot::actionLoop(){
     linienFolger();
     gruenerPunkt();
     pruefeSilber();
+    Serial.println("Core 1 is running");
 
   }
 
@@ -113,9 +118,9 @@ void Robot::actionLoop(){
 
 void sensorLoop(void* pvParameters){
   while (1) {
-	if (!robot.running){
-		continue;
-	}
+    if (!robot.running){
+      continue;
+    }
     robot.messeLicht();
     // Serial.println(Light_sensor_M.val);
     MPU.update();
@@ -129,8 +134,8 @@ void sensorLoop(void* pvParameters){
     Serial.println(MPU.AccelY);
     Serial.println("");
 
-    Rotary_encoder_.measure();
-    Serial.println(Rotary_encoder_.counter);
+    Rotary.measure();
+    Serial.println(Rotary.counter);
   }
 }
 
