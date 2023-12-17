@@ -1,3 +1,6 @@
+#include <sys/types.h>
+#include <sys/_stdint.h>
+#include <sys/_types.h>
 #include "esp32-hal.h"
 #include "sys_arch.h"
 #ifndef LIGHTSENSOR_H
@@ -15,20 +18,16 @@ struct SensorData{
   int16_t value=0;
 };
 
-/*inline uint16_t map(uint16_t value, uint16_t fromlow, uint16_t tolow, uint16_t tohigh){
-  return (value-fromlow)/(tolow-fromlow)*tohigh;
-}*/
-
 class LightSensor{
   private:
     uint8_t led_pin;
     void led_on(){
       shift_register::write(this->led_pin, HIGH); // TODO test and make private
-      delayMicroseconds(60);
+      delayMicroseconds(80);
     }
     void led_off(){
       delayMicroseconds(20);
-      shift_register::write(this->led_pin, LOW);
+      shift_register::write(this->led_pin, LOW, true);
     }
 
     inline int16_t map(int16_t value, int16_t minv, int16_t maxv){
@@ -46,7 +45,6 @@ class LightSensor{
     }
     void calibrate_turn(){
       led_on();
-      //delayMicroseconds(20);
       int16_t current_value = ADCRead(ADC_PT_L_1); // TODO: change part of the ifs to else ifs
       this->left_outer.max = max(this->left_outer.max, current_value);
       this->left_outer.min = min(this->left_outer.min, current_value);
@@ -71,7 +69,6 @@ class LightSensor{
     }
     void read(){
       led_on();
-      //Serial.println(ADCRead(ADC_PT_R_0));
       this->left_outer.value  = map(ADCRead(ADC_PT_L_1), left_outer.min,  left_outer.max);
       this->left.value        = map(ADCRead(ADC_PT_L_0), left.min,        left.max);
       this->center.value      = map(ADCRead(ADC_PT_M  ), center.min,      center.max);
@@ -80,6 +77,18 @@ class LightSensor{
       led_off();
     }
 
+};
+
+class DirectSensor{
+  public:
+    SensorData data;
+    DirectSensor(uint8_t ledPin, uint8_t adcPin);
+    void read();
+  private:
+    uint8_t ledPin;
+    uint8_t adcPin;
+    void ledOn();
+    void ledOff();
 };
 
 
