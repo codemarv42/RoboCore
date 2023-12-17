@@ -39,21 +39,21 @@ Servo rottof;
 TaskHandle_t loop0; //used for handling the second main loop
 int16_t diff_interchange;
 
-bool HardwareInit(){
+void HardwareInit(){
   /// get the shift register's Pins ///
-  claw::setup();
-  claw::up();
-  claw::open();
+  Serial.println("Fetching shiftregister and ADC pins...");
   pinMode(SHCP, OUTPUT);
   pinMode(STCP, OUTPUT);
   pinMode(DS, OUTPUT);
+  Serial.println("Seting up button pins..");
   pinMode(T_L, INPUT_PULLUP);
   pinMode(T_R, INPUT);
   pinMode(T_M, INPUT);
+  Serial.println("Fetching Tof servo pin...");
   rottof.attach(18);
 
+  Serial.println("Resetting shiftregister pins...")
   shift_register::reset(); /// set all values to LOW
-  return true;
 }
 
 
@@ -61,44 +61,63 @@ void setup(){
   Serial.begin(115200);
 
   ///// start core 0 //////
-  //Serial.println("Hallo");
+  Serial.println("Serial INIT");
   Serial.print("Loop running on core:");
   Serial.println(xPortGetCoreID());
-  //xTaskCreatePinnedToCore(core0, "Core0MainLoop", 10000, NULL, 0, &loop0, 0);
 
   Wire.begin();
+  Serial.print("WIRE on core:");
+  Serial.println(xPortGetCoreID());
   Serial.println("HardwareInit...");
   HardwareInit();
   
-  Serial.println("MPU-detection...");
-  gyro::MPU6050Init();
-  Serial.println("Resetting Claw...");
-  claw::up(); // reset the claw
-  claw::close();
+  Serial.println("Claw Setup...");
+  claw::setup();
+
+  Serial.println("Resetting claw...");
+  claw::up();
+  claw::open();
+  
+  Serial.print("MPU-detection...");
+  if (!gyro::MPU6050Init()){
+    Serial.println("\tMISSING MPU5060!!!");
+  }
+  else{
+    Serial.println("\tfound");
+  }
+  Serial.println("Setting up tof sensors...");
   tof::init();
+
+  Serial.println("Resetting tof servo...");
   rottof.write(90);
-  delay(2000);/*
-  rottof.write(180);
-  delay(2000);*/
+  delay(2000);
+
   #ifdef LED_TEST
+    Serial.println("LED test (WGR)...");
     shift_register::write(SR_PT_WHITE, HIGH);
     delay(2000);
-    shift_register::write(SR_PT_WHITE, LOW);
+    shift_register::write(SR_PT_WHITE, LOW, true);
     shift_register::write(SR_PT_GREEN, HIGH);
     delay(2000);
-    shift_register::write(SR_PT_GREEN, LOW);
+    shift_register::write(SR_PT_GREEN, LOW, true);
     shift_register::write(SR_PT_RED, HIGH);
     delay(2000);
-    shift_register::write(SR_PT_RED, LOW);
+    shift_register::write(SR_PT_RED, LOW, true);
   #endif
 
   Serial.println("Calibration...");
-  calibrate(all_sensors, 3000, 3);
+  calibrate(all_sensors, 5000, 3);
   Serial.print("White Left max: "); Serial.print(white.left.max); Serial.print(" - White Right max: "); Serial.println(white.right.max);
   Serial.print("White Left min: "); Serial.print(white.left.min); Serial.print(" - White Right min: "); Serial.println(white.right.min);
   shift_register::write(SR_PT_GREEN, HIGH); // turn on cool green LED's
   delay(1000);
   gyro::ResetZAngle();
+  
+  #ifdef BLE
+    StartBLE();
+  #endif
+
+  //xTaskCreatePinnedToCore(core0, "Core0MainLoop", 10000, NULL, 0, &loop0, 0);
 }
 
 int16_t diff_cache[10] = {0};
