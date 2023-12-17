@@ -1,3 +1,4 @@
+#include "HardwareSerial.h"
 #ifndef MOTOR_CPP
 #define MOTOR_CPP
 
@@ -64,6 +65,7 @@ namespace motor{
     motor::stop();
     gyro::ResetZAngle();
     Serial.println("motor::gyro");
+    gyro::UpdateMPU6050();
     delay(10);
     if (deg < 0){
       fwd(A, v);
@@ -77,7 +79,7 @@ namespace motor{
       fwd(A, -v);
       fwd(B, v);
     
-      while (mpu.getAngleZ() < deg){
+      while (gyro::ZAngle < deg){
         gyro::UpdateMPU6050();
       }
     }
