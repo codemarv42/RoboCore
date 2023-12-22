@@ -163,6 +163,10 @@ void Robot::output(){
   return;
 }
 
+float Robot::battery_voltage(){
+  return 1649/649*analogRead(VBAT);
+}
+
 void Robot::kalibriere_LS(int anz){
   for (int i = 0; i < anz; i++){
     Light_sensor_L1.calibrate();
