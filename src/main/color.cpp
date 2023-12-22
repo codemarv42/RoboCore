@@ -1,14 +1,13 @@
 
-//#ifndef COLOR_CPP
-//#define COLR_CPP
 #include "Pins.h"
 #include "color.h"
 #include <Arduino.h>
 #include "lightsensor.h"
 
-#define check_length 7
-#define GREEN_THRESHOLD 10
-#define BLACK_THRESHOLD 50
+#define check_length 7  // How often a color must be checked to allow a true call 
+#define GREEN_THRESHOLD 15 // Minimum diff for a recognised green
+#define BLACK_THRESHOLD 35 // Max value for black
+#define CHECKRED
 
 namespace color{
   struct ColorCount{
@@ -63,25 +62,24 @@ namespace color{
     else if(green.right > 0){
       green.right--;
     }
-
-    if (-s_green->left.value + s_red->left.value*1.2 > GREEN_THRESHOLD){
-      if (green.left < check_length){
-        green.left++;
+    #ifdef CHECKRED
+      if (-s_green->left.value + s_red->left.value > GREEN_THRESHOLD){
+        if (green.left < check_length){
+          red.left++;
+        }
       }
-    }
-    else if(green.left > 0){
-      green.left--;
-    }
-
-    if (-s_green->right.value + s_red->right.value > GREEN_THRESHOLD){
-      if (red.right < check_length){
-        red.right++;
+      else if(green.left > 0){
+        red.left--;
       }
-    }
-    else if(red.right > 0){
-      red.right--;
-    }
+
+      if (-s_green->right.value + s_red->right.value > GREEN_THRESHOLD){
+        if (red.right < check_length){
+          red.right++;
+        }
+      }
+      else if(red.right > 0){
+        red.right--;
+      }
+    #endif
   }
 }
-
-//#endif

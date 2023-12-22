@@ -26,27 +26,22 @@ namespace tof{
     
     shift_register::write(SR_XSHT1, HIGH);
     delay(10);
-    if (!left.init()){Serial.print("dumm 1");}
+    if (!left.init()){Serial.print("\tMISSING TOF 1 (Left)");}
     shift_register::write(SR_XSHT1, LOW, true);
     shift_register::write(SR_XSHT2, HIGH);
     delay(10);
-    if (!claw.init()){Serial.print("dumm 2");}
+    if (!claw.init()){Serial.print("\tMISSING TOF 2 (Claw)");}
     shift_register::write(SR_XSHT3, HIGH, true);
     shift_register::write(SR_XSHT2, LOW);
     delay(10);
-    if (!turnable_upper.init()){Serial.print("dumm 3");}
+    if (!turnable_upper.init()){Serial.print("\tMISSING TOF 3 (Upper)");}
     shift_register::write(SR_XSHT4, HIGH, true);
     shift_register::write(SR_XSHT3, LOW);
     delay(10);
-    if (!turnable_lower.init()){Serial.print("dumm 4");}
+    if (!turnable_lower.init()){Serial.print("\tMISSING TOF 4 (Lower)");}
     shift_register::write(SR_XSHT4, LOW);
 
-    Serial.println("All tof Sensors active!");
-
-    /*left.startContinuous(50);
-    claw.startContinuous(50);
-    turnable_upper.startContinuous(50);
-    turnable_lower.startContinuous(50);*/
+    Serial.println("...tof Sensors active!");
   }
 
   uint16_t readLeft(){

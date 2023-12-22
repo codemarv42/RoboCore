@@ -4,6 +4,8 @@
 #include "hardware.h"
 #include "Wire.h"
 #include <time.h>
+#include "menu.h"
+#include "eeprom.h"
 //#include "color.h"
 
 /*
@@ -19,7 +21,7 @@ view LICENSE.md for details
 #define V 200
 #define V2 140
 #define V3 40
-#define BLE
+//#define BLE
 #define DEBUG
 #define NOMOTORS
 //#define LED_TEST
@@ -52,7 +54,7 @@ void HardwareInit(){
   Serial.println("Fetching Tof servo pin...");
   rottof.attach(18);
 
-  Serial.println("Resetting shiftregister pins...")
+  Serial.println("Resetting shiftregister pins...");
   shift_register::reset(); /// set all values to LOW
 }
 
@@ -70,13 +72,10 @@ void setup(){
   Serial.println(xPortGetCoreID());
   Serial.println("HardwareInit...");
   HardwareInit();
-  
-  Serial.println("Claw Setup...");
-  claw::setup();
 
-  Serial.println("Resetting claw...");
-  claw::up();
-  claw::open();
+  Serial.print("Display Init...");
+  menu::DisplayInit();
+  menu::showWaiting("Initializing...");
   
   Serial.print("MPU-detection...");
   if (!gyro::MPU6050Init()){
@@ -85,12 +84,21 @@ void setup(){
   else{
     Serial.println("\tfound");
   }
+
   Serial.println("Setting up tof sensors...");
   tof::init();
 
   Serial.println("Resetting tof servo...");
   rottof.write(90);
-  delay(2000);
+  delay(1000);
+
+  Serial.println("Claw Setup...");
+  claw::setup();
+
+  menu::showWaiting("Resetting claw...");
+  Serial.println("Resetting claw...");
+  claw::up();
+  claw::open();
 
   #ifdef LED_TEST
     Serial.println("LED test (WGR)...");
@@ -105,17 +113,30 @@ void setup(){
     shift_register::write(SR_PT_RED, LOW, true);
   #endif
 
-  Serial.println("Calibration...");
-  calibrate(all_sensors, 5000, 3);
-  Serial.print("White Left max: "); Serial.print(white.left.max); Serial.print(" - White Right max: "); Serial.println(white.right.max);
-  Serial.print("White Left min: "); Serial.print(white.left.min); Serial.print(" - White Right min: "); Serial.println(white.right.min);
-  shift_register::write(SR_PT_GREEN, HIGH); // turn on cool green LED's
-  delay(1000);
-  gyro::ResetZAngle();
-  
   #ifdef BLE
     StartBLE();
   #endif
+  
+  // Menu
+  while (true){
+    shift_register::write(SR_PT_GREEN, HIGH); // turn on cool green LED's
+    int option = menu::menu();
+    if (option == MENU_CALIBRATE){
+
+      menu::showWaiting("Calibration...");
+      Serial.println("Calibration...");
+      calibrate(all_sensors, 5000, 3);
+      Serial.print("White Left max: "); Serial.print(white.left.max); Serial.print(" - White Right max: "); Serial.println(white.right.max);
+      Serial.print("White Left min: "); Serial.print(white.left.min); Serial.print(" - White Right min: "); Serial.println(white.right.min);
+      eeprom::writeLSData(&white,&green,&red, nullptr);
+    }
+    else if (option == MENU_RUN){
+      break;
+    }
+  }
+  shift_register::write(SR_PT_GREEN, HIGH); // turn on cool green LED's
+  delay(1000);
+  gyro::ResetZAngle();
 
   //xTaskCreatePinnedToCore(core0, "Core0MainLoop", 10000, NULL, 0, &loop0, 0);
 }
@@ -330,7 +351,7 @@ void loop() {
 }
 
 ////// CORE 0 LOOP //////
-void core0(void * pvParameters){
+/*void core0(void * pvParameters){
   pinMode(ENC_SW, INPUT);
   
   // Begin I2C
@@ -371,4 +392,4 @@ void core0(void * pvParameters){
         );
     #endif
   }
-}
+}*/
