@@ -19,3 +19,7 @@
 | ToDo | Status |
 |--|--|
 |dirt protection for motors|Build|
+|top left|not working|
+|top right|loud|
+|bottom left|loud|
+|bottom right|ok?!|
