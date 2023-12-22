@@ -119,7 +119,7 @@ void Robot::actionLoop(){
     // gruenerPunkt();
     // pruefeSilber();
     Serial.println("Core 1 is running");
-    
+    Serial.println(battery_voltage());
     // Serial.print("X : ");
     // Serial.println(MPU.AngleX);
     // Serial.print("Y : ");

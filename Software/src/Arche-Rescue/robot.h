@@ -35,6 +35,7 @@ class Robot {
     void abbiegenGruen(int rich);
     void kehrtwende();
     void secureLoop();
+    float battery_voltage();
 };
 
 extern Robot robot;
