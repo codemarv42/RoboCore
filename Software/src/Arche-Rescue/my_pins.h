@@ -100,7 +100,7 @@
 
 #define PAUSE_MESSEN    150 //anpassen nach unten?
 
-#define ANZ_KAL         200 //anpassen zusammen mit delay in kali?
+#define ANZ_KAL         150 //anpassen zusammen mit delay in kali?
 
 #define SCHNELL         150
 #define SOLL            100

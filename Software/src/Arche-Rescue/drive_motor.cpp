@@ -1,6 +1,7 @@
-#include <Arduino.h>
+#include "Arduino.h"
 #include "drive_motor.h"
 #include "robot.h"
+#include "shift_register.h"
 
 Motor::Motor(byte pinPwm, byte pin1, byte pin2, byte pinStby) {
   this->pinPwm = pinPwm;
@@ -10,11 +11,7 @@ Motor::Motor(byte pinPwm, byte pin1, byte pin2, byte pinStby) {
 }
 
 void Motor::init() {
-  pinMode(pinPwm, OUTPUT);
-  pinMode(pin1, OUTPUT);
-  pinMode(pin2, OUTPUT);
-  pinMode(pinStby, OUTPUT);
-  digitalWrite(pinStby, HIGH);
+  ShiftRegisterWrite(pinStby, HIGH);
 }
 
 void Motor::Fwd(int v) {
@@ -28,14 +25,14 @@ void Motor::Fwd(int v) {
   }
   
   if (v >= 0) {
-    digitalWrite(pin1, LOW);
-    digitalWrite(pin2, HIGH);
+    ShiftRegisterWrite(pin1, LOW);
+    ShiftRegisterWrite(pin2, HIGH);
   
   }
   if (v < 0) {
     v = -v;
-    digitalWrite(pin1, HIGH);
-    digitalWrite(pin2, LOW);
+    ShiftRegisterWrite(pin1, HIGH);
+    ShiftRegisterWrite(pin2, LOW);
   }
   
   analogWrite(pinPwm, v);
@@ -58,9 +55,9 @@ void Motor::Off() {
 }
 
 void Motor::StandBy() {
-  digitalWrite(pinStby, LOW);
+  ShiftRegisterWrite(pinStby, LOW);
 }
 
 void Motor::WakeUp() {
-  digitalWrite(pinStby, HIGH);
+  ShiftRegisterWrite(pinStby, HIGH);
 }

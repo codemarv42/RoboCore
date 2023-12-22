@@ -88,9 +88,20 @@ void Robot::init() {
 
   Serial.println("vor MPU");
 
-  MPU.init();
+  // MPU.init();
 
   Serial.println("nach MPU");
+
+  Motor_L.Fwd(SOLL);
+  delay(5000);
+  Motor_L.Off();
+  Motor_R.Fwd(SOLL);
+  delay(5000);
+  Motor_L.Rev(SOLL);
+  Motor_R.Rev(SOLL);
+  delay(5000);
+  Motor_L.Off();
+  Motor_R.Off();
 
   return;
 }
@@ -101,13 +112,23 @@ void Robot::actionLoop(){
 
   while (1) {
 
-    pruefeQuerschwarz();
-    pruefeGruen();
-    pruefeRot();
-    linienFolger();
-    gruenerPunkt();
-    pruefeSilber();
+    // pruefeQuerschwarz();
+    // pruefeGruen();
+    // pruefeRot();
+    // linienFolger();
+    // gruenerPunkt();
+    // pruefeSilber();
     Serial.println("Core 1 is running");
+    
+    // Serial.print("X : ");
+    // Serial.println(MPU.AngleX);
+    // Serial.print("Y : ");
+    // Serial.println(MPU.AngleY);
+    // Serial.print("Z : ");
+    // Serial.println(MPU.AngleZ);
+    // Serial.print("AccY : ");
+    // Serial.println(MPU.AccelY);
+    // Serial.println("");
 
   }
 
@@ -123,19 +144,10 @@ void sensorLoop(void* pvParameters){
     }
     robot.messeLicht();
     // Serial.println(Light_sensor_M.val);
-    MPU.update();
-    Serial.print("X : ");
-    Serial.println(MPU.AngleX);
-    Serial.print("Y : ");
-    Serial.println(MPU.AngleY);
-    Serial.print("Z : ");
-    Serial.println(MPU.AngleZ);
-    Serial.print("AccY : ");
-    Serial.println(MPU.AccelY);
-    Serial.println("");
+    // MPU.update();
 
-    Rotary.measure();
-    Serial.println(Rotary.counter);
+    // Rotary.measure();
+    // Serial.println(Rotary.counter);
   }
 }
 
