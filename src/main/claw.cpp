@@ -13,7 +13,7 @@ namespace claw{
   
   void setup(){
     grab.attach(16);
-    lift.attach(18);
+    lift.attach(19);
     push.attach(17);
   }
   void unload_victims(bool push=false){
