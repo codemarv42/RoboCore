@@ -62,22 +62,30 @@ namespace menu {
 
   int menu(){
     int selected = 0;
-    const unsigned char * icons[menuOptions] = {iconGo, iconCalibrate};
+    const unsigned char * icons[menuOptions] = {iconRun, iconCalibrate};
+    const char * texts[menuOptions] = {"Run", "Calibrate"};
     in_menu = true;
     bool last_RE_state = analogRead(ENC_B);
     Serial.println("InMenu");
     while (in_menu){
+      #ifdef BLE
+        BLELoop(0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0);
+      #endif
       display.clearDisplay();
       overlay();
+      display.setTextSize(1);
+      display.setTextColor(SSD1306_WHITE);
       for(int i = 0; i < menuOptions; i++){
         if (i == selected){
-          display.drawRect(16*i, 16, 16, 16, SSD1306_WHITE);
-          display.drawBitmap(16*i, 16, icons[i], 16, 16, SSD1306_WHITE);
+          display.fillRoundRect(32*i, 16, 32, 32, 4, SSD1306_WHITE);
+          display.drawBitmap(32*i, 16, icons[i], 32, 32, SSD1306_INVERSE);
         }
         else{
-          display.drawBitmap(16*i, 16, icons[i], 16, 16, SSD1306_WHITE);
+          display.drawBitmap(32*i, 16, icons[i], 32, 32, SSD1306_INVERSE);
         }
       }
+      display.setCursor(8, 49);
+      display.print(texts[selected]);
       bool enc = analogRead(ENC_B);
       //Serial.println(enc);
       if (enc != last_RE_state && enc == HIGH){
@@ -93,8 +101,6 @@ namespace menu {
       last_RE_state = enc;
 
       display.display();
-
-      delay(10);
       if (digitalRead(ENC_SW) == HIGH){
         in_menu = false;
         return selected;
