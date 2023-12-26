@@ -4,7 +4,6 @@
 #include "Pins.h"
 #include "MPU6050_light.h"
 #include "Wire.h"
-//#include "gyro.cpp"
 
 extern MPU6050 mpu;
 

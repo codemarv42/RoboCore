@@ -40,7 +40,7 @@ namespace menu {
     }
     #ifdef SHOW_VBAT
         display.setCursor(0, 0);
-        display.print(F(1649/649*analogRead(VBAT)));
+        display.print(String(1649/649*analogRead(VBAT)));
         display.print("V");
     #endif
   }
