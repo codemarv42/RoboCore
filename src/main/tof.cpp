@@ -1,11 +1,15 @@
+#include <sys/unistd.h>
 
 #include <Arduino.h>
 #include <VL53L1X.h>
 #include <Wire.h>
 #include "Pins.h"
 #include "shiftregister.h"
+#include <ESP32Servo.h>
 
 #include "tof.h"
+
+Servo rottof;
 
 namespace tof{
   VL53L1X left;
@@ -15,6 +19,7 @@ namespace tof{
 
   void init(){
 
+    rottof.attach(18);
     left.setAddress(TOF_ADRESS);
     left.setTimeout(500);
     claw.setAddress(TOF_ADRESS);
@@ -64,6 +69,20 @@ namespace tof{
     uint16_t a = turnable_lower.readSingle();
     shift_register::write(SR_XSHT4, LOW, true);
     return a;
+  }
+
+  triangleData* readPos(){ // DONT FORGET TO DELETE THE TRIANGLEDATA!!!
+    triangleData* t = new triangleData;
+    rottof.write(0);
+    delay(1000);
+    for(uint8_t i = 0; i < 180; i++){
+      rottof.write(i);
+      delay(10);
+      t->upper[i] == readUpper();
+      t->lower[i] == readLower();
+    }
+
+    return t;
   }
 }
 
