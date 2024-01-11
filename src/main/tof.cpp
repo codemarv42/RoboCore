@@ -58,14 +58,14 @@ namespace tof{
   }
   uint16_t readUpper(){
     shift_register::write(SR_XSHT3, HIGH);
-    delay(1);
+    //delay(1);
     uint16_t a = turnable_upper.readSingle();
     shift_register::write(SR_XSHT3, LOW, true);
     return a;
   }
   uint16_t readLower(){
     shift_register::write(SR_XSHT4, HIGH);
-    delay(10);
+    //delay(1);
     uint16_t a = turnable_lower.readSingle();
     shift_register::write(SR_XSHT4, LOW, true);
     return a;
@@ -74,12 +74,10 @@ namespace tof{
   triangleData* readPos(){ // DONT FORGET TO DELETE THE TRIANGLEDATA!!!
     triangleData* t = new triangleData;
     rottof.write(0);
-    delay(1000);
     for(uint8_t i = 0; i < 180; i++){
       rottof.write(i);
-      delay(10);
-      t->upper[i] == readUpper();
-      t->lower[i] == readLower();
+      t->upper[i] = readUpper();
+      t->lower[i] = readLower();
     }
 
     return t;
