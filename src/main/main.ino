@@ -6,7 +6,7 @@
 #include <time.h>
 #include "menu.h"
 #include "eeprom.h"
-//#include "color.h"
+#include "evac.h"
 
 /*
 copyright (c) ImmernochKeinName, 2023
@@ -21,11 +21,11 @@ view LICENSE.md for details
 #define V 200
 #define V2 140
 #define V3 40
-//#define BLE
-#define DEBUG
-#define NOMOTORS
+#define BLE
+//#define DEBUG
+//#define NOMOTORS
 //#define LED_TEST
-//#define LF_ACTIVE
+#define LF_ACTIVE
 
   
 // Init Light Sesnsors
@@ -36,7 +36,6 @@ DirectSensor refL = DirectSensor(SR_PT_WHITE, ADC_PT_REF_L);
 DirectSensor refR = DirectSensor(SR_PT_WHITE, ADC_PT_REF_R);
 
 LightSensor* all_sensors[] = {&white,&green,&red,nullptr};  // nullptr is placeholder for an (optional) blue LightSensor
-Servo rottof;
 
 TaskHandle_t loop0; //used for handling the second main loop
 int16_t diff_interchange;
@@ -47,12 +46,12 @@ void HardwareInit(){
   pinMode(SHCP, OUTPUT);
   pinMode(STCP, OUTPUT);
   pinMode(DS, OUTPUT);
+  pinMode(ENC_SW, INPUT);
   Serial.println("Seting up button pins..");
   pinMode(T_L, INPUT_PULLUP);
   pinMode(T_R, INPUT);
   pinMode(T_M, INPUT);
   Serial.println("Fetching Tof servo pin...");
-  rottof.attach(18);
 
   Serial.println("Resetting shiftregister pins...");
   shift_register::reset(); /// set all values to LOW
@@ -90,7 +89,7 @@ void setup(){
 
   Serial.println("Resetting tof servo...");
   rottof.write(90);
-  delay(1000);
+  delay(2000);
 
   Serial.println("Claw Setup...");
   claw::setup();
@@ -115,30 +114,42 @@ void setup(){
 
   #ifdef BLE
     StartBLE();
+    BLELoop(0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0);
   #endif
   
+  triangleData* t;
+
   // Menu
   while (true){
     shift_register::write(SR_PT_GREEN, HIGH); // turn on cool green LED's
-    int option = menu::menu();
-    if (option == MENU_CALIBRATE){
+    int option = menu::menu(); // run displayMenu
+    if (option == MENU_CALIBRATE){ // handle results
 
       menu::showWaiting("Calibration...");
       Serial.println("Calibration...");
+      delay(1000);
       calibrate(all_sensors, 5000, 3);
+      // Print min/max of WHITE
       Serial.print("White Left max: "); Serial.print(white.left.max); Serial.print(" - White Right max: "); Serial.println(white.right.max);
       Serial.print("White Left min: "); Serial.print(white.left.min); Serial.print(" - White Right min: "); Serial.println(white.right.min);
-      eeprom::writeLSData(&white,&green,&red, nullptr);
+      eeprom::writeLSData(&white,&green,&red, nullptr); // save light values
     }
     else if (option == MENU_RUN){
       break;
     }
+    else if (option == 2){
+      evacuationZone();
+    }
   }
-  shift_register::write(SR_PT_GREEN, HIGH); // turn on cool green LED's
+
+  // Done before Loop
+  eeprom::loadLSData(&white,&green,&red, nullptr);
+  Serial.print("White Left max: "); Serial.print(white.left.max); Serial.print(" - White Right max: "); Serial.println(white.right.max);
+  Serial.print("White Left min: "); Serial.print(white.left.min); Serial.print(" - White Right min: "); Serial.println(white.right.min);
   delay(1000);
   gyro::ResetZAngle();
 
-  //xTaskCreatePinnedToCore(core0, "Core0MainLoop", 10000, NULL, 0, &loop0, 0);
+  xTaskCreatePinnedToCore(core0, "Core0MainLoop", 10000, NULL, 0, &loop0, 0);
 }
 
 int16_t diff_cache[10] = {0};
@@ -221,22 +232,33 @@ void loop() {
       #ifdef DEBUG
         Serial.println("Green Detected!");
       #endif
+      // read again to confirm
+      for(uint8_t i; i < 15; i++){
+        green.read();
+        red.read();
+        color::update(&white, &green, &red);
+      }
       bool left = color::on_green(LEFT);
       bool right = color::on_green(RIGHT);
       shift_register::write(SR_LED_R_GREEN, !right); // show side on LED
       shift_register::write(SR_LED_L_GREEN, !left);
+
       motor::stop();
       delay(1000);
       if(right || left){
-        motor::sensorFwd(V/2, V/2 , 2000, all_sensors); // go fwd, until there is no green
+        motor::sensorFwd(V/2, V/2 , 2500, all_sensors); // go fwd, until there is no green
         motor::stop();
-        //motor::readFwd(AB, V, 1000, all_sensors);
         white.read();
-        if(white.left_outer.value < 50 || white.right_outer.value < 50){ // check for black line
+        if((white.left_outer.value < 50 && left) || (white.right_outer.value < 50 && right)){ // check for black line
           delay(1000);
-          int16_t turn = 0; // choose turn side W.I.P.
-          if (left){ turn += 80;}
-          if (right){ turn += 80;}
+          if(left != right){ // only do if not turning 180 degrees
+            motor::fwd(AB, V);
+            delay(250);
+            motor::stop();
+          }
+          int16_t turn = 0; // choose turn side
+          if (left){ turn += 90;}
+          if (right){ turn += 90;}
           if (right && (!left)){turn = -turn;}
           motor::gyro(V, turn);
           motor::fwd(AB, V);
@@ -296,7 +318,7 @@ void loop() {
       if (mot_diff > 100){
         v = V2;
       }
-      motor::fwd(A, ( v + mot_diff)); // TODO: change both sides to be equal, when hardware-problem is solved
+      motor::fwd(A, ( v + mot_diff));
       motor::fwd(B, ( v - mot_diff));
     #endif
   #endif
@@ -326,6 +348,7 @@ void loop() {
     if (dist > 250){ // => check if there is enough space to pass on this side
       motor::gyro(V, 90);
       motor::stop();
+      Serial.println("Baum");
       rottof.write(0);
       delay(2000);
       dist = tof::readUpper(); // set approximation dist
@@ -351,31 +374,9 @@ void loop() {
 }
 
 ////// CORE 0 LOOP //////
-/*void core0(void * pvParameters){
-  pinMode(ENC_SW, INPUT);
-  
-  // Begin I2C
-  //Wire.begin();
-  Serial.print("WIRE on Core");
-  Serial.println(xPortGetCoreID());
-
-  // Init Display
-  DisplayInit();
-  delay(1000);
-  showGyroWaiting();
-
-  delay(2000);
-  //menu();
-
-  // Start BLE
-  #ifdef BLE
-    StopBLE();
-    StartBLE();
-  #endif
-  
+void core0(void * pvParameters){
   while (true){
-    //delay(100);
-    showDifference(diff_interchange, "D", true);
+    menu::showDifference(diff_interchange, true);
     #ifdef BLE
       BLELoop(
         int(white.left_outer.value),
@@ -383,8 +384,8 @@ void loop() {
         int(white.center.value),
         int(white.right.value),
         int(white.right_outer.value),
-        0,
-        0,
+        int(refL.data.value),
+        int(refR.data.value),
         int(red.left.value),
         int(red.right.value),
         int(green.left.value),
@@ -392,4 +393,4 @@ void loop() {
         );
     #endif
   }
-}*/
+}

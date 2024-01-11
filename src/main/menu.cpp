@@ -56,7 +56,7 @@ namespace menu {
     #endif
     #ifdef SHOW_VBAT
         display.setCursor(0, 0);
-        display.print(String(1649/649*analogRead(VBAT)));
+        display.print(String((1649/649*analogRead(VBAT))/1000));
         display.print("V");
     #endif
   }
@@ -72,12 +72,12 @@ namespace menu {
   }
 
   
-  #define menuOptions 2
+  #define menuOptions 3
 
   int menu(){
     int selected = 0;
-    const unsigned char * icons[menuOptions] = {iconRun, iconCalibrate}; // icons to display in menu
-    const char * texts[menuOptions] = {"Run", "Calibrate"}; // text of the options
+    const unsigned char * icons[menuOptions] = {iconRun, iconCalibrate, placeholder}; // icons to display in menu
+    const char * texts[menuOptions] = {"Run", "Calibrate", "test"}; // text of the options
 
     bool in_menu = true;
     bool last_RE_state = analogRead(ENC_B); // used for rotary encoder detection
@@ -142,10 +142,13 @@ namespace menu {
     display.clearDisplay();
     overlay();
     for(uint8_t i = 0; i < SCREEN_WIDTH; i++){
-      uint16_t dataMappedUpper = map(t->upper[i + VIEW_START], 0, 1200, 32, 0); // map from 0mm - 1200mm to 0 - 32
+      Serial.print(t->upper[i]);
+      Serial.print(" ");
+      Serial.println(t->lower[i]);
+      uint16_t dataMappedUpper = 32-(float(t->upper[i + VIEW_START])/1200*32); // map from 0mm - 1200mm to 0 - 32
       display.drawFastVLine(i, 32-dataMappedUpper, dataMappedUpper, SSD1306_WHITE);
 
-      uint16_t dataMappedLower = map(t->lower[i + VIEW_START], 0, 1200, 32, 0); // map from 0mm - 1200mm to 0 - 32
+      uint16_t dataMappedLower = 32-(float(t->lower[i + VIEW_START])/1200*32); // map from 0mm - 1200mm to 0 - 32
       display.drawFastVLine(i, 32, dataMappedLower, SSD1306_WHITE);
 
     }

@@ -89,47 +89,47 @@ void BLELoop(int wlo, int wli, int wc, int wri, int wro, int rl, int rr, int red
     if (deviceConnected) {
       char a[6];
       itoa(wlo, a, 10);
-      pCharacteristic->setValue(a);
+      pCharacteristic->setValue(String(a).c_str());
       pCharacteristic->notify();
 
       itoa(wli,a,10);
-      pCharacteristic_2->setValue(a);
+      pCharacteristic_2->setValue(String(a).c_str());
       pCharacteristic_2->notify();
 
       itoa(wc,a,10);
-      pCharacteristic_3->setValue(a);
+      pCharacteristic_3->setValue(String(a).c_str());
       pCharacteristic_3->notify();
 
       itoa(wri,a,10);
-      pCharacteristic_4->setValue(a);
+      pCharacteristic_4->setValue(String(a).c_str());
       pCharacteristic_4->notify();
 
       itoa(wro,a,10);
-      pCharacteristic_5->setValue(a);
+      pCharacteristic_5->setValue(String(a).c_str());
       pCharacteristic_5->notify();
 
       itoa(rl,a,10);
-      pCharacteristic_6->setValue(a);
+      pCharacteristic_6->setValue(String(a).c_str());
       pCharacteristic_6->notify();
 
       itoa(rr,a,10);
-      pCharacteristic_7->setValue(a);
+      pCharacteristic_7->setValue(String(a).c_str());
       pCharacteristic_7->notify();
 
       itoa(redl,a,10);
-      pCharacteristic_8->setValue(a);
+      pCharacteristic_8->setValue(String(a).c_str());
       pCharacteristic_8->notify();
 
       itoa(redr,a,10);
-      pCharacteristic_9->setValue(a);
+      pCharacteristic_9->setValue(String(a).c_str());
       pCharacteristic_9->notify();
 
       itoa(gl,a,10);
-      pCharacteristic_10->setValue(a);
+      pCharacteristic_10->setValue(String(a).c_str());
       pCharacteristic_10->notify();
 
       itoa(gr,a,10);
-      pCharacteristic_11->setValue(a);
+      pCharacteristic_11->setValue(String(a).c_str());
       pCharacteristic_11->notify();
     }
     // disconnecting
@@ -238,8 +238,8 @@ void StartBLE() {
   BLEAdvertising* pAdvertising = BLEDevice::getAdvertising();
   pAdvertising->addServiceUUID(SERVICE_UUID);
   pAdvertising->setScanResponse(false);
-  pAdvertising->setMinPreferred(0x06);  // functions that help with iPhone connections issue
-  pAdvertising->setMinPreferred(0x12);
+  //pAdvertising->setMinPreferred(0x06);  // functions that help with iPhone connections issue
+  //pAdvertising->setMinPreferred(0x12);
   BLEDevice::startAdvertising();
   Serial.println("BLE - Waiting a client connection to notify...");
 }

@@ -1,4 +1,4 @@
-
+#pragma once
 #include "Pins.h"
 #include <Arduino.h>
 #include <EEPROM.h>
@@ -12,6 +12,7 @@ namespace eeprom{
   //extern bool loadInRescueZone(); // NYI
 
   extern void writeLSData(LightSensor* white, LightSensor* green, LightSensor* red, LightSensor* blue);
+  extern void loadLSData(LightSensor* white, LightSensor* green, LightSensor* red, LightSensor* blue);
 }
 
 
