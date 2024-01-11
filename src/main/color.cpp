@@ -63,12 +63,12 @@ namespace color{
       green.right--;
     }
     #ifdef CHECKRED
-      if (-s_green->left.value + s_red->left.value > GREEN_THRESHOLD){
-        if (green.left < check_length){
+      if (-s_red->left.value + s_red->left.value > GREEN_THRESHOLD){
+        if (red.left < check_length){
           red.left++;
         }
       }
-      else if(green.left > 0){
+      else if(red.left > 0){
         red.left--;
       }
 
