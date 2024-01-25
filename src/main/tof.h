@@ -19,5 +19,6 @@ namespace tof{
   extern uint16_t readLeft();
   extern uint16_t readUpper();
   extern uint16_t readLower();
+  extern uint16_t readClaw();
   extern triangleData* readPos();
 }

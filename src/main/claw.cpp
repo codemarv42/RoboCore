@@ -16,15 +16,17 @@ namespace claw{
     lift.attach(19);
     push.attach(17);
   }
-  void unload_victims(bool push=false){
-    shift_register::write(SR_SOLONOID, HIGH);
-    delay(2000);
-    shift_register::write(SR_SOLONOID, LOW);
+  void unload_victims(bool pushv=false){
+    //shift_register::write(SR_SOLONOID, HIGH);
+    //delay(2000);
+    //shift_register::write(SR_SOLONOID, LOW);
+    push.write(0);
+    delay(1000);
+    push.write(180);
   }
 
   void down(){
-    lift.write(180);
-    //lift.writeMicroseconds(2800);
+    lift.write(360);
     delay(2000);
   }
   void up(){

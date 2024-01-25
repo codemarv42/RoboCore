@@ -17,7 +17,7 @@
 
 std::pair<uint8_t, bool> getOptimalVictimAngle(triangleData* t){
   for(static uint8_t i = 0; i < 180; i++){
-    if (t->upper[i] - t->lower[i] >= VICTIM_DIFF){
+    if (t->upper[i] - t->lower[i] >= VICTIM_DIFF && i > 15 && i < 165){
       return std::make_pair<uint8_t, bool>(i+1, false);
     }
   }
@@ -38,7 +38,7 @@ void evacuationZone(){
     menu::showView(t);
     std::pair<uint8_t, bool> angle = getOptimalVictimAngle(t);
     if (!angle.second){
-      motor::gyro(V, 90 - angle.first);
+      motor::gyro(V, angle.first - 90);
     }
 
     delete t;

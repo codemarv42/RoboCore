@@ -56,6 +56,13 @@ namespace tof{
     shift_register::write(SR_XSHT1, LOW, true);
     return a;
   }
+  uint16_t readClaw(){
+    shift_register::write(SR_XSHT2, HIGH);
+    delay(1);
+    uint16_t a = claw.readSingle();
+    shift_register::write(SR_XSHT2, LOW, true);
+    return a;
+  }
   uint16_t readUpper(){
     shift_register::write(SR_XSHT3, HIGH);
     //delay(1);

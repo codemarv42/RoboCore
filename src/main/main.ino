@@ -18,10 +18,10 @@ view LICENSE.md for details
 
 
 // SPEED
-#define V 200
-#define V2 140
+#define V 100
+#define V2 80
 #define V3 40
-#define BLE
+//#define BLE
 //#define DEBUG
 //#define NOMOTORS
 //#define LED_TEST
@@ -138,7 +138,41 @@ void setup(){
       break;
     }
     else if (option == 2){
-      evacuationZone();
+      /*while(true){
+        //for(uint i = 0; i < 180; i += 15){
+        //  rottof.write(i);
+          uint16_t upper = tof::readUpper();
+          uint16_t lower = tof::readLower();
+          Serial.print(upper);
+          Serial.print(" ");
+          Serial.print(lower);
+          Serial.print(" ");
+          Serial.println(upper-lower);
+          if(upper - lower <= 100 && upper - lower > 10){
+            Serial.println("found Victim!");
+            shift_register::write(SR_LED_L_BLUE, LOW);
+            claw::open();
+            claw::down();
+            int claw;
+            do {
+              claw = tof::readClaw();
+              Serial.println(claw);
+              motor::fwd(AB,min(70,claw));
+            } while(claw > 69);
+            motor::fwd(AB, 70);
+            delay(100);
+            motor::stop();
+            motor::stop();
+            claw::close();
+            claw::up();
+          }
+          else{
+            shift_register::write(SR_LED_L_BLUE, HIGH);
+          }
+        //}
+      }*/
+      menu::showWaiting("Baum");
+      claw::unload_victims(true);
     }
   }
 
@@ -149,7 +183,8 @@ void setup(){
   delay(1000);
   gyro::ResetZAngle();
 
-  xTaskCreatePinnedToCore(core0, "Core0MainLoop", 10000, NULL, 0, &loop0, 0);
+  xTaskCreatePinnedToCore(core0, "Core0MainLoop", 10000, NULL, 0, &loop0, 0); // create second core loop
+  long timestamp = micros();
 }
 
 int16_t diff_cache[10] = {0};
@@ -229,6 +264,10 @@ void loop() {
 
   #ifndef NOMOTORS
     if (color::on_green(RIGHT | LEFT)){
+      motor::stop();
+      motor::rev(AB, V/2);
+      delay(25);
+      motor::stop();
       #ifdef DEBUG
         Serial.println("Green Detected!");
       #endif
@@ -243,7 +282,6 @@ void loop() {
       shift_register::write(SR_LED_R_GREEN, !right); // show side on LED
       shift_register::write(SR_LED_L_GREEN, !left);
 
-      motor::stop();
       delay(1000);
       if(right || left){
         motor::sensorFwd(V/2, V/2 , 2500, all_sensors); // go fwd, until there is no green
@@ -252,8 +290,8 @@ void loop() {
         if((white.left_outer.value < 50 && left) || (white.right_outer.value < 50 && right)){ // check for black line
           delay(1000);
           if(left != right){ // only do if not turning 180 degrees
-            motor::fwd(AB, V);
-            delay(250);
+            motor::fwd(AB, V2);
+            delay(500);
             motor::stop();
           }
           int16_t turn = 0; // choose turn side
@@ -262,7 +300,7 @@ void loop() {
           if (right && (!left)){turn = -turn;}
           motor::gyro(V, turn);
           motor::fwd(AB, V);
-          delay(300);
+          delay(100);
           motor::stop();
         }
         shift_register::write(SR_LED_R_GREEN, HIGH, true); // LEDs off
@@ -272,8 +310,9 @@ void loop() {
   #endif
   ////// LINE FOLLOWING //////
   #ifdef LF_ACTIVE
-    #define diff_outer_factor 2 // Factor for the outer light 
-    #define mul 1
+    #define diff_outer_factor 3 // Factor for the outer light 
+    #define mul 2
+    
     int16_t mot_diff;
     int16_t diff = (white.left.value - white.center.value) - (white.right.value - white.center.value);
     int16_t diff_outer = white.left_outer.value - white.right_outer.value;
@@ -314,12 +353,15 @@ void loop() {
       //delay(200);
     #endif
     #ifndef NOMOTORS
+      mot_diff = mot_diff * (micros()-timestamp)/100000;
+      static int16_t last = mot_diff;
       int16_t v = V;
-      if (mot_diff > 100){
-        v = V2;
-      }
-      motor::fwd(A, ( v + mot_diff));
-      motor::fwd(B, ( v - mot_diff));
+      /*if (diff_outer > 50){
+        v = V3;
+      }*/
+      motor::fwd(A, ( v + (mot_diff+last)/2));
+      motor::fwd(B, ( v - (mot_diff+last)/2));
+      timestamp = micros();
     #endif
   #endif
 
@@ -357,8 +399,15 @@ void loop() {
         rdist = 150-tof::readUpper();
         motor::fwd(A, (V2-rdist)*0.6);
         motor::fwd(B, (V2+rdist)*0.6);
-        
+        if (abs(rdist) > 300){
+          motor::rev(AB, V2);
+        }
+        white.read();
+        if (white.left_outer.value < 35 || white.right_outer.value < 35){
+          break;
+        }
       }
+      motor::gyro(V, 90);
     }
     else{
       motor::gyro(V, -90);
@@ -368,7 +417,15 @@ void loop() {
         rdist = 150-tof::readLeft();
         motor::fwd(A, (V2+rdist)*0.6);
         motor::fwd(B, (V2-rdist)*0.6);
+        if (abs(rdist) > 300){
+          motor::rev(AB, V2);
+        }
+        white.read();
+        if (white.left_outer.value < 35 || white.right_outer.value < 35){
+          break;
+        }
       }
+      motor::gyro(V, -90);
     }
   }
 }
