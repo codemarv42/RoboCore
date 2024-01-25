@@ -39,6 +39,7 @@ LightSensor* all_sensors[] = {&white,&green,&red,nullptr};  // nullptr is placeh
 
 TaskHandle_t loop0; //used for handling the second main loop
 int16_t diff_interchange;
+static int16_t last = 0;
 
 void HardwareInit(){
   /// get the shift register's Pins ///
@@ -310,16 +311,14 @@ void loop() {
   #endif
   ////// LINE FOLLOWING //////
   #ifdef LF_ACTIVE
-    #define diff_outer_factor 3 // Factor for the outer light 
+    #define diff_outer_factor 2 // Factor for the outer light 
     #define mul 2
     
     int16_t mot_diff;
-    int16_t diff = (white.left.value - white.center.value) - (white.right.value - white.center.value);
+    int16_t diff = white.left.value - white.right.value;
     int16_t diff_outer = white.left_outer.value - white.right_outer.value;
-    int16_t diff_green = (green.left.value-red.left.value)-(green.right.value-red.right.value); // difference to ignore green value
-    //if (abs(diff_outer) < 25){diff_outer = 0;} // set diff to 0 when no difference is recognised
-    mot_diff = ((diff+diff_green*2)*4 + diff_outer*diff_outer_factor) * mul;  // calculate inner to outer mult
-    diff_interchange = mot_diff;
+    mot_diff = (diff + int(diff_outer * diff_outer_factor)) * mul;
+    
     cache(mot_diff); // cache W.I.P.
     #ifdef DEBUG  // Debug light values
       Serial.print("White: ");
@@ -353,15 +352,16 @@ void loop() {
       //delay(200);
     #endif
     #ifndef NOMOTORS
-      mot_diff = mot_diff * (micros()-timestamp)/100000;
-      static int16_t last = mot_diff;
       int16_t v = V;
-      /*if (diff_outer > 50){
-        v = V3;
-      }*/
-      motor::fwd(A, ( v + (mot_diff+last)/2));
-      motor::fwd(B, ( v - (mot_diff+last)/2));
-      timestamp = micros();
+      //if (diff_outer > 50){
+      //  v = V2;
+      //}
+
+      v = min(max(V2, V-mot_diff), V);
+      motor::fwd(A, ( v + (mot_diff*2+last)/3));
+      motor::fwd(B, ( v - (mot_diff*2+last)/3));
+      last = mot_diff;
+      diff_interchange = v;
     #endif
   #endif
 
