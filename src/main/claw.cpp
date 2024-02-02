@@ -17,9 +17,9 @@ namespace claw{
     push.attach(17);
   }
   void unload_victims(bool pushv=false){
-    //shift_register::write(SR_SOLONOID, HIGH);
-    //delay(2000);
-    //shift_register::write(SR_SOLONOID, LOW);
+    shift_register::write(SR_SOLONOID, HIGH);
+    delay(2000);
+    shift_register::write(SR_SOLONOID, LOW);
     push.write(0);
     delay(1000);
     push.write(180);

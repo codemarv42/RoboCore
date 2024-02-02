@@ -6,7 +6,7 @@
 
 #define check_length 7  // How often a color must be checked to allow a true call 
 #define GREEN_THRESHOLD 15 // Minimum diff for a recognised green
-#define BLACK_THRESHOLD 35// Max value for black
+#define BLACK_THRESHOLD 30// Max value for black
 #define CHECKRED
 
 namespace color{
@@ -45,7 +45,7 @@ namespace color{
       black.right--;
     }
 
-    if (s_green->left.value - s_red->left.value*2 > GREEN_THRESHOLD){
+    if (s_green->left.value - s_red->left.value > GREEN_THRESHOLD){
       if (green.left < check_length){
         green.left++;
       }
@@ -54,7 +54,7 @@ namespace color{
       green.left--;
     }
 
-    if (s_green->right.value - s_red->right.value*2 > GREEN_THRESHOLD){
+    if (s_green->right.value - s_red->right.value > GREEN_THRESHOLD){
       if (green.right < check_length){
         green.right++;
       }
@@ -63,7 +63,7 @@ namespace color{
       green.right--;
     }
     #ifdef CHECKRED
-      if (-s_red->left.value + s_red->left.value > GREEN_THRESHOLD){
+      if (-s_green->left.value + s_red->left.value > GREEN_THRESHOLD){
         if (red.left < check_length){
           red.left++;
         }
