@@ -10,6 +10,7 @@
 namespace eeprom{
   //extern void writeInRescueZone(bool); // NYI
   //extern bool loadInRescueZone(); // NYI
+  extern void setup();
 
   extern void writeLSData(LightSensor* white, LightSensor* green, LightSensor* red, LightSensor* blue);
   extern void loadLSData(LightSensor* white, LightSensor* green, LightSensor* red, LightSensor* blue);
