@@ -22,24 +22,24 @@ namespace motor{
     shift_register::write(SR_STBY, LOW);
     digitalWrite(PWMA, LOW);
     digitalWrite(PWMB, LOW);
-    shift_register::write(SR_AIN1, LOW);
-    shift_register::write(SR_AIN2, LOW);
-    shift_register::write(SR_BIN1, LOW);
+    shift_register::write(SR_AIN1, LOW, true);
+    shift_register::write(SR_AIN2, LOW, true);
+    shift_register::write(SR_BIN1, LOW, true);
     shift_register::write(SR_BIN2, LOW);
   }
   void fwd(int motor,int v){
     if (v > 255){v = 255;}
     else if (v < -255){v = -255;}
     if (v == 0){stop(); return;}
-    shift_register::write(SR_STBY, HIGH);
+    shift_register::write(SR_STBY, HIGH, true);
     if (v > 0) {
       if (motor & A) {
-        shift_register::write(SR_AIN1, LOW);
+        shift_register::write(SR_AIN1, LOW, true);
         shift_register::write(SR_AIN2, HIGH);
         analogWrite(PWMA, v);
       }
       if (motor & B) {
-        shift_register::write(SR_BIN1, LOW);
+        shift_register::write(SR_BIN1, LOW, true);
         shift_register::write(SR_BIN2, HIGH);
         analogWrite(PWMB, v);
       }
@@ -47,12 +47,12 @@ namespace motor{
     else{
       v = -v;
       if (motor & A) {
-        shift_register::write(SR_AIN1, HIGH);
+        shift_register::write(SR_AIN1, HIGH, true);
         shift_register::write(SR_AIN2, LOW);
         analogWrite(PWMA, v);
       }
       if (motor & B) {
-        shift_register::write(SR_BIN1, HIGH);
+        shift_register::write(SR_BIN1, HIGH, true);
         shift_register::write(SR_BIN2, LOW);
         analogWrite(PWMB, v);
       }
