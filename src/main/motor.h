@@ -18,5 +18,4 @@ extern void readFwd(int motor, int v, int time, LightSensor* all[4]);
 extern bool sensorFwd(int va, int vb, int time, LightSensor* all[4]); 
 extern bool sensorFwd(int motor, int v, LightSensor* s, int diff, int time); 
 }
-//extern void setupMPU();
 #endif

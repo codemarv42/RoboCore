@@ -9,7 +9,6 @@
 
 MPU6050 mpu(Wire);
 
-
 namespace gyro {
 unsigned long timer = 0;
 
@@ -23,12 +22,10 @@ bool MPU6050Init() {  //Initalizes the Gyro Sensor (MPU6050)
   if(status != 0){
     Serial.println(F("Fail to detect MPU6050!"));
     return false;
-  }else{
-    //Serial.println(F("Found MPU6050"));
-    //Serial.println(F("While calculating the offsets value, do not move the MPU6050 sensor!"));
+  }
+  else{
     delay(500);
     mpu.calcOffsets();
-    //Serial.println("...Done!\n");
   }
   return true;
 }
@@ -43,8 +40,6 @@ void UpdateMPU6050() {  //Reads out the values of the gyro sensor via I2C
   unsigned long t = micros();
   unsigned long diff = t - timestamp;
   timestamp = t;
-  //float mult = diff / 1000000.0;
-  
   
   XAngle += (mpu.getGyroX() * diff) / 1000000.0;
   YAngle += (mpu.getGyroY() * diff) / 1000000.0;
@@ -58,6 +53,4 @@ void ResetZAngle() {  //The Z axis is reset
   YAngle = 0;
   ZAngle = 0;
 }
-
-
 }

@@ -76,6 +76,7 @@ namespace eeprom {
   }
 
   void loadLSData(LightSensor* white, LightSensor* green, LightSensor* red, LightSensor* blue){
+    Serial.println("Loading from file...");
     File f = SPIFFS.open("/calibration.txt","r");
     if (!f){
       Serial.println("ERROR opening read file!");
