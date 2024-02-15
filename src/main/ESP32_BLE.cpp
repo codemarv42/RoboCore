@@ -25,6 +25,8 @@
 #define CHAR10_UUID "71d5574a-b20c-4904-a0f2-135d2d39504f"
 #define CHAR11_UUID "700f02fa-371f-4e3d-b034-c9c0cf5c8684"
 
+#define CHAR25_UUID "7a270fc4-1b41-424b-84fd-9852246593c4"
+
 BLEServer* pServer = NULL;
 
 BLECharacteristic* pCharacteristic = NULL;
@@ -38,6 +40,7 @@ BLECharacteristic* pCharacteristic_8 = NULL;
 BLECharacteristic* pCharacteristic_9 = NULL;
 BLECharacteristic* pCharacteristic_10 = NULL;
 BLECharacteristic* pCharacteristic_11 = NULL;
+BLECharacteristic* pCharacteristic_25 = NULL;
 
 BLE2902* pBLE2902;
 
@@ -55,6 +58,8 @@ BLE2902* pBLE2902;
   -CHAR9 - RedRightInner
   -CHAR10 - GreenLeftInner
   -CHAR11 - GreenRightInner
+
+  -CHAR25 - Message: Use post() method to post
 */
 
 /////////////////////////////////////////////
@@ -145,6 +150,10 @@ void BLELoop(int wlo, int wli, int wc, int wri, int wro, int rl, int rr, int red
       oldDeviceConnected = deviceConnected;
     }
   }
+}
+
+void post(std::string msg){
+
 }
 
 void StartBLE() {
