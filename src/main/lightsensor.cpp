@@ -36,7 +36,7 @@ inline int16_t LightSensor::map(int16_t value, int16_t minv, int16_t maxv){
   return ((value - minv) * 100) / (maxv - minv);
 }
 LightSensor::LightSensor(int led_pin){
-  led_pin = led_pin;
+  this->led_pin = led_pin;
 }
 
 void LightSensor::calibrate_turn(){
