@@ -8,4 +8,5 @@
 #include "menu.h"
 
 extern void evacuationZone();
+extern void navRoom(LightSensorArray* w);
 

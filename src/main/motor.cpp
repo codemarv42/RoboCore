@@ -85,7 +85,7 @@ namespace motor{
     }
     stop();
   }
-  void readFwd(int motor, int v, int time, LightSensor* all[4]){
+  void readFwd(int motor, int v, int time, LightSensorArray* all[4]){
     const int timestamp = millis() + time;
     while (true){
       for (int i = 0; i < 4; i++){
@@ -96,7 +96,7 @@ namespace motor{
     }
   }
 
-  bool sensorFwd(int va, int vb, int time, LightSensor* all[4]){
+  bool sensorFwd(int va, int vb, int time, LightSensorArray* all[4]){
     fwd(A, va);
     fwd(B, vb);
     const int timestamp = millis() + time;
@@ -111,7 +111,7 @@ namespace motor{
     stop();
     return true;
   }
-  bool sensorFwd(int motor, int v, LightSensor* s, int diff, int time){
+  bool sensorFwd(int motor, int v, LightSensorArray* s, int diff, int time){
     fwd(motor, v);
     const int timestamp = millis() + time;
     while (!(s->left_outer.value >= diff && s->right_outer.value >= diff)){

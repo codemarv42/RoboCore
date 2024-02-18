@@ -30,7 +30,7 @@ namespace color{
   return (side & LEFT && red.left >= check_length) || (side & RIGHT && red.right >= check_length);
   }
 
-  void update(LightSensor* s_white, LightSensor* s_green, LightSensor* s_red){
+  void update(LightSensorArray* s_white, LightSensorArray* s_green, LightSensorArray* s_red){
     if (s_white->left_outer.value < BLACK_THRESHOLD && black.left < check_length){
       black.left++;
     }

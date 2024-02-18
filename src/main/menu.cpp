@@ -121,6 +121,7 @@ namespace menu {
         return selected;
       }
     }
+    return selected;
   }
 
 

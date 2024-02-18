@@ -23,8 +23,8 @@ namespace eeprom {
   }
 
   inline void writeMinMax(File& f, int16_t min, int16_t max){
-    f.print(min); f.print("\n");
-    f.print(max); f.print("\n");
+    f.print(String(min)); f.print("\n");
+    f.print(String(max)); f.print("\n");
     /*f.write(uint8_t (min & (  (1 << 8) - 1)));
     f.write(uint8_t ((max & (~((1 << 8) - 1)))) >> 8);
     
@@ -32,7 +32,7 @@ namespace eeprom {
     f.write(uint8_t ((max & (~((1 << 8) - 1)))) >> 8);*/
   }
 
-  void writeLS(File& f, LightSensor* l){
+  void writeLS(File& f, LightSensorArray* l){
     writeMinMax(f, l->left_outer.min, l->left_outer.max);
     writeMinMax(f, l->left.min, l->left.max);
     writeMinMax(f, l->center.min, l->center.max);
@@ -40,7 +40,7 @@ namespace eeprom {
     writeMinMax(f, l->right_outer.min, l->right_outer.max);
   }
 
-  void writeLSData(LightSensor* white, LightSensor* green, LightSensor* red, LightSensor* blue){
+  void writeLSData(LightSensorArray* white, LightSensorArray* green, LightSensorArray* red, LightSensorArray* blue){
     File file = SPIFFS.open("/calibration.txt","w");
     if (!file){
       Serial.println("ERROR opening write file!");
@@ -62,7 +62,7 @@ namespace eeprom {
     return s.toInt();
   }
 
-  void loadLS(File& f, LightSensor* l){
+  void loadLS(File& f, LightSensorArray* l){
     l->left_outer.min = loadValue(f);  l->left_outer.max = loadValue(f);
     l->left.min = loadValue(f);        l->left.max = loadValue(f);
     l->center.min = loadValue(f);      l->center.max = loadValue(f);
@@ -75,7 +75,7 @@ namespace eeprom {
     loadMinMax(f, uint16_t&(l->right_outer.min), uint16_t&(l->right_outer.max));*/
   }
 
-  void loadLSData(LightSensor* white, LightSensor* green, LightSensor* red, LightSensor* blue){
+  void loadLSData(LightSensorArray* white, LightSensorArray* green, LightSensorArray* red, LightSensorArray* blue){
     Serial.println("Loading from file...");
     File f = SPIFFS.open("/calibration.txt","r");
     if (!f){

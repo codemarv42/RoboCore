@@ -26,18 +26,19 @@ view LICENSE.md for details
 //#define BLE
 //#define DEBUG
 //#define NOMOTORS
-//#define LED_TEST
+#define LED_TEST
 #define LF_ACTIVE
 
   
 // Init Light Sesnsors
-LightSensor white = LightSensor(SR_PT_WHITE);
-LightSensor red   = LightSensor(SR_PT_RED);
-LightSensor green = LightSensor(SR_PT_GREEN);
+LightSensorArray white = LightSensorArray(SR_PT_WHITE);
+LightSensorArray red   = LightSensorArray(SR_PT_RED);
+LightSensorArray green = LightSensorArray(SR_PT_GREEN);
 DirectSensor refL = DirectSensor(SR_PT_WHITE, ADC_PT_REF_L);
 DirectSensor refR = DirectSensor(SR_PT_WHITE, ADC_PT_REF_R);
 
-LightSensor* all_sensors[] = {&white,&green,&red,nullptr};  // nullptr is placeholder for an (optional) blue LightSensor
+LSBase* all_sensors[] = {&white,&green,&red,nullptr, &refL,&refR};  // nullptr is placeholder for an (optional) blue LightSensorArray
+LightSensorArray* ls[] = {&white,&green,&red,nullptr};
 
 TaskHandle_t loop0; //used for handling the second main loop
 int16_t diff_interchange;
@@ -51,7 +52,7 @@ void HardwareInit(){
   pinMode(DS, OUTPUT);
   pinMode(ENC_SW, INPUT);
   Serial.println("Seting up button pins..");
-  pinMode(T_L, INPUT_PULLUP);
+  pinMode(T_L, INPUT);
   pinMode(T_R, INPUT);
   pinMode(T_M, INPUT);
   Serial.println("Fetching Tof servo pin...");
@@ -100,7 +101,7 @@ void setup(){
   menu::showWaiting("Resetting claw...");
   Serial.println("Resetting claw...");
   claw::up();
-  claw::open();
+  claw::close();
 
   eeprom::setup();
 
@@ -115,6 +116,9 @@ void setup(){
     shift_register::write(SR_PT_RED, HIGH);
     delay(2000);
     shift_register::write(SR_PT_RED, LOW, true);
+    shift_register::write(SR_DE1, HIGH);
+    delay(2000);
+    shift_register::write(SR_DE1, LOW, true);
   #endif
 
   #ifdef BLE
@@ -133,7 +137,7 @@ void setup(){
       menu::showWaiting("Calibration...");
       Serial.println("Calibration...");
       delay(1000);
-      calibrate(all_sensors, 5000, 3);
+      calibrate(all_sensors, 5000, 0);
       // Print min/max of WHITE
       Serial.print("White Left max: "); Serial.print(white.left.max); Serial.print(" - White Right max: "); Serial.println(white.right.max);
       Serial.print("White Left min: "); Serial.print(white.left.min); Serial.print(" - White Right min: "); Serial.println(white.right.min);
@@ -143,52 +147,14 @@ void setup(){
       break;
     }
     else if (option == 2){
-      //shift_register::write(SR_DE1, HIGH);
-      //delay(100);
-      //Serial.println(ADCRead(ADC_AE1));
-      //shift_register::write(SR_DE1, LOW);
-      //delay(1000);
-      while(true){
-        for(uint i = 0; i < 180; i += 15){
-          rottof.write(i);
-          uint16_t upper = tof::readUpper();
-          uint16_t lower = tof::readLower();
-          Serial.print(upper);
-          Serial.print(" ");
-          Serial.print(lower);
-          Serial.print(" ");
-          Serial.println(upper-lower);
-          if(upper - lower <= 100 && upper - lower > 10){
-            motor::gyro(V2,90-i);
-            Serial.println("found Victim!");
-            shift_register::write(SR_LED_L_BLUE, LOW);
-            claw::open();
-            claw::down();
-            int claw;
-            do {
-              claw = tof::readClaw();
-              Serial.println(claw);
-              motor::fwd(AB,min(70,claw));
-            } while(claw > 69);
-            motor::fwd(AB, 70);
-            delay(100);
-            motor::stop();
-            motor::stop();
-            claw::close();
-            claw::up();
-          }
-          else{
-            shift_register::write(SR_LED_L_BLUE, HIGH);
-          }
-        }
-      }
-      //menu::showWaiting("Baum");
-      //claw::unload_victims(true);
+      //shift_register::reset();
+      //evacuationZone();
+      
     }
   }
 
   // Done before Loop
-  eeprom::loadLSData(&white,&green,&red, nullptr);
+  //eeprom::loadLSData(&white,&green,&red, nullptr);
   Serial.print("White Left max: "); Serial.print(white.left.max); Serial.print(" - White Right max: "); Serial.println(white.right.max);
   Serial.print("White Left min: "); Serial.print(white.left.min); Serial.print(" - White Right min: "); Serial.println(white.right.min);
   delay(1000);
@@ -230,8 +196,8 @@ void loop() {
       for (auto sensor:all_sensors){ // read light values
         if (sensor != nullptr){sensor->read();}
       }
-      refL.read(); // read Reflective sensors
-      refR.read();
+      //refL.read(); // read Reflective sensors
+      //refR.read();
 
       // Silver Line -> align with silver line
       // left
@@ -312,7 +278,7 @@ void loop() {
 
           delay(1000);
           if(right || left){
-            motor::sensorFwd(V/2, V/2 , 2500, all_sensors); // go fwd, until there is no green
+            motor::sensorFwd(V/2, V/2 , 2500, ls); // go fwd, until there is no green
             motor::stop();
             white.read();
             if((white.left_outer.value < 50 && left) || (white.right_outer.value < 50 && right)){ // check for black line
@@ -339,12 +305,12 @@ void loop() {
       ////// LINE FOLLOWING //////
       #ifdef LF_ACTIVE
         #define diff_outer_factor 2 // Factor for the outer light 
-        #define mul 2
+        #define mul 1
         
         int16_t mot_diff;
         int16_t diff = (white.left.value - white.center.value) - (white.right.value - white.center.value);
         int16_t diff_green = (green.left.value-red.left.value)-(green.right.value-red.right.value); // difference to ignore green value
-        int16_t diff_outer = white.left_outer.value - white.right_outer.value*1.5;
+        int16_t diff_outer = white.left_outer.value - white.right_outer.value;
         mot_diff = ((diff+diff_green*2)*4 + diff_outer*diff_outer_factor) * mul;  // calculate inner to outer mult
         diff_interchange = mot_diff;
         
@@ -378,7 +344,7 @@ void loop() {
           Serial.print(red.right_outer.value);
           Serial.print(" ");
           Serial.println(mot_diff);
-          //delay(200);
+          delay(200);
         #endif
         #ifndef NOMOTORS
           int16_t v = min(max(V2, V-mot_diff), V); // scale bas speed based on difference
@@ -454,8 +420,8 @@ void loop() {
         }
       }
     }
-  
 
+    navRoom(&white);
 }
 
 ////// CORE 0 LOOP //////
