@@ -31,8 +31,8 @@
 
 /////////////Motor Driver (TB6612FNG)///////////////
 
-#define PWMA             23
 #define PWMB             25
+#define PWMA             23
 
 ////////////Shiftregister (74HC595PW)///////////////
 
@@ -101,22 +101,26 @@
 #define PAUSE_MESSEN    150 //anpassen nach unten?
 
 #define ANZ_KAL         150 //anpassen zusammen mit delay in kali?
+#define ANZ_LS          13
 
 #define SCHNELL         150
-#define SOLL            100
+#define SOLL            130
 #define LANGSAM         50
-#define FAKTOR          3
+#define FAKTOR          2
 
-//Werte messen und anpassen!
-#define WEISS           80
-#define GRAU            40
-#define SCHWARZ         10
-#define SILBER          0
-#define GRUEN_MAX       50
-#define GRUEN_MIN       50
-#define ROT_MAX         50
+#define WEISS           90
+#define GRAU            60
+#define SCHWARZ         30
+#define SILBER          130
+#define GRUEN_MAX       24      //anpassen?
+#define GRUEN_MIN       12       //anpassen?
+#define ROT_MAX         95
 #define ROT_MIN         50
 
-#define TIME_SCHWARZ    3000
+#define TIME_SCHWARZ    1000
+#define ANZ_GRUEN       7
+#define ANZ_ROT         7
+#define ANZ_SILBER      10
+#define ANZ_SCHWARZ     13
 
 #endif

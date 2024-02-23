@@ -1,0 +1,10 @@
+[gd_scene load_steps=2 format=3 uid="uid://cmwoaajaqbvie"]
+
+[ext_resource type="Script" path="res://Rescue Room.gd" id="1_cnb6l"]
+
+[node name="Rescue Room" type="Node3D"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0.451567)
+script = ExtResource("1_cnb6l")
+
+[node name="Camera3D" type="Camera3D" parent="."]
+transform = Transform3D(0.928927, -0.257524, -0.266036, 0.29723, 0.947101, 0.121052, 0.220789, -0.191523, 0.956332, 3.31761, 0.262805, 7.82565)

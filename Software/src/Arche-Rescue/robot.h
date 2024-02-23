@@ -8,14 +8,14 @@ class Robot {
   private:
     int his_wL1[10] = {100, 100, 100, 100, 100, 100, 100, 100, 100, 100};
     int his_wR1[10] = {100, 100, 100, 100, 100, 100, 100, 100, 100, 100};
-    int his_gL1[10] = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
-    int his_gR1[10] = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
-    int his_rL1[10] = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
-    int his_rR1[10] = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
-    int his_sL1[10] = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
-    int his_sR1[10] = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
-    int gruen_rich = 0;
-    int schwarz_quer_rich = 0;
+    int count_green_l = 0;
+    int count_green_r = 0;
+    int count_red_l = 0;
+    int count_red_r = 0;
+    int count_silver_l = 0;
+    int count_silver_r = 0;
+    int count_schwarz_l = 0;
+    int count_schwarz_r = 0;
     unsigned long schwarz_quer_time = 0;
   
   public:
@@ -36,6 +36,8 @@ class Robot {
     void kehrtwende();
     void secureLoop();
     float battery_voltage();
+    void leseKalWerte();
+    void schreibeKalWerte();
 };
 
 extern Robot robot;

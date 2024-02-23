@@ -11,10 +11,9 @@ class Rotary_encoder {
   private:
     int pin_a = ENC_A;
     int pin_b = ENC_B;
-    int last_state_a;
+    int last_state_a = 1;
     
     int pin_sw = ENC_SW;
-    int last_state_sw = 0;
 
   public:
     void measure();

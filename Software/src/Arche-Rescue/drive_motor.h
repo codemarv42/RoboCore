@@ -9,9 +9,10 @@ class Motor {
     byte pin2;
     byte pinStby;
     int v;  // optional, muss nicht gespeichert werden
+    bool pol;
 
   public:
-    Motor(byte pinPwm, byte pin1, byte pin2, byte pinStby);
+    Motor(byte pinPwm, byte pin1, byte pin2, byte pinStby, bool pol);
 
     void init();
     void Fwd(int v);

@@ -6,7 +6,7 @@
 #include "adc_multiplexer.h"
 
 
-Light_sensor::Light_sensor(int pin, int upper_limit, int led){
+Light_sensor::Light_sensor(int pin, short int upper_limit, int led){
   this->pin = pin;
   this->upper_limit = upper_limit;
   this->led = led;
@@ -22,7 +22,6 @@ int Light_sensor::measure_raw(){
   delayMicroseconds(PAUSE_MESSEN);
   raw = ADCMultiplexerRead(pin);
   ShiftRegisterWrite(led, 0);
-  delayMicroseconds(PAUSE_MESSEN);
   return raw;
 }
 
@@ -31,15 +30,14 @@ int Light_sensor::measure(){
   delayMicroseconds(PAUSE_MESSEN);
   raw = ADCMultiplexerRead(pin);
   ShiftRegisterWrite(led, 0);
-  delayMicroseconds(PAUSE_MESSEN);
-  val = map(raw, min, max, 0, 100);
-  return val;
+  this->val = map(raw, this->min, this->max, 0, 100);
+  return this->val;
 }
 
 void Light_sensor::calibrate(){
   measure_raw();
-  if (raw < min){min = raw;}
-  else if (raw > max){max = raw;};
+  if (raw < min){this->min = raw;}
+  else if (raw > max){this->max = raw;};
   Serial.println(min);
   Serial.println(max);
   Serial.println("");

@@ -5,19 +5,17 @@
 void Rotary_encoder::measure()
 {
   int state_a = digitalRead(this->pin_a);
+  int state_b = digitalRead(this->pin_b);
 
   if (state_a != this->last_state_a && state_a == 1) {
 
-    if (digitalRead(this->pin_b) != state_a) {
+    if (state_b != state_a) {
 
-      if (this->counter == 0) {
-        this->counter = 0;
-      } else {
-        this->counter--;
-      }
+      this->counter++;  // im Uhrzeigersinn
 
-    } else {
-      this->counter++;
+    } 
+    else {
+      this->counter--;  // gegen Uhrzeigersinn
     }
   }
 
@@ -25,7 +23,4 @@ void Rotary_encoder::measure()
 
   bool state_sw = digitalRead(pin_sw);
 
-  if ((state_sw == 1) && (this->last_state_sw != 1)) {
-    this->last_state_sw = 1;
-  }
 }

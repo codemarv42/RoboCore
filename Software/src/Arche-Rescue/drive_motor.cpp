@@ -3,19 +3,20 @@
 #include "robot.h"
 #include "shift_register.h"
 
-Motor::Motor(byte pinPwm, byte pin1, byte pin2, byte pinStby) {
+Motor::Motor(byte pinPwm, byte pin1, byte pin2, byte pinStby, bool pol) {
   this->pinPwm = pinPwm;
   this->pin1 = pin1;
   this->pin2 = pin2;
   this->pinStby = pinStby;
+  this->pol = pol;
 }
 
 void Motor::init() {
+  pinMode(pinPwm, OUTPUT);
   ShiftRegisterWrite(pinStby, HIGH);
 }
 
 void Motor::Fwd(int v) {
-  
   if (v > 255) {
     v = 255;
   }
@@ -24,12 +25,11 @@ void Motor::Fwd(int v) {
     v = -255;
   }
   
-  if (v >= 0) {
+  if ((v >= 0)) {
     ShiftRegisterWrite(pin1, LOW);
     ShiftRegisterWrite(pin2, HIGH);
-  
   }
-  if (v < 0) {
+  if ((v < 0)) {
     v = -v;
     ShiftRegisterWrite(pin1, HIGH);
     ShiftRegisterWrite(pin2, LOW);

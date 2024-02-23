@@ -18,12 +18,14 @@
 
 #include "Wire.h"
 #include "CD74HC4067.h"
+#include "SPI.h"
+#include "EEPROM.h"
 
 
 Robot robot = Robot();
 
-Motor Motor_L = Motor(PWMA, SR_AIN1, SR_AIN2, SR_STBY);
-Motor Motor_R = Motor(PWMB, SR_BIN1, SR_BIN2, SR_STBY);
+Motor Motor_R = Motor(PWMA, SR_AIN1, SR_AIN2, SR_STBY,0);
+Motor Motor_L = Motor(PWMB, SR_BIN1, SR_BIN2, SR_STBY,1);
 
 Button_sensor Button_sensor_L = Button_sensor(T_L);
 Button_sensor Button_sensor_M = Button_sensor(T_M);
@@ -46,6 +48,7 @@ Light_sensor Light_sensor_RGB_w = Light_sensor(ADC_PT_RGB, 4096, SR_PT_WHITE);
 Light_sensor Light_sensor_RGB_r = Light_sensor(ADC_PT_RGB, 4096, SR_PT_RED);
 Light_sensor Light_sensor_RGB_g = Light_sensor(ADC_PT_RGB, 4096, SR_PT_GREEN);
 Light_sensor Light_sensor_RGB_b = Light_sensor(ADC_PT_RGB, 4096, SR_PT_BLUE);
+Light_sensor* lightsensors[ANZ_LS] = {&Light_sensor_REF_L,&Light_sensor_L1,&Light_sensor_L0_w,&Light_sensor_L0_r,&Light_sensor_L0_g,&Light_sensor_L0_b,&Light_sensor_M,&Light_sensor_R0_w,&Light_sensor_R0_r,&Light_sensor_R0_g,&Light_sensor_R0_b,&Light_sensor_R1,&Light_sensor_REF_R};
 
 RGB_led RGB_led_L = RGB_led(SR_LED_L_RED, SR_LED_L_GREEN, SR_LED_L_BLUE);
 RGB_led RGB_led_R = RGB_led(SR_LED_R_RED, SR_LED_R_GREEN, SR_LED_R_BLUE);
@@ -84,24 +87,28 @@ void Robot::init() {
   Light_sensor_R1.init();
   Light_sensor_REF_R.init();
 
-  kalibriere_LS(ANZ_KAL);
+  pinMode(ENC_A,INPUT);
+  pinMode(ENC_B,INPUT);
+  pinMode(ENC_SW,INPUT);
+
+  while (true){
+    Rotary.measure();
+    if (Rotary.counter == 1){
+      kalibriere_LS(ANZ_KAL);
+      schreibeKalWerte();
+      break;
+    }
+    if (Rotary.counter == -1){
+      leseKalWerte();
+      break;
+    }
+  }
 
   Serial.println("vor MPU");
 
   // MPU.init();
 
   Serial.println("nach MPU");
-
-  Motor_L.Fwd(SOLL);
-  delay(5000);
-  Motor_L.Off();
-  Motor_R.Fwd(SOLL);
-  delay(5000);
-  Motor_L.Rev(SOLL);
-  Motor_R.Rev(SOLL);
-  delay(5000);
-  Motor_L.Off();
-  Motor_R.Off();
 
   return;
 }
@@ -111,15 +118,35 @@ void Robot::actionLoop(){
   this->running = true;
 
   while (1) {
+    messeLicht();
+    linienFolger();
+    pruefeRot();
+    pruefeQuerschwarz();
+    gruenerPunkt();
 
-    // pruefeQuerschwarz();
-    // pruefeGruen();
-    // pruefeRot();
-    // linienFolger();
+    // Serial.print("L0: ");
+    // Serial.println(Light_sensor_L0_w.val);
+    // Serial.print("R0: ");
+    // Serial.println(Light_sensor_R0_w.val);
+    // Serial.print("L1: ");
+    // Serial.println(Light_sensor_L1.val);
+    Serial.print("GruenL: ");
+    Serial.println(Light_sensor_L0_g.val-Light_sensor_L0_r.val);
+    Serial.print("GruenR: ");
+    Serial.println(Light_sensor_R0_g.val-Light_sensor_R0_r.val);
+    // Serial.print("Rot: ");
+    // Serial.println(Light_sensor_L0_r.val-Light_sensor_L0_g.val);
+    // Serial.print("Silber: ");
+    // Serial.println(Light_sensor_REF_L.val);
+    // delay(1000);
+    
+    // Serial.println(Light_sensor_M.val);
+    // Serial.println(Light_sensor_L0_w.val);
+    // delay(200);
     // gruenerPunkt();
     // pruefeSilber();
-    Serial.println("Core 1 is running");
-    Serial.println(battery_voltage());
+    // Serial.println("Core 1 is running");
+    // Serial.println(battery_voltage());
     // Serial.print("X : ");
     // Serial.println(MPU.AngleX);
     // Serial.print("Y : ");
@@ -143,11 +170,9 @@ void sensorLoop(void* pvParameters){
       continue;
     }
     robot.messeLicht();
-    // Serial.println(Light_sensor_M.val);
     // MPU.update();
 
     // Rotary.measure();
-    // Serial.println(Rotary.counter);
   }
 }
 
@@ -169,49 +194,94 @@ float Robot::battery_voltage(){
 
 void Robot::kalibriere_LS(int anz){
   for (int i = 0; i < anz; i++){
-    Light_sensor_L1.calibrate();
-    Light_sensor_L0_w.calibrate();
-    Light_sensor_L0_r.calibrate();
-    Light_sensor_L0_g.calibrate();
-    Light_sensor_L0_b.calibrate();
-    Light_sensor_M.calibrate();
-    Light_sensor_R0_w.calibrate();
-    Light_sensor_R0_r.calibrate();
-    Light_sensor_R0_g.calibrate();
-    Light_sensor_R0_b.calibrate();
-    Light_sensor_R1.calibrate();
+    for (int j = 0; j < ANZ_LS; j++){
+      lightsensors[j]->calibrate();
+    }
     delay(100);
   }
 }
 
-void Robot::messeLicht(){
-  
-  Light_sensor_L1.measure();
-  Light_sensor_L0_w.measure();
-  Light_sensor_L0_r.measure();
-  Light_sensor_L0_g.measure();
-  Light_sensor_L0_b.measure();
-  Light_sensor_M.measure();
-  Light_sensor_R0_w.measure();
-  Light_sensor_R0_r.measure();
-  Light_sensor_R0_g.measure();
-  Light_sensor_R0_b.measure();
-  Light_sensor_R1.measure();
+void Robot::schreibeKalWerte() {
+  int addr = 10;
+  for (int i = 0; i < ANZ_LS; i++){
+    EEPROM.write (addr, lightsensors[i]->max >> 8);
+    EEPROM.write (addr + 1, lightsensors[i]->max & 0xff);
+    EEPROM.write (addr + 2,lightsensors[i]->min >> 8);
+    EEPROM.write (addr + 3, lightsensors[i]->min & 0xff);
+    addr = addr + 4;
+  }
+}
 
+void Robot::leseKalWerte() {    //liest falsch min > max
+  int addr = 10;
+  for (int i = 0; i < ANZ_LS; i++){
+    lightsensors[i]->max = EEPROM.read (addr);
+    lightsensors[i]->max = lightsensors[i]->max << 8;
+    lightsensors[i]->max = lightsensors[i]->max | EEPROM.read (addr + 1);
+    lightsensors[i]->min = EEPROM.read (addr + 2);
+    lightsensors[i]->min = lightsensors[i]->min << 8;
+    lightsensors[i]->min = lightsensors[i]->min | EEPROM.read (addr + 3);
+    addr = addr + 4;
+  }
+}
+
+void Robot::messeLicht(){
+  for (int i = 0; i < ANZ_LS; i++){
+    lightsensors[i]->measure();
+  }
 }
 
 void Robot::linienFolger(){
   int diff = 0;
   diff = (int) ((Light_sensor_L0_w.val - Light_sensor_R0_w.val) * FAKTOR);
-  diff = (int) diff + ((Light_sensor_L1.val - Light_sensor_R1.val) * FAKTOR * 2);
+  diff += (int) (Light_sensor_L1.val - Light_sensor_R1.val) * FAKTOR/1.5;
   Motor_L.Fwd(SOLL + diff);
   Motor_R.Fwd(SOLL - diff);
+  // Serial.println(diff);
   return;
 }
 
 void Robot::gruenerPunkt(){
-  int rich = 0;
   if ((millis()-schwarz_quer_time) > TIME_SCHWARZ){
+    int gruen_rich = 0;
+    int unterl = Light_sensor_L0_g.val - Light_sensor_L0_r.val;
+    int unterr = Light_sensor_R0_g.val - Light_sensor_R0_r.val;
+    if ((unterl > GRUEN_MIN)&&(unterl < GRUEN_MAX)){
+      count_green_l += 1;
+    }
+    else{
+      count_green_l -=1;
+      if(count_green_l < 0){
+        count_green_l = 0;
+      };
+    }
+    if ((unterr > GRUEN_MIN)&&(unterr < GRUEN_MAX)){
+      count_green_r += 1;
+    }
+    else{
+      count_green_r -= 1;
+      if(count_green_r < 0){
+        count_green_r = 0;
+      };
+    }
+    if(count_green_l==ANZ_GRUEN){
+      gruen_rich += 1;
+      count_green_l = 0;
+      if(count_green_r>0){
+        gruen_rich += 2;
+        count_green_r = 0;
+      };
+    }
+    else if(count_green_r==ANZ_GRUEN){
+      gruen_rich += 2;
+      count_green_r = 0;
+      if(count_green_l>0){
+        gruen_rich += 1;
+        count_green_l = 0;
+      };
+    };
+    Serial.println(gruen_rich);
+    int rich = 0;
     switch (gruen_rich){
       case 0:
         break;
@@ -234,88 +304,91 @@ void Robot::gruenerPunkt(){
 }
 
 void Robot::pruefeQuerschwarz(){
-  int mwL = his_wL1[0];
-  int mwR = his_wR1[0];
-  for (int i = 0; i < 10;i++){
-    his_wL1[i] = his_wL1[i+1];
-    his_wR1[i] = his_wR1[i+1];
-    mwL = (int) mwL + his_wL1[i];
-    mwR = (int) mwR + his_wR1[i];
+  if(Light_sensor_L1.val<SCHWARZ){
+    count_schwarz_l +=1;
+    if(count_schwarz_l == ANZ_SCHWARZ){
+      schwarz_quer_time = millis();
+      count_schwarz_l = 0;
+      return;
+    };
   }
-  his_wL1[9] = (int) (Light_sensor_L1.val);
-  his_wR1[9] = (int) (Light_sensor_R1.val);
-  mwL  = (int) mwL/10;
-  mwR  = (int) mwR/10;
-  if (mwL < SCHWARZ){
-    schwarz_quer_rich = -1;
-    schwarz_quer_time = millis();
-  };
-  if (mwR < SCHWARZ){
-    schwarz_quer_rich = 1;
-    schwarz_quer_time = millis();
-  };
-  return;
-}
-
-void Robot::pruefeGruen(){
-  int mwL = his_gL1[0];
-  int mwR = his_gR1[0];
-  for (int i = 0; i < 10;i++){
-    his_gL1[i] = his_gL1[i+1];
-    his_gR1[i] = his_gR1[i+1];
-    mwL = (int) mwL + his_gL1[i];
-    mwR = (int) mwR + his_gR1[i];
+  else{
+    count_schwarz_l -=1;
+    if(count_schwarz_l < 0){
+      count_schwarz_l = 0;
+    };
   }
-  his_gL1[9] = (int) (Light_sensor_L0_g.val - Light_sensor_L0_r.val);
-  his_gR1[9] = (int) (Light_sensor_R0_g.val - Light_sensor_R0_r.val);
-  mwL  = (int) mwL/10;
-  mwR  = (int) mwR/10;
-  gruen_rich = 0;
-  if ((mwL > GRUEN_MIN)&&(mwL < GRUEN_MAX)){
-    gruen_rich += 1;
-  };
-  if ((mwR > GRUEN_MIN)&&(mwR < GRUEN_MAX)){
-    gruen_rich += 2;
-  };
+  if(Light_sensor_R1.val<SCHWARZ){
+    count_schwarz_r +=1;
+    if(count_schwarz_r == ANZ_SCHWARZ){
+      schwarz_quer_time = millis();
+      count_schwarz_r = 0;
+      return;
+    };
+  }
+  else{
+    count_schwarz_r -=1;
+    if(count_schwarz_r < 0){
+      count_schwarz_r = 0;
+    };
+  }
   return;
 }
 
 void Robot::pruefeRot(){
-  int mwL = his_rL1[0];
-  int mwR = his_rR1[0];
-  for (int i = 0; i < 10;i++){
-    his_rL1[i] = his_rL1[i+1];
-    his_rR1[i] = his_rR1[i+1];
-    mwL = (int) mwL + his_rL1[i];
-    mwR = (int) mwR + his_rR1[i];
+  int unterl = Light_sensor_L0_r.val - Light_sensor_L0_g.val;
+  int unterr = Light_sensor_R0_r.val - Light_sensor_R0_g.val;
+  if ((unterl > ROT_MIN)&&(unterl < ROT_MAX)){
+    count_red_l += 1;
   }
-  his_rL1[9] = (int) (Light_sensor_L0_r.val - Light_sensor_L0_g.val);
-  his_rR1[9] = (int) (Light_sensor_R0_r.val - Light_sensor_R0_g.val);
-  mwL  = (int) mwL/10;
-  mwR  = (int) mwR/10;
-  if (((mwL > ROT_MIN)&&(mwL < ROT_MAX))&&((mwR > ROT_MIN)&&(mwR < ROT_MAX))){
+  else{
+    count_red_l -= 1;
+    if(count_red_l < 0){
+      count_red_l = 0;
+    };
+  }
+  if ((unterr > ROT_MIN)&&(unterr < ROT_MAX)){
+    count_red_r += 1;
+  }
+  else{
+    count_red_r -= 1;
+    if(count_red_r < 0){
+      count_red_r = 0;
+    };
+  }
+  if ((count_red_l>ANZ_ROT)||(count_red_r>ANZ_ROT)){
     Motor_L.Off();
     Motor_R.Off();
     Serial.println("Ende");
     delay(10000); //Ende
+    count_red_l = 0;
+    count_red_r = 0;
   };
   return;
 }
 
 void Robot::pruefeSilber(){
-  int mwL = his_sL1[0];
-  int mwR = his_sR1[0];
-  for (int i = 0; i < 10;i++){
-    his_sL1[i] = his_sL1[i+1];
-    his_sR1[i] = his_sR1[i+1];
-    mwL = (int) mwL + his_sL1[i];
-    mwR = (int) mwR + his_sR1[i];
+  if(Light_sensor_REF_L.val>SILBER){
+    count_silver_l +=1;
   }
-  his_sL1[9] = (int) (Light_sensor_REF_L.val);
-  his_sR1[9] = (int) (Light_sensor_REF_R.val);
-  mwL  = (int) mwL/10;
-  mwR  = (int) mwR/10;
-  if ((mwL > SILBER)&&(mwR > SILBER)){
+  else{
+    count_silver_l -=1;
+    if(count_silver_l < 0){
+      count_silver_l = 0;
+    };
+  }
+  if(Light_sensor_REF_R.val>SILBER){
+    count_silver_r +=1;
+  }
+  else{
+    count_silver_r -=1;
+    if(count_silver_r < 0){
+      count_silver_r = 0;
+    };
+  }
+  if ((count_silver_l > ANZ_SILBER)&&(count_silver_r > ANZ_SILBER)){
+    count_silver_l = 0;
+    count_silver_r = 0;
     Serial.println("Silber");
     secureLoop();
   };
@@ -323,9 +396,15 @@ void Robot::pruefeSilber(){
 }
 
 void Robot::abbiegenGruen(int rich){
+  Motor_L.Off();
+  Motor_R.Off();
+  delay(3000);
   return;
 }
 
 void Robot::kehrtwende(){
+  Motor_L.Fwd(-100);
+  Motor_R.Fwd(-100);
+  delay(3000);
   return;
 }
