@@ -105,12 +105,12 @@ namespace menu {
       bool enc = analogRead(ENC_B); // rotary encoder turn detection
       if (enc != last_RE_state && enc == HIGH){
         if (analogRead(ENC_A) == LOW){
-          selected++;
-          if (selected >= menuOptions){selected = 0;}
-        }
-        else{
           selected--;
           if (selected < 0){selected = menuOptions-1;}
+        }
+        else{
+          selected++;
+          if (selected >= menuOptions){selected = 0;}
         }
       }
       last_RE_state = enc;
