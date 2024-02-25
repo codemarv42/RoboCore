@@ -98,22 +98,22 @@
 
 ////////////////////////////////////////////////////
 
-#define PAUSE_MESSEN    150 //anpassen nach unten?
+#define PAUSE_MESSEN    100 //anpassen nach unten?
 
-#define ANZ_KAL         150 //anpassen zusammen mit delay in kali?
+#define ANZ_KAL         75 //150
 #define ANZ_LS          13
 
 #define SCHNELL         150
 #define SOLL            130
-#define LANGSAM         50
+#define LANGSAM         75
 #define FAKTOR          2
 
 #define WEISS           90
 #define GRAU            60
-#define SCHWARZ         30
+#define SCHWARZ         20      //30
 #define SILBER          130
-#define GRUEN_MAX       24      //anpassen?
-#define GRUEN_MIN       12       //anpassen?
+#define GRUEN_MAX       26      //anpassen? 24
+#define GRUEN_MIN       10       //anpassen? 12
 #define ROT_MAX         95
 #define ROT_MIN         50
 
@@ -122,5 +122,14 @@
 #define ANZ_ROT         7
 #define ANZ_SILBER      10
 #define ANZ_SCHWARZ     13
+
+#define VRICH           1       // 1: rechtsrum; -1: linksrum
+
+#define TOF_LINKS       SR_XSHT1    // ANPASSEN auf HARDWARE
+#define TOF_RECHTS      SR_XSHT2
+#define TOF_UNTEN       SR_XSHT3
+#define TOF_OBEN        SR_XSHT4
+
+#define EEPROM_START    0
 
 #endif

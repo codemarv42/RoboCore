@@ -26,12 +26,12 @@ void Motor::Fwd(int v) {
   }
   
   if ((v >= 0)) {
-    ShiftRegisterWrite(pin1, LOW);
+    ShiftRegisterWrite(pin1, LOW,false);
     ShiftRegisterWrite(pin2, HIGH);
   }
-  if ((v < 0)) {
+  else{
     v = -v;
-    ShiftRegisterWrite(pin1, HIGH);
+    ShiftRegisterWrite(pin1, HIGH,false);
     ShiftRegisterWrite(pin2, LOW);
   }
   

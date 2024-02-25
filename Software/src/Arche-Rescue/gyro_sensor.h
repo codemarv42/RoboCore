@@ -7,13 +7,15 @@
 
 class Gyro_sensor{
     public:
-        void init();
+        bool init();
         void update();
+        unsigned long t0;
         float AngleX;
-        float AngleY;  // unnötig, abschalten
         float AngleZ;
-        float AccelY;
+        // float AccelY;    // eher nicht nutzen
         float RefZ = 0.0;
 };
+
+extern MPU6050 mpu; //löschen
 
 #endif

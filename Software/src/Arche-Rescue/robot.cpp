@@ -24,6 +24,8 @@
 
 Robot robot = Robot();
 
+// EEPROMClass eeprom = EEPROMClass();
+
 Motor Motor_R = Motor(PWMA, SR_AIN1, SR_AIN2, SR_STBY,0);
 Motor Motor_L = Motor(PWMB, SR_BIN1, SR_BIN2, SR_STBY,1);
 
@@ -31,23 +33,23 @@ Button_sensor Button_sensor_L = Button_sensor(T_L);
 Button_sensor Button_sensor_M = Button_sensor(T_M);
 Button_sensor Button_sensor_R = Button_sensor(T_R);
 
-Light_sensor Light_sensor_REF_L = Light_sensor(ADC_PT_REF_L, 4096, SR_PT_WHITE);
-Light_sensor Light_sensor_L1 = Light_sensor(ADC_PT_L1, 4096, SR_PT_WHITE);
-Light_sensor Light_sensor_L0_w = Light_sensor(ADC_PT_L0, 4096, SR_PT_WHITE);
-Light_sensor Light_sensor_L0_r = Light_sensor(ADC_PT_L0, 4096, SR_PT_RED);
-Light_sensor Light_sensor_L0_g = Light_sensor(ADC_PT_L0, 4096, SR_PT_GREEN);
-Light_sensor Light_sensor_L0_b = Light_sensor(ADC_PT_L0, 4096, SR_PT_BLUE);
-Light_sensor Light_sensor_M = Light_sensor(ADC_PT_M, 4096, SR_PT_WHITE);
-Light_sensor Light_sensor_R0_w = Light_sensor(ADC_PT_R0, 4096, SR_PT_WHITE);
-Light_sensor Light_sensor_R0_r = Light_sensor(ADC_PT_R0, 4096, SR_PT_RED);
-Light_sensor Light_sensor_R0_g = Light_sensor(ADC_PT_R0, 4096, SR_PT_GREEN);
-Light_sensor Light_sensor_R0_b = Light_sensor(ADC_PT_R0, 4096, SR_PT_BLUE);
-Light_sensor Light_sensor_R1 = Light_sensor(ADC_PT_R1, 4096, SR_PT_WHITE);
-Light_sensor Light_sensor_REF_R = Light_sensor(ADC_PT_REF_R, 4096, SR_PT_WHITE);
-Light_sensor Light_sensor_RGB_w = Light_sensor(ADC_PT_RGB, 4096, SR_PT_WHITE);
-Light_sensor Light_sensor_RGB_r = Light_sensor(ADC_PT_RGB, 4096, SR_PT_RED);
-Light_sensor Light_sensor_RGB_g = Light_sensor(ADC_PT_RGB, 4096, SR_PT_GREEN);
-Light_sensor Light_sensor_RGB_b = Light_sensor(ADC_PT_RGB, 4096, SR_PT_BLUE);
+Light_sensor Light_sensor_REF_L = Light_sensor(ADC_PT_REF_L, uint16_t(4096), SR_PT_WHITE);
+Light_sensor Light_sensor_L1 = Light_sensor(ADC_PT_L1, uint16_t(4096), SR_PT_WHITE);
+Light_sensor Light_sensor_L0_w = Light_sensor(ADC_PT_L0, uint16_t(4096), SR_PT_WHITE);
+Light_sensor Light_sensor_L0_r = Light_sensor(ADC_PT_L0, uint16_t(4096), SR_PT_RED);
+Light_sensor Light_sensor_L0_g = Light_sensor(ADC_PT_L0, uint16_t(4096), SR_PT_GREEN);
+Light_sensor Light_sensor_L0_b = Light_sensor(ADC_PT_L0, uint16_t(4096), SR_PT_BLUE);
+Light_sensor Light_sensor_M = Light_sensor(ADC_PT_M, uint16_t(4096), SR_PT_WHITE);
+Light_sensor Light_sensor_R0_w = Light_sensor(ADC_PT_R0, uint16_t(4096), SR_PT_WHITE);
+Light_sensor Light_sensor_R0_r = Light_sensor(ADC_PT_R0, uint16_t(4096), SR_PT_RED);
+Light_sensor Light_sensor_R0_g = Light_sensor(ADC_PT_R0, uint16_t(4096), SR_PT_GREEN);
+Light_sensor Light_sensor_R0_b = Light_sensor(ADC_PT_R0, uint16_t(4096), SR_PT_BLUE);
+Light_sensor Light_sensor_R1 = Light_sensor(ADC_PT_R1, uint16_t(4096), SR_PT_WHITE);
+Light_sensor Light_sensor_REF_R = Light_sensor(ADC_PT_REF_R, uint16_t(4096), SR_PT_WHITE);
+Light_sensor Light_sensor_RGB_w = Light_sensor(ADC_PT_RGB, uint16_t(4096), SR_PT_WHITE);
+Light_sensor Light_sensor_RGB_r = Light_sensor(ADC_PT_RGB, uint16_t(4096), SR_PT_RED);
+Light_sensor Light_sensor_RGB_g = Light_sensor(ADC_PT_RGB, uint16_t(4096), SR_PT_GREEN);
+Light_sensor Light_sensor_RGB_b = Light_sensor(ADC_PT_RGB, uint16_t(4096), SR_PT_BLUE);
 Light_sensor* lightsensors[ANZ_LS] = {&Light_sensor_REF_L,&Light_sensor_L1,&Light_sensor_L0_w,&Light_sensor_L0_r,&Light_sensor_L0_g,&Light_sensor_L0_b,&Light_sensor_M,&Light_sensor_R0_w,&Light_sensor_R0_r,&Light_sensor_R0_g,&Light_sensor_R0_b,&Light_sensor_R1,&Light_sensor_REF_R};
 
 RGB_led RGB_led_L = RGB_led(SR_LED_L_RED, SR_LED_L_GREEN, SR_LED_L_BLUE);
@@ -61,7 +63,7 @@ Gyro_sensor MPU = Gyro_sensor();
 
 void Robot::init() {
   Serial.begin(115200);
-  Wire.begin();
+  EEPROM.begin(EEPROM_START+ANZ_LS*4);
 
   ShiftRegisterInit();
   ShiftRegisterReset();
@@ -91,6 +93,10 @@ void Robot::init() {
   pinMode(ENC_B,INPUT);
   pinMode(ENC_SW,INPUT);
 
+  RGB_led_L.green();
+
+  Serial.println(battery_voltage());
+
   while (true){
     Rotary.measure();
     if (Rotary.counter == 1){
@@ -104,11 +110,10 @@ void Robot::init() {
     }
   }
 
-  Serial.println("vor MPU");
-
-  // MPU.init();
-
-  Serial.println("nach MPU");
+  int rstate = Rotary.counter;
+  while(Rotary.counter==rstate){
+    Rotary.measure();
+  }
 
   return;
 }
@@ -116,13 +121,19 @@ void Robot::init() {
 void Robot::actionLoop(){
 
   this->running = true;
+  RGB_led_R.red();
+  int rstate = Rotary.counter;
+  while(Rotary.counter==rstate){
+    Rotary.measure();
+  }
+  RGB_led_R.blue();
 
   while (1) {
-    messeLicht();
-    linienFolger();
-    pruefeRot();
-    pruefeQuerschwarz();
-    gruenerPunkt();
+    // messeLicht();
+    // linienFolger();
+    // pruefeRot();
+    // pruefeQuerschwarz();
+    // gruenerPunkt();
 
     // Serial.print("L0: ");
     // Serial.println(Light_sensor_L0_w.val);
@@ -130,10 +141,12 @@ void Robot::actionLoop(){
     // Serial.println(Light_sensor_R0_w.val);
     // Serial.print("L1: ");
     // Serial.println(Light_sensor_L1.val);
-    Serial.print("GruenL: ");
-    Serial.println(Light_sensor_L0_g.val-Light_sensor_L0_r.val);
-    Serial.print("GruenR: ");
-    Serial.println(Light_sensor_R0_g.val-Light_sensor_R0_r.val);
+    // Serial.print("R1: ");
+    // Serial.println(Light_sensor_R1.val);
+    // Serial.print("GruenL: ");
+    // Serial.println(Light_sensor_L0_g.val-Light_sensor_L0_r.val);
+    // Serial.print("GruenR: ");
+    // Serial.println(Light_sensor_R0_g.val-Light_sensor_R0_r.val);
     // Serial.print("Rot: ");
     // Serial.println(Light_sensor_L0_r.val-Light_sensor_L0_g.val);
     // Serial.print("Silber: ");
@@ -149,10 +162,10 @@ void Robot::actionLoop(){
     // Serial.println(battery_voltage());
     // Serial.print("X : ");
     // Serial.println(MPU.AngleX);
-    // Serial.print("Y : ");
-    // Serial.println(MPU.AngleY);
     // Serial.print("Z : ");
     // Serial.println(MPU.AngleZ);
+    Serial.println(mpu.getGyroZ());
+    Serial.println(mpu.getAngleX());
     // Serial.print("AccY : ");
     // Serial.println(MPU.AccelY);
     // Serial.println("");
@@ -165,12 +178,16 @@ void Robot::actionLoop(){
 }
 
 void sensorLoop(void* pvParameters){
+  RGB_led_L.magenta();
+  Wire.begin();
+  MPU.init();
+  // TofInit();   // fehlerhaft wegen libary oder weil keine angeschlossen sind
   while (1) {
     if (!robot.running){
       continue;
     }
     robot.messeLicht();
-    // MPU.update();
+    MPU.update();
 
     // Rotary.measure();
   }
@@ -202,27 +219,39 @@ void Robot::kalibriere_LS(int anz){
 }
 
 void Robot::schreibeKalWerte() {
-  int addr = 10;
+  int addr = EEPROM_START;
   for (int i = 0; i < ANZ_LS; i++){
-    EEPROM.write (addr, lightsensors[i]->max >> 8);
-    EEPROM.write (addr + 1, lightsensors[i]->max & 0xff);
-    EEPROM.write (addr + 2,lightsensors[i]->min >> 8);
-    EEPROM.write (addr + 3, lightsensors[i]->min & 0xff);
+    // Serial.println(lightsensors[i]->max);
+    EEPROM.writeByte (addr, (unsigned short int)lightsensors[i]->max >> 8);
+    // Serial.println(EEPROM.read(addr)<<8);
+    EEPROM.writeByte (addr + 1, (unsigned short int)lightsensors[i]->max & 0xff);
+    // Serial.println(EEPROM.read(addr+1));
+    // Serial.println(lightsensors[i]->min);
+    EEPROM.writeByte (addr + 2,(unsigned short int)lightsensors[i]->min >> 8);
+    // Serial.println(EEPROM.read(addr+2)<<8);
+    EEPROM.writeByte (addr + 3, (unsigned short int)lightsensors[i]->min & 0xff);
+    // Serial.println(EEPROM.read(addr+3));
     addr = addr + 4;
+    // Serial.println("");
   }
+  EEPROM.commit();
+  return;
 }
 
-void Robot::leseKalWerte() {    //liest falsch min > max
-  int addr = 10;
+void Robot::leseKalWerte() {
+  int addr = EEPROM_START;
   for (int i = 0; i < ANZ_LS; i++){
-    lightsensors[i]->max = EEPROM.read (addr);
+    lightsensors[i]->max = (unsigned short int)EEPROM.read (addr);
     lightsensors[i]->max = lightsensors[i]->max << 8;
-    lightsensors[i]->max = lightsensors[i]->max | EEPROM.read (addr + 1);
-    lightsensors[i]->min = EEPROM.read (addr + 2);
+    lightsensors[i]->max += (unsigned short int)EEPROM.read (addr + 1);
+    lightsensors[i]->min = (unsigned short int)EEPROM.read (addr + 2);
     lightsensors[i]->min = lightsensors[i]->min << 8;
-    lightsensors[i]->min = lightsensors[i]->min | EEPROM.read (addr + 3);
+    lightsensors[i]->min += (unsigned short int)EEPROM.read (addr + 3);
     addr = addr + 4;
+    // Serial.println(lightsensors[i]->max);
+    // Serial.println(lightsensors[i]->min);
   }
+  return;
 }
 
 void Robot::messeLicht(){
@@ -280,20 +309,23 @@ void Robot::gruenerPunkt(){
         count_green_l = 0;
       };
     };
-    Serial.println(gruen_rich);
+    // Serial.println(gruen_rich);
     int rich = 0;
     switch (gruen_rich){
       case 0:
         break;
       case 1:
+        Serial.println("Gruen links");
         rich = -1;
         abbiegenGruen(rich);
         break;
       case 2:
+        Serial.println("Gruen rechts");
         rich = 1;
         abbiegenGruen(rich);
         break;
       case 3:
+        Serial.println("Kehrtwende");
         kehrtwende();
         break;
       default:
@@ -396,15 +428,82 @@ void Robot::pruefeSilber(){
 }
 
 void Robot::abbiegenGruen(int rich){
-  Motor_L.Off();
-  Motor_R.Off();
-  delay(3000);
+  int rich_sens = 0;
+  Motor_L.Fwd(SOLL);
+  Motor_R.Fwd(SOLL);
+  while((Light_sensor_L1.val>SCHWARZ) && (Light_sensor_R1.val>SCHWARZ)){
+    delay(10);
+    Serial.println("vorfahren");
+    Serial.println(Light_sensor_R1.val);
+  }
+  while((Light_sensor_L1.val<SCHWARZ) || (Light_sensor_R1.val<SCHWARZ)){
+    delay(10);
+    Serial.println("weiter vor");
+    Serial.println(Light_sensor_R1.val);
+  }
+  delay(100);
+  float angle0 = MPU.AngleZ;
+  Motor_L.Fwd(SOLL*rich);
+  Motor_R.Fwd(-(SOLL*rich));
+  while(abs(MPU.AngleZ-angle0)<90.0){   // vielleicht 95?
+    if(rich == 1){
+      if((Light_sensor_L0_w.val<SCHWARZ) && (abs(MPU.AngleZ-angle0)>30.0)){
+        Motor_L.Off();
+        Motor_R.Off();
+        Serial.println("rechts abgebogen");
+        return;
+      }
+    }
+    else{
+      if((Light_sensor_R0_w.val<SCHWARZ) && (abs(MPU.AngleZ-angle0)>30.0)){
+        Motor_L.Off();
+        Motor_R.Off();
+        Serial.println("links abgebogen");
+        return;
+      }
+    }
+  }
   return;
 }
 
 void Robot::kehrtwende(){
-  Motor_L.Fwd(-100);
-  Motor_R.Fwd(-100);
-  delay(3000);
+  float angle0 = MPU.AngleZ;
+  Motor_L.Fwd(SOLL*VRICH);
+  Motor_R.Fwd(-(SOLL*VRICH));
+  while(abs(MPU.AngleZ-angle0)<180.0){    // vielleicht 185?
+    if(VRICH == 1){
+      if((Light_sensor_L0_w.val<SCHWARZ) && (abs(MPU.AngleZ-angle0)>120.0)){
+        Motor_L.Off();
+        Motor_R.Off();
+        return;
+      }
+    }
+    else{
+      if((Light_sensor_R0_w.val<SCHWARZ) && (abs(MPU.AngleZ-angle0)>120.0)){
+        Motor_L.Off();
+        Motor_R.Off();
+        return;
+      }
+    }
+  }
+  return;
+}
+
+void Robot::pruefeHindernis(){
+  if(Button_sensor_L.state() || Button_sensor_R.state()){
+    Motor_L.Rev(LANGSAM);
+    Motor_R.Rev(LANGSAM);
+    delay(1000);
+    float angle0 = MPU.AngleZ;
+    Motor_L.Fwd(LANGSAM*VRICH);
+    Motor_L.Fwd(-(LANGSAM*VRICH));
+    while(abs(MPU.AngleZ-angle0)<45.0){
+      delay(1);
+    }
+    Motor_L.Fwd(LANGSAM);
+    Motor_R.Fwd(LANGSAM);
+    delay(1500);
+    // wiggle machen
+  };
   return;
 }

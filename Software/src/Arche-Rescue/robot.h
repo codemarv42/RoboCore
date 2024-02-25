@@ -2,6 +2,7 @@
 #define ROBOT_H
 #include "Arduino.h"
 #include "CD74HC4067.h"
+#include "rgb_led.h"
 
 
 class Robot {
@@ -29,11 +30,11 @@ class Robot {
     void linienFolger();
     void gruenerPunkt();
     void pruefeQuerschwarz();
-    void pruefeGruen();
     void pruefeRot();
     void pruefeSilber();
     void abbiegenGruen(int rich);
     void kehrtwende();
+    void pruefeHindernis();
     void secureLoop();
     float battery_voltage();
     void leseKalWerte();
@@ -41,8 +42,8 @@ class Robot {
 };
 
 extern Robot robot;
-
 extern CD74HC4067 ADC_multiplexer;
+extern RGB_led RGB_led_L,RGB_led_R;
 
 extern void sensorLoop(void* pvParameters);
 

@@ -4,15 +4,15 @@
 class  Light_sensor{
   private:
     int pin;
-    short int upper_limit;
-    short int raw;
+    unsigned short int upper_limit;
+    unsigned short int raw;
     int led;
   
   public:
-    short int min;
-    short int max;
+    unsigned short int min;
+    unsigned short int max;
     int val;
-    Light_sensor(int pin, short int upper_limit, int led);
+    Light_sensor(int pin,unsigned short int upper_limit, int led);
 
     void init();
     int measure_raw();
