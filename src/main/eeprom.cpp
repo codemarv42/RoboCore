@@ -1,5 +1,4 @@
 #include <sys/_stdint.h>
-#include <fstream>
 #include <string>
 
 #include <SPIFFS.h>
@@ -7,7 +6,6 @@
 #include "eeprom.h"
 #include "Pins.h"
 #include <Arduino.h>
-//#include <EEPROM.h>
 #include "lightsensor.h"
 
 
@@ -25,11 +23,6 @@ namespace eeprom {
   inline void writeMinMax(File& f, int16_t min, int16_t max){
     f.print(String(min)); f.print("\n");
     f.print(String(max)); f.print("\n");
-    /*f.write(uint8_t (min & (  (1 << 8) - 1)));
-    f.write(uint8_t ((max & (~((1 << 8) - 1)))) >> 8);
-    
-    f.write(uint8_t (min & (  (1 << 8) - 1)));
-    f.write(uint8_t ((max & (~((1 << 8) - 1)))) >> 8);*/
   }
 
   void writeLS(File& f, LightSensorArray* l){
@@ -47,7 +40,6 @@ namespace eeprom {
       file.close();
       return;
     }
-    //std::fstream f("Calibration.txt");
     writeLS(file, white);
     writeLS(file, green);
     writeLS(file, red);
@@ -57,8 +49,9 @@ namespace eeprom {
     file.close();
   }
 
-  uint16_t loadValue(File& f){
+  int16_t loadValue(File& f){
     String s = f.readStringUntil('\n');
+    Serial.println(s.toInt());
     return s.toInt();
   }
 
@@ -68,11 +61,6 @@ namespace eeprom {
     l->center.min = loadValue(f);      l->center.max = loadValue(f);
     l->right.min = loadValue(f);       l->right.max = loadValue(f);
     l->right_outer.min = loadValue(f); l->right_outer.max = loadValue(f);
-    /*loadMinMax(f, (ls.left_outer.min), uint16_t&(l->left_outer.max));
-    loadMinMax(f, uint16_t&(l->left.min), uint16_t&(l->left.max));
-    loadMinMax(f, uint16_t&(l->center.min), uint16_t&(l->center.max));
-    loadMinMax(f, uint16_t&(l->right.min), uint16_t&(l->right.max));
-    loadMinMax(f, uint16_t&(l->right_outer.min), uint16_t&(l->right_outer.max));*/
   }
 
   void loadLSData(LightSensorArray* white, LightSensorArray* green, LightSensorArray* red, LightSensorArray* blue){
