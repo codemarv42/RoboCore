@@ -18,6 +18,7 @@ view LICENSE.md for details
 
 
 // SPEED
+#define VZ 100
 #define V 100
 #define V2 80
 #define V3 40
@@ -26,23 +27,28 @@ view LICENSE.md for details
 //#define BLE
 //#define DEBUG
 //#define NOMOTORS
-#define LED_TEST
+//#define LED_TEST
 #define LF_ACTIVE
 
   
 // Init Light Sesnsors
-LightSensorArray white = LightSensorArray(SR_PT_WHITE);
-LightSensorArray red   = LightSensorArray(SR_PT_RED);
-LightSensorArray green = LightSensorArray(SR_PT_GREEN);
-DirectSensor refL = DirectSensor(SR_PT_WHITE, ADC_PT_REF_L);
-DirectSensor refR = DirectSensor(SR_PT_WHITE, ADC_PT_REF_R);
+LightSensorArray white(SR_PT_WHITE);
+LightSensorArray red(SR_PT_RED);
+LightSensorArray green(SR_PT_GREEN);
+DirectSensor refL(SR_PT_WHITE, ADC_PT_REF_L);
+DirectSensor refR(SR_PT_WHITE, ADC_PT_REF_R);
+LightSensorPair back(SR_DE1, ADC_AE2, ADC_AE3);
 
-LSBase* all_sensors[] = {&white,&green,&red,nullptr, &refL,&refR};  // nullptr is placeholder for an (optional) blue LightSensorArray
+LSBase* all_sensors[] = {&white,&green,&red,nullptr, &refL,&refR, &back};  // nullptr is placeholder for an (optional) blue LightSensorArray
 LightSensorArray* ls[] = {&white,&green,&red,nullptr};
 
 TaskHandle_t loop0; //used for handling the second main loop
 int16_t diff_interchange;
 static int16_t last = 0;
+
+void IRAM_ATTR isr() {
+	ESP.restart();
+}
 
 void HardwareInit(){
   /// get the shift register's Pins ///
@@ -71,6 +77,7 @@ void setup(){
   Serial.println(xPortGetCoreID());
 
   Wire.begin();
+  Wire.setClock(400000); // Fast mode
   Serial.print("WIRE on core:");
   Serial.println(xPortGetCoreID());
   Serial.println("HardwareInit...");
@@ -106,7 +113,7 @@ void setup(){
   eeprom::setup();
 
   #ifdef LED_TEST
-    Serial.println("LED test (WGR)...");
+    Serial.println("LED test (WGRB)...");
     shift_register::write(SR_PT_WHITE, HIGH);
     delay(2000);
     shift_register::write(SR_PT_WHITE, LOW, true);
@@ -116,9 +123,9 @@ void setup(){
     shift_register::write(SR_PT_RED, HIGH);
     delay(2000);
     shift_register::write(SR_PT_RED, LOW, true);
-    shift_register::write(SR_DE1, HIGH);
+    shift_register::write(SR_DE1, LOW);
     delay(2000);
-    shift_register::write(SR_DE1, LOW, true);
+    shift_register::write(SR_DE1, HIGH, true);
   #endif
 
   #ifdef BLE
@@ -141,67 +148,58 @@ void setup(){
       // Print min/max of WHITE
       Serial.print("White Left max: "); Serial.print(white.left.max); Serial.print(" - White Right max: "); Serial.println(white.right.max);
       Serial.print("White Left min: "); Serial.print(white.left.min); Serial.print(" - White Right min: "); Serial.println(white.right.min);
+      Serial.print("Back Left max: "); Serial.print(back.left.max); Serial.print(" - Back Right max: "); Serial.println(back.right.max);
+      Serial.print("Back Left min: "); Serial.print(back.left.min); Serial.print(" - Back Right min: "); Serial.println(back.right.min);
       eeprom::writeLSData(&white,&green,&red, nullptr); // save light values
     }
     else if (option == MENU_RUN){
       break;
     }
     else if (option == 2){
-      //shift_register::reset();
+      shift_register::reset();
       //evacuationZone();
-      
+      //navRoom(&white);
+      /*rottof.write(40);
+      while (true){
+        uint16_t upper = tof::readUpper();
+        uint16_t lower = tof::readLower();
+        Serial.print(upper);
+        Serial.print("\t");
+        Serial.print(lower);
+        Serial.print("\t");
+        Serial.println(upper - lower);
+        delay(100);
+      }*/
+      claw::down();
+      claw::open();
     }
   }
 
   // Done before Loop
-  //eeprom::loadLSData(&white,&green,&red, nullptr);
+  eeprom::loadLSData(&white,&green,&red, nullptr);
   Serial.print("White Left max: "); Serial.print(white.left.max); Serial.print(" - White Right max: "); Serial.println(white.right.max);
   Serial.print("White Left min: "); Serial.print(white.left.min); Serial.print(" - White Right min: "); Serial.println(white.right.min);
+  Serial.print("Back Left max: "); Serial.print(back.left.max); Serial.print(" - Back Right max: "); Serial.println(back.right.max);
+  Serial.print("Back Left min: "); Serial.print(back.left.min); Serial.print(" - Back Right min: "); Serial.println(back.right.min);
   delay(1000);
   gyro::ResetZAngle();
 
   xTaskCreatePinnedToCore(core0, "Core0MainLoop", 10000, NULL, 0, &loop0, 0); // create second core loop
-}
-
-int16_t diff_cache[10] = {0};
-uint32_t timestamp = millis() + 100;
-uint8_t cache_index = 0;
-
-inline void clear_cache(){
-  std::fill(std::begin(diff_cache), std::end(diff_cache), 0);
-}
-void cache(int16_t value){
-  if (millis() > timestamp){
-    timestamp = millis() + 100;
-    diff_cache[cache_index] = value;
-    cache_index = (cache_index + 1) % 10;
-    #ifdef DEBUG
-      Serial.println("Cached");
-    #endif
-  }
+  attachInterrupt(ENC_SW, isr, RISING);
 }
 
 void loop() {
-  start:
     while (true){
-
-      if (digitalRead(ENC_SW) == HIGH){
-        Serial.println("L.O.P. occured");
-        motor::stop();
-        delay(4000);
-        goto start; // restart loop()
-      }
-
-      
       for (auto sensor:all_sensors){ // read light values
         if (sensor != nullptr){sensor->read();}
       }
-      //refL.read(); // read Reflective sensors
-      //refR.read();
 
       // Silver Line -> align with silver line
       // left
       if (refL.data.value > 1000){
+        motor::rev(AB, V3);
+        delay(250);
+        motor::stop();
         shift_register::write(SR_LED_L_BLUE, LOW);
         while (refR.data.value < 1000){
           motor::fwd(B, V3);
@@ -216,6 +214,9 @@ void loop() {
       }
       // right
       else if (refR.data.value > 1000){
+        motor::rev(AB, V3);
+        delay(250);
+        motor::stop();
         shift_register::write(SR_LED_R_BLUE, LOW);
         while (refL.data.value < 1000){
           motor::fwd(A, V3);
@@ -258,6 +259,7 @@ void loop() {
 
       #ifndef NOMOTORS
         if (color::on_green(RIGHT | LEFT)){
+          //delay(25);
           motor::stop();
           motor::rev(AB, V/2);
           delay(25);
@@ -278,8 +280,12 @@ void loop() {
 
           delay(1000);
           if(right || left){
-            motor::sensorFwd(V/2, V/2 , 2500, ls); // go fwd, until there is no green
+            motor::sensorFwd(V/2, V/2 , 700, ls); // go fwd, until there is no green
             motor::stop();
+            left = left   || color::on_green(LEFT);
+            right = right || color::on_green(RIGHT);
+            shift_register::write(SR_LED_R_GREEN, !right, true); // show side on LED
+            shift_register::write(SR_LED_L_GREEN, !left);
             white.read();
             if((white.left_outer.value < 50 && left) || (white.right_outer.value < 50 && right)){ // check for black line
               delay(1000);
@@ -308,13 +314,13 @@ void loop() {
         #define mul 1
         
         int16_t mot_diff;
+        int16_t diff_back = back.left.value - back.right.value;
         int16_t diff = (white.left.value - white.center.value) - (white.right.value - white.center.value);
         int16_t diff_green = (green.left.value-red.left.value)-(green.right.value-red.right.value); // difference to ignore green value
         int16_t diff_outer = white.left_outer.value - white.right_outer.value;
         mot_diff = ((diff+diff_green*2)*4 + diff_outer*diff_outer_factor) * mul;  // calculate inner to outer mult
         diff_interchange = mot_diff;
         
-        //cache(mot_diff); // cache W.I.P.
         #ifdef DEBUG  // Debug light values
           Serial.print("White: ");
           Serial.print(white.left_outer.value);
@@ -347,11 +353,11 @@ void loop() {
           delay(200);
         #endif
         #ifndef NOMOTORS
-          int16_t v = min(max(V2, V-mot_diff), V); // scale bas speed based on difference
+          int16_t v = min(max(V2, int(VZ-mot_diff*1.5)), VZ); // scale bas speed based on difference
           motor::fwd(A, ( v + (mot_diff*2+last)/3));
           motor::fwd(B, ( v - (mot_diff*2+last)/3));
           last = mot_diff;
-          diff_interchange = v;
+          diff_interchange = mot_diff;
         #endif
       #endif
 
@@ -381,19 +387,23 @@ void loop() {
           motor::gyro(V, 90);
           motor::stop();
           Serial.println("Baum");
-          rottof.write(0);
+          rottof.write(-10);
           delay(2000);
           dist = tof::readUpper(); // set approximation dist TODO
           int16_t rdist;
+          uint timestamp = millis();
           while (true){
-            rdist = 150-tof::readUpper();
-            motor::fwd(A, (V2-rdist)*0.6);
-            motor::fwd(B, (V2+rdist)*0.6);
+            rdist = 100-tof::readUpper();
+            motor::fwd(A, (V2-rdist));
+            motor::fwd(B, (V2+rdist));
             if (abs(rdist) > 300){
-              motor::rev(AB, V2);
+              motor::rev(AB, V3);
             }
             white.read();
-            if (white.left_outer.value < 35 || white.right_outer.value < 35){
+            if ((white.left_outer.value < 35 || white.right_outer.value < 35) && millis() > timestamp + 5000){
+              motor::fwd(B, V2);
+              delay(500);
+              motor::stop();
               break;
             }
           }
@@ -404,15 +414,18 @@ void loop() {
           motor::gyro(V, -90);
           motor::stop();
           int16_t rdist;
-          while (true){ // TODO
-            rdist = 150-tof::readLeft();
-            motor::fwd(A, (V2+rdist)*0.6);
-            motor::fwd(B, (V2-rdist)*0.6);
+          while (true){
+            rdist = 50-tof::readLeft();
+            motor::fwd(A, (V2+rdist*0.6));
+            motor::fwd(B, (V2-rdist*0.6));
             if (abs(rdist) > 300){
-              motor::rev(AB, V2);
+              motor::fwd(AB, V2);
             }
             white.read();
-            if (white.left_outer.value < 35 || white.right_outer.value < 35){
+            if ((white.left_outer.value < 35 || white.right_outer.value < 35)){
+              motor::fwd(AB, V2);
+              delay(500);
+              motor::stop();
               break;
             }
           }
@@ -427,7 +440,7 @@ void loop() {
 ////// CORE 0 LOOP //////
 void core0(void * pvParameters){
   while (true){
-    menu::showDifference(diff_interchange, true);
+    menu::showDifference(diff_interchange*0.5, true);
     #ifdef BLE
       BLELoop(
         int(white.left_outer.value),
