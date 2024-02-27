@@ -1,3 +1,4 @@
+#include "Adafruit_GFX.h"
 #include "esp32-hal.h"
 #include "esp32-hal-gpio.h"
 #include <sys/_stdint.h>
@@ -37,7 +38,7 @@ void LSBase::ledOn(){
 void LSBase::ledOff(){
   shift_register::write(led_pin, LOW, true);
 }
-inline int16_t LightSensorArray::map(int16_t value, int16_t minv, int16_t maxv){
+inline int16_t mapper::map(int16_t value, int16_t minv, int16_t maxv){
   return ((value - minv) * 100) / (maxv - minv);
 }
 LightSensorArray::LightSensorArray(int led_pin){
@@ -100,7 +101,49 @@ void DirectSensor::read(){
   ledOff();
 }
 
+LightSensorPair::LightSensorPair(int8_t ledPin, uint8_t pinLeft, uint8_t pinRight){
+  led_pin = ledPin;
+  adcPinLeft = pinLeft;
+  adcPinRight = pinRight;
+}
 
+void LightSensorPair::calibrate_turn(int i){
+  if (i <= 20){
+    ledOn();
+    ADCRead(adcPinLeft);
+    ADCRead(adcPinRight);
+    ledOff();
+  }
+  else{
+    ledOn();
+    int16_t currentValue = ADCRead(adcPinLeft);
+    left.min = min(currentValue, left.min);
+    left.max = max(currentValue, left.max);
+
+    currentValue = ADCRead(adcPinRight);
+    right.min = min(currentValue, right.min);
+    right.max = max(currentValue, right.max);
+    ledOff();
+  }
+}
+
+
+void LightSensorPair::ledOn(){
+  shift_register::write(led_pin, LOW);
+  delayMicroseconds(80);
+}
+
+void LightSensorPair::ledOff(){
+  shift_register::write(led_pin, HIGH, true);
+  delayMicroseconds(80);
+}
+
+void LightSensorPair::read(){
+  ledOn();
+  left .value = map(ADCRead(adcPinLeft), left.min, left.max);
+  right.value = map(ADCRead(adcPinRight), right.min, right.max);
+  ledOff();
+}
 
 
 #endif

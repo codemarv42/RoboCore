@@ -13,8 +13,8 @@
 
 
 struct SensorData{
-  int16_t min=0x7FFF; // max value vor a 16-Bit integer in Hexadecimal
-  int16_t max=0;
+  int16_t min=0x7FFF; // max value for a 16-Bit integer in Hexadecimal
+  int16_t max=1;
   int16_t value=0;
   int16_t raw;
 };
@@ -30,12 +30,14 @@ class LSBase{
     virtual void calibrate_turn(int i);
 };
 
-class LightSensorArray : public LSBase{
-  private:
+class mapper{
+  public:
     inline int16_t map(int16_t value, int16_t minv, int16_t maxv);
+};
+
+class LightSensorArray : public LSBase, private mapper{
 
   public:
-    uint8_t led_pin;
     SensorData left_outer;
     SensorData left;
     SensorData center;
@@ -53,11 +55,25 @@ class DirectSensor : public LSBase{
     SensorData data;
     DirectSensor(uint8_t ledPin, uint8_t adcPin);
     void read();
+    void calibrate_turn(int i){}; // Placeholder
   private:
     uint8_t adcPin;
-    void calibrate_turn(int i){}; // Placeholder
 };
 
+class LightSensorPair : public LSBase, private mapper{
+  public:
+    SensorData left;
+    SensorData right;
+    void read();
+    void ledOn();
+    void ledOff();
+    void calibrate_turn(int i);
+    LightSensorPair(int8_t ledPin, uint8_t PinLeft, uint8_t PinRight);
+  
+  private:
+    uint8_t adcPinLeft;
+    uint8_t adcPinRight;
+};
 
 
 #define CALIBRATION 1000
