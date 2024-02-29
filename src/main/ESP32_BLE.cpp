@@ -152,8 +152,11 @@ void BLELoop(int wlo, int wli, int wc, int wri, int wro, int rl, int rr, int red
   }
 }
 
-void post(std::string msg){
-
+void post(String msg){
+  #ifdef BLE
+    pCharacteristic_25->setValue(msg.c_str());
+    pCharacteristic_25->notify();
+  #endif
 }
 
 void StartBLE() {
@@ -211,6 +214,10 @@ void StartBLE() {
   pCharacteristic_11 = pService->createCharacteristic(
     CHAR11_UUID,
     BLECharacteristic::PROPERTY_NOTIFY);
+  
+  pCharacteristic_25 = pService->createCharacteristic(
+    CHAR25_UUID,
+    BLECharacteristic::PROPERTY_NOTIFY);
 
   pBLE2902 = new BLE2902();
   pBLE2902->setNotifications(true);
@@ -237,6 +244,8 @@ void StartBLE() {
   pCharacteristic_10->addDescriptor(pBLE2902);
 
   pCharacteristic_11->addDescriptor(pBLE2902);
+
+  pCharacteristic_25->addDescriptor(pBLE2902);
 
   // Start the service
   pService->start();
