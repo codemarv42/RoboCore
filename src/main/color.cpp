@@ -6,7 +6,7 @@
 
 #define check_length 7  // How often a color must be checked to allow a true call 
 #define GREEN_THRESHOLD 15 // Minimum diff for a recognised green
-#define BLACK_THRESHOLD 30// Max value for black
+#define BLACK_THRESHOLD 10// Max value for black
 #define CHECKRED
 
 namespace color{
@@ -21,13 +21,13 @@ namespace color{
 
 
   bool on_black(int side){
-  return (side & LEFT && black.left >= check_length) || (side & RIGHT && black.right >= check_length);
+    return (side & LEFT && black.left >= check_length) || (side & RIGHT && black.right >= check_length);
   }
   bool on_green(int side){
-  return (side & LEFT && green.left >= check_length) || (side & RIGHT && green.right >= check_length);
+    return (side & LEFT && green.left >= check_length) || (side & RIGHT && green.right >= check_length);
   }
   bool on_red(int side){
-  return (side & LEFT && red.left >= check_length) || (side & RIGHT && red.right >= check_length);
+    return (side & LEFT && red.left >= check_length) || (side & RIGHT && red.right >= check_length);
   }
 
   void update(LightSensorArray* s_white, LightSensorArray* s_green, LightSensorArray* s_red){
@@ -63,7 +63,7 @@ namespace color{
       green.right--;
     }
     #ifdef CHECKRED
-      if (-s_green->left.value + s_red->left.value > GREEN_THRESHOLD){
+      if (-s_green->left.value*1.5 + s_red->left.value > GREEN_THRESHOLD){
         if (red.left < check_length){
           red.left++;
         }
@@ -72,7 +72,7 @@ namespace color{
         red.left--;
       }
 
-      if (-s_green->right.value + s_red->right.value > GREEN_THRESHOLD){
+      if (-s_green->right.value*1.5 + s_red->right.value > GREEN_THRESHOLD){
         if (red.right < check_length){
           red.right++;
         }
