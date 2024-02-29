@@ -29,6 +29,7 @@ view LICENSE.md for details
 //#define NOMOTORS
 //#define LED_TEST
 #define LF_ACTIVE
+#define LF_USE_BACK
 
   
 // Init Light Sesnsors
@@ -138,6 +139,7 @@ void setup(){
   // Menu
   while (true){
     shift_register::write(SR_PT_GREEN, HIGH); // turn on cool green LED's
+    post("In Menu...");
     int option = menu::menu(); // run displayMenu
     if (option == MENU_CALIBRATE){ // handle results
 
@@ -150,7 +152,7 @@ void setup(){
       Serial.print("White Left min: "); Serial.print(white.left.min); Serial.print(" - White Right min: "); Serial.println(white.right.min);
       Serial.print("Back Left max: "); Serial.print(back.left.max); Serial.print(" - Back Right max: "); Serial.println(back.right.max);
       Serial.print("Back Left min: "); Serial.print(back.left.min); Serial.print(" - Back Right min: "); Serial.println(back.right.min);
-      eeprom::writeLSData(&white,&green,&red, nullptr); // save light values
+      eeprom::writeLSData(&white,&green,&red, nullptr, &back); // save light values
     }
     else if (option == MENU_RUN){
       break;
@@ -159,8 +161,8 @@ void setup(){
       shift_register::reset();
       //evacuationZone();
       //navRoom(&white);
-      /*rottof.write(40);
-      while (true){
+      rottof.write(40);
+      /*while (true){
         uint16_t upper = tof::readUpper();
         uint16_t lower = tof::readLower();
         Serial.print(upper);
@@ -170,13 +172,18 @@ void setup(){
         Serial.println(upper - lower);
         delay(100);
       }*/
-      claw::down();
-      claw::open();
+      //claw::down();
+      //claw::open();
+      shift_register::write(SR_DE1, LOW);
+      delayMicroseconds(80);
+      Serial.println(ADCRead(ADC_AE3));
+      delay(1000);
+      shift_register::write(SR_DE1, HIGH);
     }
   }
 
   // Done before Loop
-  eeprom::loadLSData(&white,&green,&red, nullptr);
+  eeprom::loadLSData(&white,&green,&red, nullptr, &back);
   Serial.print("White Left max: "); Serial.print(white.left.max); Serial.print(" - White Right max: "); Serial.println(white.right.max);
   Serial.print("White Left min: "); Serial.print(white.left.min); Serial.print(" - White Right min: "); Serial.println(white.right.min);
   Serial.print("Back Left max: "); Serial.print(back.left.max); Serial.print(" - Back Right max: "); Serial.println(back.right.max);
@@ -314,66 +321,66 @@ void loop() {
         #define mul 1
         
         int16_t mot_diff;
-        int16_t diff_back = back.left.value - back.right.value;
+        #ifdef LF_USE_BACK
+          int16_t diff_back = back.left.value - back.right.value;
+        #endif
         int16_t diff = (white.left.value - white.center.value) - (white.right.value - white.center.value);
         int16_t diff_green = (green.left.value-red.left.value)-(green.right.value-red.right.value); // difference to ignore green value
         int16_t diff_outer = white.left_outer.value - white.right_outer.value;
         mot_diff = ((diff+diff_green*2)*4 + diff_outer*diff_outer_factor) * mul;  // calculate inner to outer mult
         diff_interchange = mot_diff;
-        
-        #ifdef DEBUG  // Debug light values
-          Serial.print("White: ");
-          Serial.print(white.left_outer.value);
-          Serial.print(" ");
-          Serial.print(white.left.value);
-          Serial.print(" ");
-          Serial.print(white.right.value);
-          Serial.print(" ");
-          Serial.print(white.right_outer.value);
-          Serial.print(" ");
-          Serial.print("Green: ");
-          Serial.print(green.left_outer.value);
-          Serial.print(" ");
-          Serial.print(green.left.value);
-          Serial.print(" ");
-          Serial.print(green.right.value);
-          Serial.print(" ");
-          Serial.print(green.right_outer.value);
-          Serial.print(" ");
-          Serial.print("Red: ");
-          Serial.print(red.left_outer.value);
-          Serial.print(" ");
-          Serial.print(red.left.value);
-          Serial.print(" ");
-          Serial.print(red.right.value);
-          Serial.print(" ");
-          Serial.print(red.right_outer.value);
-          Serial.print(" ");
-          Serial.println(mot_diff);
-          delay(200);
-        #endif
+
         #ifndef NOMOTORS
           int16_t v = min(max(V2, int(VZ-mot_diff*1.5)), VZ); // scale bas speed based on difference
-          motor::fwd(A, ( v + (mot_diff*2+last)/3));
-          motor::fwd(B, ( v - (mot_diff*2+last)/3));
+
+          #ifdef LF_USE_BACK
+            float scale = 1/max(abs(mot_diff), 1);
+
+            int16_t vback_a = max(0, int(diff_back)) * scale;
+            int16_t vback_b = min(0, int(diff_back)) * scale;
+          #else
+            #define vback_a 1;
+            #define vback_b 1;
+          #endif
+
+          motor::fwd(A, ( v + (mot_diff*2+last)/3) + vback_a);
+          motor::fwd(B, ( v - (mot_diff*2+last)/3) + vback_b);
           last = mot_diff;
-          diff_interchange = mot_diff;
         #endif
+        diff_interchange = mot_diff;
       #endif
 
-      ////// RESCUE-KIT //////
-      /*if(digitalRead(T_M) == LOW){ // rescue kit detected
-        motor::rev(AB, V);
-        delay(1000);
-        motor::stop();
-        claw::open();
-        claw::down();
-        motor::fwd(AB, V);
-        delay(700);
-        motor::stop();
-        claw::close();
-        claw::up();
-      }*/
+      #ifdef DEBUG  // Debug light values
+        Serial.print("White: ");
+        Serial.print(white.left_outer.value);
+        Serial.print(" ");
+        Serial.print(white.left.value);
+        Serial.print(" ");
+        Serial.print(white.right.value);
+        Serial.print(" ");
+        Serial.print(white.right_outer.value);
+        Serial.print(" ");
+        Serial.print("Green: ");
+        Serial.print(green.left_outer.value);
+        Serial.print(" ");
+        Serial.print(green.left.value);
+        Serial.print(" ");
+        Serial.print(green.right.value);
+        Serial.print(" ");
+        Serial.print(green.right_outer.value);
+        Serial.print(" ");
+        Serial.print("Red: ");
+        Serial.print(red.left_outer.value);
+        Serial.print(" ");
+        Serial.print(red.left.value);
+        Serial.print(" ");
+        Serial.print(red.right.value);
+        Serial.print(" ");
+        Serial.print(red.right_outer.value);
+        Serial.print(" ");
+        Serial.println(mot_diff);
+        delay(200);
+      #endif
 
       ////// OBSTACLE HANDLING //////
       if (!(bool(digitalRead(T_L)) || bool(digitalRead(T_R)))){ // if buttons are pressed
@@ -401,8 +408,8 @@ void loop() {
             }
             white.read();
             if ((white.left_outer.value < 35 || white.right_outer.value < 35) && millis() > timestamp + 5000){
-              motor::fwd(B, V2);
-              delay(500);
+              //motor::fwd(B, V2);
+              //delay(500);
               motor::stop();
               break;
             }

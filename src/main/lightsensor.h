@@ -22,8 +22,8 @@ struct SensorData{
 class LSBase{
   protected:
     uint8_t led_pin;
-    void ledOn();
-    void ledOff();
+    virtual void ledOn();
+    virtual void ledOff();
   
   public:
     virtual void read();
@@ -68,11 +68,11 @@ class LightSensorPair : public LSBase, private mapper{
     void ledOn();
     void ledOff();
     void calibrate_turn(int i);
-    LightSensorPair(int8_t ledPin, uint8_t PinLeft, uint8_t PinRight);
+    LightSensorPair(int ledPin, int PinLeft, int PinRight);
   
   private:
-    uint8_t adcPinLeft;
-    uint8_t adcPinRight;
+    int adcPinLeft;
+    int adcPinRight;
 };
 
 

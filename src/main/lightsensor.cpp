@@ -16,18 +16,13 @@ class LSBase;
 void calibrate(LSBase* sensors[],const int amount = CALIBRATION,const int time_between_read_ms = 3)
 {
   for(int i = 0; i < amount; i++) {
-    for(int j = 0; j < 4; j++) {
+    for(int j = 0; j < 7; j++) {
       if (sensors[j] != nullptr) {
         sensors[j]->calibrate_turn(i);
       }
       delay(time_between_read_ms);
     }
   }
-  /*for(int i = 0; i < amount; i++){
-    Serial.print(werteL[i]);
-    Serial.print("\t");
-    Serial.println(werteR[i]);
-  }*/
 }
 
 void LSBase::ledOn(){
@@ -101,7 +96,7 @@ void DirectSensor::read(){
   ledOff();
 }
 
-LightSensorPair::LightSensorPair(int8_t ledPin, uint8_t pinLeft, uint8_t pinRight){
+LightSensorPair::LightSensorPair(int ledPin, int pinLeft, int pinRight){
   led_pin = ledPin;
   adcPinLeft = pinLeft;
   adcPinRight = pinRight;
@@ -135,7 +130,7 @@ void LightSensorPair::ledOn(){
 
 void LightSensorPair::ledOff(){
   shift_register::write(led_pin, HIGH, true);
-  delayMicroseconds(80);
+  //delayMicroseconds(80);
 }
 
 void LightSensorPair::read(){
