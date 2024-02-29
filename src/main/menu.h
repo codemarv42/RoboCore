@@ -12,4 +12,5 @@ namespace menu {
   extern int menu();
   extern void showWaiting(const char* msg);
   extern void showView(triangleData* t);
+  extern void showRotation();
 }

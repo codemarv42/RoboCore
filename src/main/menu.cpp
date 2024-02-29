@@ -15,7 +15,8 @@
 #include "Pins.h" // pin layout
 
 #include <SPI.h> // comms
-#include <Wire.h> 
+#include <Wire.h>
+#include <cmath>
 
 #include <Adafruit_GFX.h> //https://github.com/adafruit/Adafruit-GFX-Library
 #include <Adafruit_SSD1306.h> //https://github.com/adafruit/Adafruit_SSD1306
@@ -23,6 +24,7 @@
 #include "icons.h" // icons to be displayed
 #include "ESP32_BLE.h" // BLE - here only used for the bluetooth symbol
 #include "shiftregister.h"
+#include "gyro.h"
 
 #define SCREEN_WIDTH 128 // OLED display width, in pixels
 #define SCREEN_HEIGHT 64 // OLED display height, in pixels
@@ -153,6 +155,16 @@ namespace menu {
       display.drawFastVLine(i, 32, dataMappedLower, SSD1306_WHITE);
 
     }
+    display.display();
+  }
+
+  void showRotation(){
+    overlay();
+    display.clearDisplay();
+    display.drawCircle(64,32, 8, SSD1306_WHITE);
+    display.drawFastVLine(64, 15, 17, SSD1306_WHITE);
+    display.drawLine(64, 32, round(64 + 9 * cos(gyro::ZAngle)), round(32 + 9 * sin(gyro::ZAngle)), SSD1306_WHITE);
+
     display.display();
   }
 }
