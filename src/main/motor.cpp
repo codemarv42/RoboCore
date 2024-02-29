@@ -27,6 +27,12 @@ namespace motor{
     shift_register::write(SR_BIN1, LOW, true);
     shift_register::write(SR_BIN2, LOW);
   }
+  void hardstop(){ // works only when going fwd!!!
+    rev(AB, 40);
+    delay(25);
+    stop();
+  }
+
   void fwd(int motor,int v){
     if (v > 255){v = 255;}
     else if (v < -255){v = -255;}

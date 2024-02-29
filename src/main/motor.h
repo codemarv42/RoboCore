@@ -11,11 +11,12 @@
 
 namespace motor {
 extern void stop();
+extern void hardstop(); // only when going fwd!!!
 extern void fwd(int motor, int v);
 extern void rev(int motor, int v);
 extern void gyro(int v, int16_t deg);
 extern void readFwd(int motor, int v, int time, LightSensorArray* all[4]);
 extern bool sensorFwd(int va, int vb, int time, LightSensorArray* all[4]); 
-extern bool sensorFwd(int motor, int v, LightSensorArray* s, int diff, int time); 
+extern bool sensorFwd(int motor, int v, LightSensorArray* s, int diff, int time);
 }
 #endif
