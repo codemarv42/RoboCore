@@ -33,7 +33,7 @@ namespace eeprom {
     writeMinMax(f, l->right_outer.min, l->right_outer.max);
   }
 
-  void writeLSData(LightSensorArray* white, LightSensorArray* green, LightSensorArray* red, LightSensorArray* blue){
+  void writeLSData(LightSensorArray* white, LightSensorArray* green, LightSensorArray* red, LightSensorArray* blue, LightSensorPair* back){
     File file = SPIFFS.open("/calibration.txt","w");
     if (!file){
       Serial.println("ERROR opening write file!");
@@ -46,6 +46,8 @@ namespace eeprom {
     if (blue != nullptr){
       writeLS(file, blue);
     }
+    writeMinMax(file, back->left.min,  back->left.max);
+    writeMinMax(file, back->right.min, back->right.max);
     file.close();
   }
 
@@ -63,7 +65,7 @@ namespace eeprom {
     l->right_outer.min = loadValue(f); l->right_outer.max = loadValue(f);
   }
 
-  void loadLSData(LightSensorArray* white, LightSensorArray* green, LightSensorArray* red, LightSensorArray* blue){
+  void loadLSData(LightSensorArray* white, LightSensorArray* green, LightSensorArray* red, LightSensorArray* blue, LightSensorPair* back){
     Serial.println("Loading from file...");
     File f = SPIFFS.open("/calibration.txt","r");
     if (!f){
@@ -77,6 +79,8 @@ namespace eeprom {
     if (blue != nullptr){
       loadLS(f, blue);
     }
+    back->left.min = loadValue(f);  back->left.max = loadValue(f);
+    back->right.min = loadValue(f); back->right.max = loadValue(f);
     f.close();
   }
 }
