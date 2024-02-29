@@ -45,6 +45,7 @@ namespace shift_register{
     for(int i = 9; i < 6 + 9; i++){
       write(i, HIGH);
     }
+    write(SR_DE1, HIGH);
   }
 }
 int ADCRead(int pin) {  //Reads out the inputs of the analog multiplexer
