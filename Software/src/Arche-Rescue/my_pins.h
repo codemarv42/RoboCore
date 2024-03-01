@@ -103,10 +103,10 @@
 #define ANZ_KAL         80 //150
 #define ANZ_LS          13
 
-#define SCHNELL         150
+#define SCHNELL         200
 #define SOLL            130
 #define LANGSAM         75
-#define FAKTOR          2
+#define FAKTOR          1.2
 
 #define WEISS           90
 #define GRAU            60
@@ -118,12 +118,13 @@
 #define ROT_MIN         50      // anpassen
 
 #define TIME_SCHWARZ    1000
-#define ANZ_GRUEN       7
+#define ANZ_GRUEN       14
 #define ANZ_ROT         7
 #define ANZ_SILBER      10
 #define ANZ_SCHWARZ     13
 
 #define VRICH           1       // 1: rechtsrum; -1: linksrum
+#define RADIUS          15      // radius in cm
 
 #define TOF_LINKS       SR_XSHT1    // ANPASSEN auf HARDWARE
 #define TOF_RECHTS      SR_XSHT2
@@ -133,6 +134,9 @@
 #define EEPROM_START    0
 
 #define OMEGA_SOLL      100
-#define OMEGA           (0*1e+3)/360    // millisec pro grad bei OMEGA_SOLL
+#define OMEGA           (8983)/360    // millisec pro grad bei OMEGA_SOLL
+
+#define VOR_SOLL        100
+#define VOR             (3200)/25         // millisec pro cm bei VOR_SOLL
 
 #endif

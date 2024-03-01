@@ -130,6 +130,8 @@ void Robot::actionLoop(){
   this->running = true;
   RGB_led_R.red();
   int rstate = Rotary.counter;
+  // Motor_L.Fwd(VOR_SOLL);
+  // Motor_R.Fwd(VOR_SOLL);
   while(Rotary.counter==rstate){
     Rotary.measure();
   }
@@ -213,8 +215,63 @@ void sensorLoop(void* pvParameters){
   }
 }
 
-void Robot::secureLoop(){
-  return;
+void Robot::secureLoop(){ //max a = 1500mm
+  unsigned long t = millis();
+  Motor_L.Fwd(OMEGA_SOLL);
+  Motor_R.Rev(OMEGA_SOLL);
+  while((millis()-t)<80*OMEGA){
+    Serial.println("drehe nach rechts");
+    if(Tof_links.data>1800){
+      halteKurs();
+      return;
+    };
+    delay(1);
+  }
+
+  t = millis();
+  int max = 0;
+  Motor_L.Rev(OMEGA_SOLL);
+  Motor_R.Fwd(OMEGA_SOLL);
+  int a = 0;
+  while((millis()-t)<180*OMEGA){
+    a = Tof_links.data;
+    Serial.println(a);
+    Serial.println("drehe nach links");
+    if(a>1800){
+      halteKurs();
+      return;
+    };
+    if(a>max){
+      max = a;
+    }
+    else if((max-a)>60){
+      Serial.println("Maximum gefunden");
+      Motor_L.Fwd(OMEGA_SOLL);
+      Motor_R.Rev(OMEGA_SOLL);
+      while((max-30)>Tof_links.data){
+        delay(1);
+      }
+      Motor_L.Fwd(SOLL);
+      Motor_R.Fwd(SOLL);
+      while((max-300)<Tof_links.data){
+        delay(1);
+      }
+      Motor_L.Rev(OMEGA_SOLL);
+      Motor_R.Fwd(OMEGA_SOLL);
+      t = millis();
+      while((millis()-t)<140*OMEGA){
+        Serial.println("drehe wieder links");
+        if(Tof_links.data>1800){
+          halteKurs();
+          return;
+        };
+        delay(1);
+      }
+      return;
+    }
+    delay(1*OMEGA);
+  }
+  // kys
 }
 
 void Robot::input(){
@@ -283,7 +340,7 @@ void Robot::messeLicht(){
 void Robot::linienFolger(){
   int diff = 0;
   diff = (int) ((Light_sensor_L0_w.val - Light_sensor_R0_w.val) * FAKTOR);
-  diff += (int) (Light_sensor_L1.val - Light_sensor_R1.val) * FAKTOR/1.5;
+  diff += (int) (Light_sensor_L1.val - Light_sensor_R1.val) * FAKTOR/1.4; //1.5
   Motor_L.Fwd(SOLL + diff);
   Motor_R.Fwd(SOLL - diff);
   // Serial.println(diff);
@@ -456,12 +513,12 @@ void Robot::abbiegenGruen(int rich){
     Serial.println(Light_sensor_R1.val);
   }
   delay(10);
-  while((Light_sensor_L1.val<SCHWARZ) && (Light_sensor_R1.val<SCHWARZ)){
-    delay(10);
-    Serial.println("weiter vor");
-    Serial.println(Light_sensor_R1.val);
-  }
-  delay(20);
+  // while((Light_sensor_L1.val<SCHWARZ) || (Light_sensor_R1.val<SCHWARZ)){
+  //   delay(10);
+  //   Serial.println("weiter vor");
+  //   Serial.println(Light_sensor_R1.val);
+  // }
+
   // float angle0 = MPU.AngleZ;
   // Motor_L.Fwd(SOLL*rich);
   // Motor_R.Fwd(-(SOLL*rich));
@@ -487,20 +544,21 @@ void Robot::abbiegenGruen(int rich){
   if(rich == 1){
     rich_sens = &Light_sensor_L0_w;
   };
-  Motor_L.Fwd(SOLL*rich);
-  Motor_R.Fwd(-(SOLL*rich));
-  while(rich_sens->val>SCHWARZ){
-    delay(10);
-    Serial.println("drehen");
-  }
-  while(rich_sens->val<GRAU){
-    delay(10);
-    Serial.println("weiter drehen");
-  }
-  while(rich_sens->val>GRAU-5){     // vielleicht gefährlich
+  Motor_L.Fwd(OMEGA_SOLL*rich);
+  Motor_R.Fwd((-OMEGA_SOLL*rich));
+  delay(OMEGA*70);
+  Motor_L.Fwd(VOR_SOLL);
+  Motor_R.Fwd(VOR_SOLL);
+  delay(VOR*4);
+  Motor_L.Fwd(SOLL*rich+0);
+  Motor_R.Fwd((-SOLL*rich)+0);
+  while(rich_sens->val>GRAU){
     delay(10);
     Serial.println("immernoch drehen");
   }
+  Motor_L.Fwd(OMEGA_SOLL*-rich);
+  Motor_R.Fwd(OMEGA_SOLL*rich);
+  delay(OMEGA*7);
   schwarz_quer_time = millis();
   return;
 }
@@ -529,21 +587,27 @@ void Robot::kehrtwende(){
   if(VRICH == 1){
     rich_sens = &Light_sensor_L0_w;
   };
-  Motor_L.Rev(SOLL);
-  Motor_R.Rev(SOLL);
-  delay(200);
-  Motor_L.Fwd(SOLL*VRICH);
-  Motor_R.Fwd(-(SOLL*VRICH));
-  while(rich_sens->val>SCHWARZ){
-    delay(10);
-    Serial.println("drehen");
-  }
-  while(rich_sens->val<GRAU){
-    delay(10);
-    Serial.println("weiter drehen");
-  }
+  Motor_L.Rev(VOR_SOLL);
+  Motor_R.Rev(VOR_SOLL);
+  delay(VOR*7);
+  Motor_L.Fwd(OMEGA_SOLL*VRICH);
+  Motor_R.Fwd(-(OMEGA_SOLL*VRICH));
+  delay(OMEGA*90);
+  Motor_L.Fwd(VOR_SOLL);
+  Motor_R.Fwd(VOR_SOLL);
+  delay(VOR*4);
+  Motor_L.Fwd(OMEGA_SOLL*VRICH);
+  Motor_R.Fwd(-(OMEGA_SOLL*VRICH));
+  // while(rich_sens->val>SCHWARZ){
+  //   delay(10);
+  //   Serial.println("drehen");
+  // }
+  // while(rich_sens->val<GRAU){
+  //   delay(10);
+  //   Serial.println("weiter drehen");
+  // }
   while(rich_sens->val>GRAU-5){  // vielleicht gefährlich
-    delay(10);
+    delay(1);
     Serial.println("immernoch drehen");
   }
   schwarz_quer_time = millis();
@@ -552,20 +616,66 @@ void Robot::kehrtwende(){
 
 void Robot::pruefeHindernis(){
   if(Button_sensor_L.state() && Button_sensor_R.state()){
-    Motor_L.Rev(LANGSAM);
-    Motor_R.Rev(LANGSAM);
-    delay(1000);
+    int len = RADIUS*0.684;
+    Motor_L.Rev(VOR_SOLL);
+    Motor_R.Rev(VOR_SOLL);
+    delay(RADIUS*VOR);
     // float angle0 = MPU.AngleZ;
-    Motor_L.Fwd(LANGSAM*VRICH);
-    Motor_L.Fwd(-(LANGSAM*VRICH));
-    delay(1000);
+    Motor_L.Fwd(OMEGA_SOLL*VRICH);
+    Motor_R.Fwd(-(OMEGA_SOLL*VRICH));
+    delay(70*OMEGA);
     // while(abs(MPU.AngleZ-angle0)<45.0){
     //   delay(1);
     // }
-    Motor_L.Fwd(LANGSAM);
-    Motor_R.Fwd(LANGSAM);
-    delay(1500);
-    // wiggle machen
+
+    for(int i=0;i<4;i++){
+      Motor_L.Fwd(VOR_SOLL);
+      Motor_R.Fwd(VOR_SOLL);
+      delay(len*VOR);   // zu wenig?
+      Motor_L.Fwd(OMEGA_SOLL*-VRICH);
+      Motor_R.Fwd(OMEGA_SOLL*VRICH);
+      delay(40*OMEGA);  // eig 40
+      Serial.println("Neuneck");
+    }
+    Motor_L.Fwd(SOLL);
+    Motor_R.Fwd(SOLL);
+    while((Light_sensor_L1.val>SCHWARZ) || (Light_sensor_R1.val>SCHWARZ)){
+      delay(1);
+    }
+    delay(10);
+    while((Light_sensor_L1.val<SCHWARZ) && (Light_sensor_R1.val<SCHWARZ)){
+      delay(1);
+    }
+    Light_sensor* rich_sens = &Light_sensor_R0_w;
+    if(VRICH == 1){
+      rich_sens = &Light_sensor_L0_w;
+    };
+    Motor_L.Fwd(SOLL*VRICH);
+    Motor_R.Fwd(-(SOLL*VRICH));
+    while(rich_sens->val>GRAU){
+      delay(1);
+    }
   };
+  return;
+}
+
+void Robot::halteKurs(){
+  Motor_L.Fwd(SOLL);
+  Motor_R.Fwd(SOLL);
+  while(Light_sensor_L1.val>SCHWARZ && Light_sensor_R1.val>SCHWARZ){
+    if(Tof_links.data<1600){
+      Motor_L.Fwd(OMEGA_SOLL);
+      Motor_R.Rev(OMEGA_SOLL);
+      delay(OMEGA*5);
+      if(Tof_links.data<1600){
+        Motor_L.Fwd(OMEGA_SOLL);
+        Motor_R.Rev(OMEGA_SOLL);
+        delay(OMEGA*10);
+      };
+      Motor_L.Fwd(SOLL);
+      Motor_R.Fwd(SOLL);
+    };
+  }
+  // wie linie wiederfinden?
   return;
 }

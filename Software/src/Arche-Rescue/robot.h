@@ -42,6 +42,7 @@ class Robot {
     float battery_voltage();
     void leseKalWerte();
     void schreibeKalWerte();
+    void halteKurs();
     std::vector<tof*> active_tof;
 };
 
