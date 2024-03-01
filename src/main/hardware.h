@@ -1,5 +1,6 @@
 #ifndef HARDWARE_H
 #define HARDWARE_H
+#pragma once
 
 // This header includes all hardware related code
 #include "lightsensor.h"

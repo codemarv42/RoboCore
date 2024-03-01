@@ -26,7 +26,7 @@ namespace claw{
   }
 
   void down(){
-    lift.write(360);
+    lift.write(140);
     delay(2000);
   }
   void up(){

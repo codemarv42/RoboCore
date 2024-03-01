@@ -7,6 +7,7 @@
 #include "hardware.h"
 #include "menu.h"
 
+extern TaskHandle_t loop0; //used for handling the second main loop
 extern void evacuationZone();
-extern void navRoom(LightSensorArray* w);
+extern void navRoom(LightSensorArray* w[4]);
 

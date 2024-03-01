@@ -43,7 +43,6 @@ LightSensorPair back(SR_DE1, ADC_AE2, ADC_AE3);
 LSBase* all_sensors[] = {&white,&green,&red,nullptr, &refL,&refR, &back};  // nullptr is placeholder for an (optional) blue LightSensorArray
 LightSensorArray* ls[] = {&white,&green,&red,nullptr};
 
-TaskHandle_t loop0; //used for handling the second main loop
 int16_t diff_interchange;
 static int16_t last = 0;
 
@@ -159,10 +158,11 @@ void setup(){
     }
     else if (option == 2){
       shift_register::reset();
+      attachInterrupt(ENC_SW, isr, RISING);
       //evacuationZone();
-      //navRoom(&white);
-      rottof.write(40);
-      /*while (true){
+      navRoom(ls);
+      /*rottof.write(40);
+      while (true){
         uint16_t upper = tof::readUpper();
         uint16_t lower = tof::readLower();
         Serial.print(upper);
@@ -174,11 +174,13 @@ void setup(){
       }*/
       //claw::down();
       //claw::open();
+      /*
       shift_register::write(SR_DE1, LOW);
       delayMicroseconds(80);
       Serial.println(ADCRead(ADC_AE3));
       delay(1000);
       shift_register::write(SR_DE1, HIGH);
+      */
     }
   }
 
@@ -249,6 +251,8 @@ void loop() {
         shift_register::write(SR_LED_R_RED, HIGH, true);
         shift_register::write(SR_LED_L_RED, HIGH);
       }
+
+      // debug green detection
       #ifdef NOMOTORS
         if (color::on_green(RIGHT)){
           shift_register::write(SR_LED_R_GREEN, LOW, true);
@@ -262,11 +266,10 @@ void loop() {
         else{
           shift_register::write(SR_LED_L_GREEN, HIGH);
         }
-      #endif
 
-      #ifndef NOMOTORS
-        if (color::on_green(RIGHT | LEFT)){
-          //delay(25);
+      #else
+
+        if (color::on_green(RIGHT | LEFT)){ // green detected
           motor::stop();
           motor::rev(AB, V/2);
           delay(25);
@@ -286,8 +289,10 @@ void loop() {
           shift_register::write(SR_LED_L_GREEN, !left);
 
           delay(1000);
+          motor::fwd(AB, V2);
+          delay(300);
           if(right || left){
-            motor::sensorFwd(V/2, V/2 , 700, ls); // go fwd, until there is no green
+            motor::sensorFwd(V/2, V/2 , 1000, ls); // go fwd, until there is no green
             motor::stop();
             left = left   || color::on_green(LEFT);
             right = right || color::on_green(RIGHT);
@@ -298,16 +303,16 @@ void loop() {
               delay(1000);
               if(left != right){ // only do if not turning 180 degrees
                 motor::fwd(AB, V2);
-                delay(500);
+                delay(250);
                 motor::stop();
               }
               int16_t turn = 0; // choose turn side
-              if (left){ turn += 90;}
-              if (right){ turn += 90;}
+              if (left){ turn += 100;}
+              if (right){ turn += 100;}
               if (right && (!left)){turn = -turn;}
-              motor::gyro(V, turn);
+              motor::gyro(V, turn); // do the turning
               motor::fwd(AB, V);
-              delay(100);
+              delay(300);
               motor::stop();
             }
             shift_register::write(SR_LED_R_GREEN, HIGH, true); // LEDs off
@@ -318,7 +323,7 @@ void loop() {
       ////// LINE FOLLOWING //////
       #ifdef LF_ACTIVE
         #define diff_outer_factor 2 // Factor for the outer light 
-        #define mul 1
+        #define mul 1.5
         
         int16_t mot_diff;
         #ifdef LF_USE_BACK
@@ -334,15 +339,16 @@ void loop() {
           int16_t v = min(max(V2, int(VZ-mot_diff*1.5)), VZ); // scale bas speed based on difference
 
           #ifdef LF_USE_BACK
-            float scale = 1/max(abs(mot_diff), 1);
+            float scale = 1/(max(abs(mot_diff), 1)*0.5); // only use back LS if no difference
 
             int16_t vback_a = max(0, int(diff_back)) * scale;
             int16_t vback_b = min(0, int(diff_back)) * scale;
           #else
-            #define vback_a 1;
-            #define vback_b 1;
+            #define vback_a 0
+            #define vback_b 0
           #endif
 
+          // start motors
           motor::fwd(A, ( v + (mot_diff*2+last)/3) + vback_a);
           motor::fwd(B, ( v - (mot_diff*2+last)/3) + vback_b);
           last = mot_diff;
@@ -440,8 +446,9 @@ void loop() {
         }
       }
     }
-
-    navRoom(&white);
+    navRoom(ls);
+    vTaskDelete(loop0);
+    xTaskCreatePinnedToCore(core0, "Core0MainLoop", 10000, NULL, 0, &loop0, 0);
 }
 
 ////// CORE 0 LOOP //////
