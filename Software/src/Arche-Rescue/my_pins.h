@@ -100,7 +100,7 @@
 
 #define PAUSE_MESSEN    100 //anpassen nach unten?
 
-#define ANZ_KAL         75 //150
+#define ANZ_KAL         80 //150
 #define ANZ_LS          13
 
 #define SCHNELL         150
@@ -114,8 +114,8 @@
 #define SILBER          130
 #define GRUEN_MAX       26      //anpassen? 24
 #define GRUEN_MIN       10       //anpassen? 12
-#define ROT_MAX         95
-#define ROT_MIN         50
+#define ROT_MAX         95      //anpassen
+#define ROT_MIN         50      // anpassen
 
 #define TIME_SCHWARZ    1000
 #define ANZ_GRUEN       7
@@ -131,5 +131,8 @@
 #define TOF_OBEN        SR_XSHT4
 
 #define EEPROM_START    0
+
+#define OMEGA_SOLL      100
+#define OMEGA           (0*1e+3)/360    // millisec pro grad bei OMEGA_SOLL
 
 #endif

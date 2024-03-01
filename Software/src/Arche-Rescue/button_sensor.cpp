@@ -13,5 +13,5 @@ void Button_sensor::init() {
 
 bool Button_sensor::state() {
   stateButton = digitalRead(pinButton);
-  return stateButton;
+  return !stateButton;
 }

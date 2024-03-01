@@ -3,6 +3,8 @@
 #include "Arduino.h"
 #include "CD74HC4067.h"
 #include "rgb_led.h"
+#include "tof_sensor.h"
+#include <vector>
 
 
 class Robot {
@@ -21,6 +23,7 @@ class Robot {
   
   public:
     bool running = false;
+    bool secure = false;
     void init();
     void actionLoop();
     void input();
@@ -39,11 +42,16 @@ class Robot {
     float battery_voltage();
     void leseKalWerte();
     void schreibeKalWerte();
+    std::vector<tof*> active_tof;
 };
 
 extern Robot robot;
 extern CD74HC4067 ADC_multiplexer;
 extern RGB_led RGB_led_L,RGB_led_R;
+extern tof Tof_links;
+extern tof Tof_rechts;
+extern tof Tof_unten;
+extern tof Tof_oben;
 
 extern void sensorLoop(void* pvParameters);
 
