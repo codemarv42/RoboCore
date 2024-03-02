@@ -111,7 +111,7 @@
 #define WEISS           90
 #define GRAU            60
 #define SCHWARZ         20      //30
-#define SILBER          130
+#define SILBER          140     //130
 #define GRUEN_MAX       28      //anpassen? 24
 #define GRUEN_MIN       10       //anpassen? 10
 #define ROT_MAX         95      //anpassen
@@ -119,8 +119,8 @@
 
 #define TIME_SCHWARZ    1000
 #define ANZ_GRUEN       15
-#define ANZ_ROT         20
-#define ANZ_SILBER      2
+#define ANZ_ROT         5
+#define ANZ_SILBER      3
 #define ANZ_SCHWARZ     10
 
 #define VRICH           1       // 1: rechtsrum; -1: linksrum

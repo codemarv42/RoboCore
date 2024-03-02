@@ -233,10 +233,19 @@ void Robot::secureLoop(){ //max a = 1500mm
   unsigned long t = millis();
   Motor_L.Fwd(VOR_SOLL);
   Motor_R.Fwd(VOR_SOLL);
-  delay(VOR*5);
+  delay(VOR*2);
+  messeLicht();
+  if(!((Light_sensor_M.val>GRAU)&&(Light_sensor_L0_w.val>GRAU)&&(Light_sensor_R0_w.val>GRAU))){
+    Motor_L.Off();
+    Motor_R.Off();
+    return;
+  };
+  Motor_L.Fwd(VOR_SOLL);
+  Motor_R.Fwd(VOR_SOLL);
+  delay(VOR*10);
   Motor_L.Fwd(OMEGA_SOLL);
   Motor_R.Rev(OMEGA_SOLL);
-  while((millis()-t)<90*OMEGA){
+  while((millis()-t)<100*OMEGA){
     TofRead();
     Serial.println(Tof_links.data);
     Serial.println("drehe nach rechts");
@@ -244,7 +253,6 @@ void Robot::secureLoop(){ //max a = 1500mm
       halteKurs();
       return;
     };
-    delay(1);
     }
 
   t = millis();
@@ -252,7 +260,7 @@ void Robot::secureLoop(){ //max a = 1500mm
   Motor_L.Rev(OMEGA_SOLL);
   Motor_R.Fwd(OMEGA_SOLL);
   int a = 0;
-  while((millis()-t)<(180*OMEGA)){
+  while((millis()-t)<(270*OMEGA)){
     TofRead();
     a = Tof_links.data;
     Serial.println(a);
@@ -264,20 +272,18 @@ void Robot::secureLoop(){ //max a = 1500mm
     if(a>max){
       max = a;
     }
-    else if((max-a)>30){
+    else if((max-a)>10){
       Serial.println("Maximum gefunden");
       Motor_L.Fwd(OMEGA_SOLL);
       Motor_R.Rev(OMEGA_SOLL);
       TofRead();
       while((max-5)<Tof_links.data){
         TofRead();
-        delay(1);
       }
       Motor_L.Fwd(SOLL);
       Motor_R.Fwd(SOLL);
       while((max-500)<Tof_links.data){
         TofRead();
-        delay(1);
       }
       Motor_L.Rev(OMEGA_SOLL);
       Motor_R.Fwd(OMEGA_SOLL);
@@ -290,11 +296,9 @@ void Robot::secureLoop(){ //max a = 1500mm
           halteKurs();
           return;
         };
-        delay(1);
       }
       return;
     }
-    delay(1*OMEGA);
   }
   // kys
 }
@@ -663,13 +667,13 @@ void Robot::kehrtwende(){
   };
   Motor_L.Rev(VOR_SOLL);
   Motor_R.Rev(VOR_SOLL);
-  delay(VOR*7);
+  delay(VOR*4);
   Motor_L.Fwd(OMEGA_SOLL*VRICH);
   Motor_R.Fwd(-(OMEGA_SOLL*VRICH));
   delay(OMEGA*90);
   Motor_L.Fwd(VOR_SOLL);
   Motor_R.Fwd(VOR_SOLL);
-  delay(VOR*2);
+  delay(VOR*1); //2
   Motor_L.Fwd(OMEGA_SOLL*VRICH);
   Motor_R.Fwd(-(OMEGA_SOLL*VRICH));
   // while(rich_sens->val>SCHWARZ){
@@ -774,6 +778,7 @@ void Robot::halteKurs(){
       Motor_L.Fwd(SOLL);
       Motor_R.Fwd(SOLL);
     };
+    messeLicht();
   }
   int rich = 0;
   if(Light_sensor_L1.val<SCHWARZ){
