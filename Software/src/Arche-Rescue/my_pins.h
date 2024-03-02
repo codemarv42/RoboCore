@@ -106,22 +106,22 @@
 #define SCHNELL         200
 #define SOLL            130
 #define LANGSAM         75
-#define FAKTOR          1.2
+#define FAKTOR          1.15
 
 #define WEISS           90
 #define GRAU            60
 #define SCHWARZ         20      //30
 #define SILBER          130
 #define GRUEN_MAX       26      //anpassen? 24
-#define GRUEN_MIN       10       //anpassen? 12
+#define GRUEN_MIN       14       //anpassen? 10
 #define ROT_MAX         95      //anpassen
-#define ROT_MIN         50      // anpassen
+#define ROT_MIN         55      // anpassen
 
 #define TIME_SCHWARZ    1000
-#define ANZ_GRUEN       14
-#define ANZ_ROT         7
-#define ANZ_SILBER      10
-#define ANZ_SCHWARZ     13
+#define ANZ_GRUEN       20
+#define ANZ_ROT         20
+#define ANZ_SILBER      20
+#define ANZ_SCHWARZ     18
 
 #define VRICH           1       // 1: rechtsrum; -1: linksrum
 #define RADIUS          15      // radius in cm

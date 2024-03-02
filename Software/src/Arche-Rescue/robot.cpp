@@ -133,21 +133,31 @@ void Robot::actionLoop(){
   // Motor_L.Fwd(VOR_SOLL);
   // Motor_R.Fwd(VOR_SOLL);
   while(Rotary.counter==rstate){
+    // Serial.print("Rot: ");
+    // Serial.println(Light_sensor_L0_r.val-Light_sensor_L0_g.val);
+    // Serial.print("GruenL: ");
+    // Serial.println(Light_sensor_L0_g.val-Light_sensor_L0_r.val);
+    // Serial.print("GruenR: ");
+    // Serial.println(Light_sensor_R0_g.val-Light_sensor_R0_r.val);
+    // Serial.print("SilberL: ");
+    // Serial.println(Light_sensor_REF_L.val);
+    // delay(300);
     Rotary.measure();
   }
   RGB_led_R.blue();
   active_tof.push_back(&Tof_links);
 
   while (1) {
-    // messeLicht();
+    messeLicht();
     linienFolger();
     pruefeRot();
     pruefeQuerschwarz();
     gruenerPunkt();
     pruefeHindernis();
+    // delay(1);
 
-    Serial.print("L0: ");
-    Serial.println(Light_sensor_L0_w.val);
+    // Serial.print("L0: ");
+    // Serial.println(Light_sensor_L0_w.val);
     // Serial.print("R0: ");
     // Serial.println(Light_sensor_R0_w.val);
     // Serial.print("L1: ");
@@ -180,8 +190,8 @@ void Robot::actionLoop(){
     // Serial.print("AccY : ");
     // Serial.println(MPU.AccelY);
     // Serial.println("");
-    Serial.print("Tof links: ");
-    Serial.println(Tof_links.data);
+    // Serial.print("Tof links: ");
+    // Serial.println(Tof_links.data);
 
     // Serial.print("Button L: ");
     // Serial.println(Button_sensor_L.state());
@@ -204,11 +214,12 @@ void sensorLoop(void* pvParameters){
     if (!robot.running){
       continue;
     }
-    robot.messeLicht();
+    // robot.messeLicht();
     delay(1);
     // MPU.update();
     if(robot.secure){
       TofRead();
+      delay(10);
     }
 
     // Rotary.measure();
@@ -339,11 +350,21 @@ void Robot::messeLicht(){
 
 void Robot::linienFolger(){
   int diff = 0;
-  diff = (int) ((Light_sensor_L0_w.val - Light_sensor_R0_w.val) * FAKTOR);
-  diff += (int) (Light_sensor_L1.val - Light_sensor_R1.val) * FAKTOR/1.4; //1.5
+  // diff = (int) (Light_sensor_L0_w.val - Light_sensor_R0_w.val)*FAKTOR;
+  // diff += (int) (Light_sensor_L1.val - Light_sensor_R1.val)*FAKTOR/1.5;
+  diff = (int) ((Light_sensor_L0_w.val-Light_sensor_M.val) - (Light_sensor_R0_w.val-Light_sensor_M.val));
+  diff = (int) (diff +((Light_sensor_L0_g.val-Light_sensor_L0_r.val) - (Light_sensor_R0_g.val-Light_sensor_R0_r.val))*2)*4;
+  diff += (int) ((Light_sensor_L1.val-Light_sensor_M.val) - (Light_sensor_R1.val-Light_sensor_M.val))*2; //1.5
+  diff = (int) diff*FAKTOR;
+
+  // wenn mitte weiß und beide seiten dunkel, entscheide für weniger count
+  // if(Light_sensor_M.val>WEISS && Light_sensor_L1<SCHWARZ && Light_sensor_R1<SCHWARZ){
+  //   diff = (int) diff*(count_schwarz_l - count_schwarz_r);
+  // };
+  
   Motor_L.Fwd(SOLL + diff);
   Motor_R.Fwd(SOLL - diff);
-  // Serial.println(diff);
+  Serial.println(diff);
   return;
 }
 
@@ -386,7 +407,8 @@ void Robot::gruenerPunkt(){
         count_green_l = 0;
       };
     };
-    // Serial.println(gruen_rich);
+    // Serial.println(unterl);
+    // Serial.println(unterr);
     int rich = 0;
     switch (gruen_rich){
       case 0:
@@ -465,13 +487,14 @@ void Robot::pruefeRot(){
       count_red_r = 0;
     };
   }
-  if ((count_red_l>ANZ_ROT)||(count_red_r>ANZ_ROT)){
+  if ((count_red_l>ANZ_ROT)&&(count_red_r>ANZ_ROT)){
     Motor_L.Off();
     Motor_R.Off();
     Serial.println("Ende");
     delay(10000); //Ende
     count_red_l = 0;
     count_red_r = 0;
+    messeLicht();
   };
   return;
 }
@@ -496,10 +519,13 @@ void Robot::pruefeSilber(){
     };
   }
   if ((count_silver_l > ANZ_SILBER)&&(count_silver_r > ANZ_SILBER)){
+    secure = true;
     count_silver_l = 0;
     count_silver_r = 0;
     Serial.println("Silber");
     secureLoop();
+    secure = false;
+    messeLicht();
   };
   return;
 }
@@ -508,7 +534,8 @@ void Robot::abbiegenGruen(int rich){
   Motor_L.Fwd(SOLL);
   Motor_R.Fwd(SOLL);
   while((Light_sensor_L1.val>SCHWARZ) && (Light_sensor_R1.val>SCHWARZ)){
-    delay(10);
+    // delay(10);
+    messeLicht();
     Serial.println("vorfahren");
     Serial.println(Light_sensor_R1.val);
   }
@@ -553,7 +580,8 @@ void Robot::abbiegenGruen(int rich){
   Motor_L.Fwd(SOLL*rich+0);
   Motor_R.Fwd((-SOLL*rich)+0);
   while(rich_sens->val>GRAU){
-    delay(10);
+    // delay(10);
+    messeLicht();
     Serial.println("immernoch drehen");
   }
   Motor_L.Fwd(OMEGA_SOLL*-rich);
@@ -606,8 +634,10 @@ void Robot::kehrtwende(){
   //   delay(10);
   //   Serial.println("weiter drehen");
   // }
+  messeLicht();
   while(rich_sens->val>GRAU-5){  // vielleicht gefährlich
-    delay(1);
+    // delay(10);
+    messeLicht();
     Serial.println("immernoch drehen");
   }
   schwarz_quer_time = millis();
@@ -619,7 +649,7 @@ void Robot::pruefeHindernis(){
     int len = RADIUS*0.684;
     Motor_L.Rev(VOR_SOLL);
     Motor_R.Rev(VOR_SOLL);
-    delay(RADIUS*VOR);
+    delay(RADIUS*VOR*4/7);
     // float angle0 = MPU.AngleZ;
     Motor_L.Fwd(OMEGA_SOLL*VRICH);
     Motor_R.Fwd(-(OMEGA_SOLL*VRICH));
@@ -634,26 +664,35 @@ void Robot::pruefeHindernis(){
       delay(len*VOR);   // zu wenig?
       Motor_L.Fwd(OMEGA_SOLL*-VRICH);
       Motor_R.Fwd(OMEGA_SOLL*VRICH);
-      delay(40*OMEGA);  // eig 40
+      delay(30*OMEGA);  // eig 40
       Serial.println("Neuneck");
     }
     Motor_L.Fwd(SOLL);
     Motor_R.Fwd(SOLL);
-    while((Light_sensor_L1.val>SCHWARZ) || (Light_sensor_R1.val>SCHWARZ)){
-      delay(1);
+    messeLicht();
+    while((Light_sensor_L1.val>SCHWARZ) && (Light_sensor_R1.val>SCHWARZ)){
+      // delay(10);
+      messeLicht();
     }
     delay(10);
-    while((Light_sensor_L1.val<SCHWARZ) && (Light_sensor_R1.val<SCHWARZ)){
-      delay(1);
+    messeLicht();
+    while((Light_sensor_L1.val<SCHWARZ) || (Light_sensor_R1.val<SCHWARZ)){
+      // delay(10);
+      messeLicht();
     }
     Light_sensor* rich_sens = &Light_sensor_R0_w;
     if(VRICH == 1){
       rich_sens = &Light_sensor_L0_w;
     };
+    Motor_L.Fwd(VOR_SOLL);
+    Motor_R.Fwd(VOR_SOLL);
+    delay(2*VOR);
     Motor_L.Fwd(SOLL*VRICH);
     Motor_R.Fwd(-(SOLL*VRICH));
+    messeLicht();
     while(rich_sens->val>GRAU){
-      delay(1);
+      // delay(10);
+      messeLicht();
     }
   };
   return;
@@ -666,16 +705,71 @@ void Robot::halteKurs(){
     if(Tof_links.data<1600){
       Motor_L.Fwd(OMEGA_SOLL);
       Motor_R.Rev(OMEGA_SOLL);
-      delay(OMEGA*5);
+      delay(OMEGA*3);
       if(Tof_links.data<1600){
         Motor_L.Fwd(OMEGA_SOLL);
         Motor_R.Rev(OMEGA_SOLL);
-        delay(OMEGA*10);
+        delay(OMEGA*6);
       };
       Motor_L.Fwd(SOLL);
       Motor_R.Fwd(SOLL);
     };
   }
-  // wie linie wiederfinden?
+  int rich = 0;
+  if(Light_sensor_L1.val<SCHWARZ){
+    Motor_R.Fwd(SOLL);
+    while(Light_sensor_R1.val>SCHWARZ){
+      delay(1);
+    }
+  }
+  else{
+    Motor_L.Fwd(SOLL);
+    while(Light_sensor_L1.val>SCHWARZ){
+      delay(1);
+    }
+  }
+  Motor_L.Fwd(VOR_SOLL);
+  Motor_R.Fwd(VOR_SOLL);
+  delay(VOR*3);
+  Motor_L.Fwd(OMEGA_SOLL);
+  Motor_R.Rev(OMEGA_SOLL);
+  delay(OMEGA*45);
+  unsigned long t = millis();
+  Motor_L.Fwd(VOR_SOLL);
+  Motor_R.Fwd(VOR_SOLL);
+  while((millis()-t)<VOR*10){
+    if(Light_sensor_L0_w.val<GRAU){
+      delay(VOR*2);
+      Motor_L.Rev(OMEGA_SOLL);
+      Motor_R.Fwd(OMEGA_SOLL);
+      delay(OMEGA*45);
+      return;
+    }
+  }
+  Motor_L.Rev(VOR_SOLL);
+  Motor_R.Rev(VOR_SOLL);
+  delay(VOR*10);
+  Motor_L.Rev(OMEGA_SOLL);
+  Motor_R.Fwd(OMEGA_SOLL);
+  delay(OMEGA*90);
+
+  t = millis();
+  Motor_L.Fwd(VOR_SOLL);
+  Motor_R.Fwd(VOR_SOLL);
+  while((millis()-t)<VOR*10){
+    if(Light_sensor_R0_w.val<GRAU){
+      delay(VOR*2);
+      Motor_L.Fwd(OMEGA_SOLL);
+      Motor_R.Rev(OMEGA_SOLL);
+      delay(OMEGA*45);
+      return;
+    }
+  }
+  Motor_L.Rev(VOR_SOLL);
+  Motor_R.Rev(VOR_SOLL);
+  delay(VOR*10);
+  Motor_L.Fwd(OMEGA_SOLL);
+  Motor_R.Rev(OMEGA_SOLL);
+  delay(OMEGA*45);
   return;
 }
