@@ -20,6 +20,8 @@ class Robot {
     int count_schwarz_l = 0;
     int count_schwarz_r = 0;
     unsigned long schwarz_quer_time = 0;
+
+    unsigned long smooth_time = 0;
   
   public:
     bool running = false;
