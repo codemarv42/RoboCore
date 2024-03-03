@@ -10,7 +10,7 @@ void TofInit(){
     Tof_links.setAddress(TOF_ADRESS);
     Tof_links.setTimeout(500);
     Tof_links.xsht = TOF_LINKS;
-    // Mode setten? Tof_links.setDistanceMode(); mit enum DistanceMode { Short, Medium, Long, Unknown };
+    // Mode setten? Tof_links.setDistanceMode(VL53L1X::DistanceMode.Medium); mit enum DistanceMode { Short, Medium, Long, Unknown };
     // Tof_rechts.setAddress(TOF_ADRESS);
     // Tof_rechts.setTimeout(500);
     // Tof_rechts.xsht = TOF_RECHTS;

@@ -112,15 +112,16 @@
 #define GRAU            60
 #define SCHWARZ         20      //30
 #define SILBER          140     //130
+#define SILBER_RAW      900    // kann auch runter
 #define GRUEN_MAX       28      //anpassen? 24
 #define GRUEN_MIN       10       //anpassen? 10
 #define ROT_MAX         95      //anpassen
 #define ROT_MIN         55      // anpassen
 
 #define TIME_SCHWARZ    1000
-#define ANZ_GRUEN       15
-#define ANZ_ROT         5
-#define ANZ_SILBER      3
+#define ANZ_GRUEN       10
+#define ANZ_ROT         1
+#define ANZ_SILBER      1
 #define ANZ_SCHWARZ     10
 
 #define VRICH           1       // 1: rechtsrum; -1: linksrum
@@ -131,7 +132,7 @@
 #define TOF_UNTEN       SR_XSHT3
 #define TOF_OBEN        SR_XSHT4
 
-#define EEPROM_START    0
+#define EEPROM_START    60
 
 #define OMEGA_SOLL      100
 #define OMEGA           (8983)/360    // millisec pro grad bei OMEGA_SOLL
