@@ -106,15 +106,15 @@
 #define SCHNELL         200
 #define SOLL            130
 #define LANGSAM         75
-#define FAKTOR          1.4
+#define FAKTOR          1.3
 
 #define WEISS           90
 #define GRAU            60
 #define SCHWARZ         20      //30
 #define SILBER          140     //130
 #define SILBER_RAW      900    // kann auch runter
-#define GRUEN_MAX       28      //anpassen? 24
-#define GRUEN_MIN       10       //anpassen? 10
+#define GRUEN_MAX       30      //anpassen? 24
+#define GRUEN_MIN       8       //anpassen? 10
 #define ROT_MAX         95      //anpassen
 #define ROT_MIN         55      // anpassen
 
@@ -122,10 +122,10 @@
 #define ANZ_GRUEN       10
 #define ANZ_ROT         1
 #define ANZ_SILBER      1
-#define ANZ_SCHWARZ     10
+#define ANZ_SCHWARZ     5
 
 #define VRICH           1       // 1: rechtsrum; -1: linksrum
-#define RADIUS          15      // radius in cm
+#define RADIUS          10      // radius in cm
 
 #define TOF_LINKS       SR_XSHT1    // ANPASSEN auf HARDWARE
 #define TOF_RECHTS      SR_XSHT2

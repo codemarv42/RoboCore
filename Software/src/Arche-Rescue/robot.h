@@ -4,6 +4,7 @@
 #include "CD74HC4067.h"
 #include "rgb_led.h"
 #include "tof_sensor.h"
+#include "drive_motor.h"
 #include <vector>
 
 
@@ -20,6 +21,7 @@ class Robot {
     int count_schwarz_l = 0;
     int count_schwarz_r = 0;
     unsigned long schwarz_quer_time = 0;
+    int schwarz_quer_rich = 0;
 
     unsigned long smooth_time = 0;
   
@@ -55,6 +57,7 @@ extern tof Tof_links;
 extern tof Tof_rechts;
 extern tof Tof_unten;
 extern tof Tof_oben;
+extern Motor Motor_L,Motor_R;
 
 extern void sensorLoop(void* pvParameters);
 
