@@ -141,23 +141,6 @@ namespace menu {
     display.display();
   }
 
-  void showView(triangleData *t){
-    display.clearDisplay();
-    overlay();
-    for(uint8_t i = 0; i < SCREEN_WIDTH; i++){
-      Serial.print(t->upper[i]);
-      Serial.print(" ");
-      Serial.println(t->lower[i]);
-      uint16_t dataMappedUpper = 32-(float(t->upper[i + VIEW_START])/1200*32); // map from 0mm - 1200mm to 0 - 32
-      display.drawFastVLine(i, 32-dataMappedUpper, dataMappedUpper, SSD1306_WHITE);
-
-      uint16_t dataMappedLower = 32-(float(t->lower[i + VIEW_START])/1200*32); // map from 0mm - 1200mm to 0 - 32
-      display.drawFastVLine(i, 32, dataMappedLower, SSD1306_WHITE);
-
-    }
-    display.display();
-  }
-
   void showRotation(){
     overlay();
     display.clearDisplay();

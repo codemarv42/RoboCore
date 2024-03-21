@@ -32,62 +32,61 @@ namespace tof{
     shift_register::write(SR_XSHT1, HIGH);
     delay(10);
     if (!left.init()){Serial.print("\tMISSING TOF 1 (Left)");}
+    else{
+      left.setDistanceMode(VL53L1X::Short);
+      left.setMeasurementTimingBudget(33000);
+    }
     shift_register::write(SR_XSHT1, LOW, true);
     shift_register::write(SR_XSHT2, HIGH);
     delay(10);
     if (!claw.init()){Serial.print("\tMISSING TOF 2 (Claw)");}
+    else{
+      claw.setDistanceMode(VL53L1X::Short);
+      claw.setMeasurementTimingBudget(33000);
+    }
     shift_register::write(SR_XSHT3, HIGH, true);
     shift_register::write(SR_XSHT2, LOW);
     delay(10);
     if (!turnable_upper.init()){Serial.print("\tMISSING TOF 3 (Upper)");}
+    else{
+      turnable_upper.setDistanceMode(VL53L1X::Short);
+      turnable_upper.setMeasurementTimingBudget(33000);
+    }
     shift_register::write(SR_XSHT4, HIGH, true);
     shift_register::write(SR_XSHT3, LOW);
     delay(10);
     if (!turnable_lower.init()){Serial.print("\tMISSING TOF 4 (Lower)");}
+    else{
+      turnable_lower.setDistanceMode(VL53L1X::Short);
+      turnable_lower.setMeasurementTimingBudget(33000);
+    }
     shift_register::write(SR_XSHT4, LOW);
 
     Serial.println("...tof Sensors active!");
   }
 
-  uint16_t readLeft(){
-    shift_register::write(SR_XSHT1, HIGH);
-    delay(1);
-    uint16_t a = left.readSingle();
-    shift_register::write(SR_XSHT1, LOW, true);
+  #define MACRO_TOF_READ(pin, obj)               \
+    shift_register::write(pin, HIGH);            \
+    uint16_t a = obj.readSingle();               \
+    shift_register::write(pin, LOW, true);       \
     return a;
+
+  uint16_t readLeft(){
+    MACRO_TOF_READ(SR_XSHT1, left)
   }
   uint16_t readClaw(){
-    shift_register::write(SR_XSHT2, HIGH);
-    delay(1);
-    uint16_t a = claw.readSingle();
-    shift_register::write(SR_XSHT2, LOW, true);
-    return a;
+    MACRO_TOF_READ(SR_XSHT2, claw)
   }
   uint16_t readUpper(){
-    shift_register::write(SR_XSHT3, HIGH);
-    //delay(1);
-    uint16_t a = turnable_upper.readSingle();
-    shift_register::write(SR_XSHT3, LOW, true);
-    return a;
+    MACRO_TOF_READ(SR_XSHT3, turnable_upper)
   }
   uint16_t readLower(){
-    shift_register::write(SR_XSHT4, HIGH);
-    //delay(1);
-    uint16_t a = turnable_lower.readSingle();
-    shift_register::write(SR_XSHT4, LOW, true);
-    return a;
+    MACRO_TOF_READ(SR_XSHT4, turnable_lower)
   }
 
-  triangleData* readPos(){ // DONT FORGET TO DELETE THE TRIANGLEDATA!!!
-    triangleData* t = new triangleData;
-    rottof.write(0);
-    for(uint8_t i = 0; i < 180; i++){
-      rottof.write(i);
-      t->upper[i] = readUpper();
-      t->lower[i] = readLower();
-    }
-
-    return t;
+  void rotate(int dir){
+    dir = min(max(dir, -90), 90);
+    rottof.write(int(float(dir)/270*180) + 90);
   }
 }
 

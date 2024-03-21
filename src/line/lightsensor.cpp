@@ -1,9 +1,11 @@
-//#include "Adafruit_GFX.h"
+#include "Adafruit_GFX.h"
 #include "esp32-hal.h"
 #include "esp32-hal-gpio.h"
 #include <sys/_stdint.h>
 #include <sys/_types.h>
 #include <sys/_intsup.h>
+#ifndef LIGHTSENSORArray_CPP
+#define LIGHTSENSORArray_CPP
 
 #include "lightsensor.h"
 #include "Pins.h"
@@ -11,7 +13,7 @@
 
 class LSBase;
 
-void calibrate(LSBase* sensors[],const int amount = 3000,const int time_between_read_ms = 3)
+void calibrate(LSBase* sensors[],const int amount = CALIBRATION,const int time_between_read_ms = 3)
 {
   for(int i = 0; i < amount; i++) {
     for(int j = 0; j < 7; j++) {
@@ -44,7 +46,7 @@ void LightSensorArray::calibrate_turn(int i){
     int16_t current_value = ADCRead(ADC_PT_L_1); // TODO: change part of the ifs to else ifs
     left_outer.max = max(left_outer.max, current_value);
     left_outer.min = min(left_outer.min, current_value);
-    Serial.println(current_value);
+    left_outer.raw = current_value;
 
     current_value = ADCRead(ADC_PT_L_0);
     left.max = max(left.max, current_value);
@@ -61,10 +63,10 @@ void LightSensorArray::calibrate_turn(int i){
     current_value = ADCRead(ADC_PT_R_1);
     right_outer.max = max(right_outer.max, current_value);
     right_outer.min = min(right_outer.min, current_value);
+    right_outer.raw = current_value;
   }
   else{
     int16_t current_value = ADCRead(ADC_PT_L_1);
-    Serial.println(current_value);
     current_value = ADCRead(ADC_PT_L_0);
     current_value = ADCRead(ADC_PT_M);
     current_value = ADCRead(ADC_PT_R_0);
@@ -138,34 +140,5 @@ void LightSensorPair::read(){
   ledOff();
 }
 
-#include "shared.h"
-void read(){
-  for(auto s : all_sensors){
-    if (s != nullptr){
-      s->read();
-    }
-  }
-}
 
-void read(LSBase* sensors[]){
-  for(int i = 0; i < (sizeof(sensors) / sizeof(LSBase*)); i++){
-    if (sensors[i] != nullptr){
-      sensors[i]->read();
-    }
-  }
-}
-void read(LightSensorArray* sensors[]){
-  for(int i = 0; i < (sizeof(sensors) / sizeof(LightSensorArray*)); i++){
-    if (sensors[i] != nullptr){
-      sensors[i]->read();
-    }
-  }
-}
-
-void read(std::initializer_list<LSBase*> sensors){
-  for(auto s : sensors){
-    if (s != nullptr){
-      s->read();
-    }
-  }
-}
+#endif

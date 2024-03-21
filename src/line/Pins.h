@@ -1,4 +1,5 @@
-#pragma once
+#ifndef PINS_H
+#define PINS_H
 
 ///////////ADC Multiplexer (CD74HC4067S)////////////
 
@@ -97,5 +98,5 @@
 #define LEFT 1
 #define RIGHT 2
 
-
+#endif
 

@@ -1,10 +1,10 @@
-#pragma once
 #include <sys/types.h>
 #include <sys/_stdint.h>
 #include <sys/_types.h>
 #include "esp32-hal.h"
 #include "sys_arch.h"
-
+#ifndef LIGHTSENSOR_H
+#define LIGHTSENSOR_H
 
 #include <Arduino.h>
 #include "Pins.h"
@@ -13,40 +13,30 @@
 
 
 struct SensorData{
-  /*
-  Struct that contains the data of a single sensor, along with its max and min values
-  */
   int16_t min=0x7FFF; // max value for a 16-Bit integer in Hexadecimal
   int16_t max=1;
   int16_t value=0;
+  int16_t raw;
 };
 
 class LSBase{
-  /*
-  Class that is the base class of all light sensor classes to allow the all to be read in a single read() call
-  */
   protected:
     uint8_t led_pin;
-    virtual void ledOn(); // turns on the LED
-    virtual void ledOff(); // turns off the LED
+    virtual void ledOn();
+    virtual void ledOff();
   
   public:
-    virtual void read() = 0; // Read out this sensor
-    virtual void calibrate_turn(int i); // calibrate this sensor one time. i is the number of the iteration
+    virtual void read();
+    virtual void calibrate_turn(int i);
 };
 
 class mapper{
-  /*
-  Class that defines the map() function
-  */
   public:
     inline int16_t map(int16_t value, int16_t minv, int16_t maxv);
 };
 
 class LightSensorArray : public LSBase, private mapper{
-  /*
-  Class for a light sensor array of one color
-  */
+
   public:
     SensorData left_outer;
     SensorData left;
@@ -61,9 +51,6 @@ class LightSensorArray : public LSBase, private mapper{
 
 
 class DirectSensor : public LSBase{
-  /*
-  Class that reads raw values (used for silver detection)
-  */
   public:
     SensorData data;
     DirectSensor(uint8_t ledPin, uint8_t adcPin);
@@ -74,9 +61,6 @@ class DirectSensor : public LSBase{
 };
 
 class LightSensorPair : public LSBase, private mapper{
-  /*
-  Class that is used for a pair of light sensors with a single LED
-  */
   public:
     SensorData left;
     SensorData right;
@@ -91,16 +75,9 @@ class LightSensorPair : public LSBase, private mapper{
     int adcPinRight;
 };
 
-// calibrate all sensors in 'sensors' 'amount' times with 'time_between_read_ms' spacing
+
+#define CALIBRATION 1000
 extern void calibrate(LSBase* sensors[],const int amount,const int time_between_read_ms);
 
-// read all sensors
-extern void read();
 
-// read all sensors in this array
-extern void read(LSBase* sensors[]);
-extern void read(LightSensorArray* sensors[]);
-
-// read all sensors passed by initializer
-extern void read(std::initializer_list<LSBase*> sensors);
-
+#endif

@@ -7,13 +7,12 @@
 #include "MPU6050_light.h"
 #include "Wire.h"
 
-// this file contains our gyro-related functions
-
 MPU6050 mpu(Wire);
 
 namespace gyro {
+unsigned long timer = 0;
 
-float XAngle; // summed angles of the gyro
+float XAngle;
 float YAngle;
 float ZAngle;
 unsigned long timestamp;
@@ -42,7 +41,6 @@ void UpdateMPU6050() {  //Reads out the values of the gyro sensor via I2C
   unsigned long diff = t - timestamp;
   timestamp = t;
   
-  // XAngle is rounded to allow a better pitch detection
   XAngle += round((mpu.getGyroX() * diff) / 1000000.0);
   YAngle += (mpu.getGyroY() * diff) / 1000000.0;
   ZAngle += (mpu.getGyroZ() * diff) / 1000000.0;

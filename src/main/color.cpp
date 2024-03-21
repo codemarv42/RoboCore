@@ -22,15 +22,19 @@ namespace color{
   }
 
   void update(LightSensorArray* s_white, LightSensorArray* s_green, LightSensorArray* s_red){
-    if (s_white->left_outer.value < BLACK_THRESHOLD && black.left < check_length){
-      black.left++;
+    if (s_white->left_outer.value < BLACK_THRESHOLD){
+      if (black.left < check_length){
+        black.left++;
+      }
     }
     else if(black.left > 0){
       black.left--;
     }
 
-    if (s_white->right_outer.value < BLACK_THRESHOLD && black.right < check_length){
-      black.right++;
+    if (s_white->right_outer.value < BLACK_THRESHOLD){
+      if (black.right < check_length){
+        black.right++;
+      }
     }
     else if(black.right > 0){
       black.right--;

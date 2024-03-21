@@ -12,6 +12,7 @@
 #include "menu.h"
 #include <utility>
 #include <vector>
+#include <cmath>
 
 #define VICTIM1 1 // dead victim
 #define VICTIM2 2
@@ -23,33 +24,21 @@
 
 TaskHandle_t loop0;
 
-std::pair<uint8_t, bool> getOptimalVictimAngle(triangleData* t){
-  for(static uint8_t i = 0; i < 180; i++){
-    if (t->upper[i] - t->lower[i] >= VICTIM_DIFF && i > 15 && i < 165){
-      return std::make_pair<uint8_t, bool>(i+1, false);
-    }
-  }
-  
-  return std::make_pair<uint8_t, bool>(0, true);
-}
-
-void core0evac(void * pvParameters);
 void evacuationZone(){
   uint8_t transporting = 0; // which victims are transported
   
-  motor::fwd(AB, V); // go into the room
-  delay(1500);
-  motor::stop();
+  //motor::fwd(AB, V); // go into the room
+  //delay(1500);
+  //motor::stop();
 
   while (true){
     // search victim
 
-    rottof.write(90);
-    //int16_t diff_av = tof::readUpper() - tof::readLower();
-    for(uint i = 15; i < 180; i += 15){
-      rottof.write(i);
-      uint16_t upper = tof::readUpper();
-      uint16_t lower = tof::readLower();
+    tof::rotate(0);
+    for(int i = 45; i < 135; i++){
+      tof::rotate(i - 90);
+      int16_t upper = tof::readUpper();
+      int16_t lower = tof::readLower();
       
       Serial.print(upper);
       Serial.print(" ");
@@ -57,78 +46,66 @@ void evacuationZone(){
       Serial.print(" ");
       Serial.println(upper-lower);
 
-      if (upper < 1200 && upper-lower >= 110 && i != 30 && i != 165){ // found -> init better search
+      if (upper < 1200 && upper-lower  > 90 && upper-lower < 250){ // found -> init better search
         
-        std::vector<uint16_t> distances = {};
-        std::vector<uint> is = {};
-        for (uint j = i-7; j < i+6; j++){
-          rottof.write(j);
-          uint16_t upper = tof::readUpper();
-          uint16_t lower = tof::readLower();
-          distances.push_back(upper-lower);
+        std::vector<int16_t> distances = {};
+        std::vector<int> is = {};
+        
+        for (int j = i-7; j < i+6; j++){
+          tof::rotate(j - 90);
+          uint16_t upper_r = tof::readUpper();
+          uint16_t lower_r = tof::readLower();
+          distances.push_back(upper_r-lower_r);
           is.push_back(j);
         }
-
+        
+        Serial.print("Distances Evaluated: "); Serial.println(distances.size());
         int correction = is[std::distance(distances.begin(), std::max_element(distances.begin(), distances.end()))]; // get best angle.
+        
+        Serial.print("Correction: "); Serial.println((correction - 90) * std::pow(2, abs(correction) / 90) * 0.5);
         shift_register::write(SR_LED_L_RED, LOW);
-        motor::gyro(V2, -90 + correction); // turn at victim
+        if (abs(correction -90) > 5){
+          motor::gyro(V2, (correction - 90) * std::pow(2, abs(correction) / 90) * 0.5); // turn at victim
+        }
+        delay(1000);
         motor::stop();
 
-        rottof.write(90); // reset servo for security
+        tof::rotate(0); // reset servo for security
         claw::down();
         claw::open();
         uint16_t clawdist = tof::readClaw();
+        auto timestamp = millis() + 4000;
         while (clawdist > 69) {
           clawdist = tof::readClaw();
-          motor::fwd(AB, min(clawdist/2, V));
+          Serial.println(clawdist);
+          motor::fwd(AB, max(min(clawdist/2, V), 60));
+          if (millis() > timestamp){
+            goto after_pickup;
+          }
         }
+
+        motor::fwd(AB, 60);
+        delay(700);
+        motor::stop();
+        claw::close();
+        motor::rev(AB, 60);
+        delay(500);
+
+        after_pickup:
+        motor::stop();
+        claw::up();
+        
       }
     }
   }
 }
-/*
-while(true){
-  for(uint i = 0; i < 180; i += 15){
-    rottof.write(i);
-    uint16_t upper = tof::readUpper();
-    uint16_t lower = tof::readLower();
-    Serial.print(upper);
-    Serial.print(" ");
-    Serial.print(lower);
-    Serial.print(" ");
-    Serial.println(upper-lower);
-    if(upper - lower <= 100 && upper - lower > 10){
-      motor::gyro(V2,90-i);
-      Serial.println("found Victim!");
-      shift_register::write(SR_LED_L_BLUE, LOW);
-      claw::open();
-      claw::down();
-      int claw;
-      do {
-        claw = tof::readClaw();
-        Serial.println(claw);
-        motor::fwd(AB,min(70,claw));
-      } while(claw > 69);
-      motor::fwd(AB, 70);
-      delay(100);
-      motor::stop();
-      motor::stop();
-      claw::close();
-      claw::up();
-    }
-    else{
-      shift_register::write(SR_LED_L_BLUE, HIGH);
-    }
-  }
-}
-*/
-
 
 void navRoom(LightSensorArray* a[4]){
+  shift_register::reset();
   motor::fwd(AB, V);
   delay(1500);
   motor::stop();
-  motor::gyro(V, 90);
+  motor::gyro(V, 110);
   
   motor::fwd(AB, V2);
   uint16_t dist;
@@ -139,29 +116,47 @@ void navRoom(LightSensorArray* a[4]){
 
   while(true){
     a[0]->read();
-    color::update(a[0], a[1], a[2])
+    //color::update(a[0], a[1], a[2]);
     motor::fwd(AB, V2);
-    if (!(bool(digitalRead(T_L)) || bool(digitalRead(T_R)))){
+    if (!(bool(digitalRead(T_L))))/* || bool(digitalRead(T_R))))*/{
+      //motor::stop();
       delay(500);
+      motor::stop();
+      motor::fwd(B, 200);
+      delay(5000);
+      motor::stop();
       motor::rev(AB, 70);
       delay(500);
       motor::gyro(V, -90);
     }
-    if (tof::readLeft() > 250){
+    if (tof::readLeft() > 500){
       motor::fwd(AB, V);
       delay(700);
       motor::gyro(V, 90);
-      if (motor::sensorFwd(V2, V2, 1500, a)){
+      motor::sensorFwd(V2, V2, 2000, a);
+      break;
+
+      
+      /*if (motor::sensorFwd(V2, V2, 3000, a)){
         shift_register::reset();
-        break;
+        break;*/
       }
-      else{
+      /*else{
         motor::rev(AB, V);
         delay(400);
         motor::gyro(V, -90);
+      }*/
+    //}
+    if (a[0]->left_outer.value < 35 || a[0]->right_outer.value < 35){
+      motor::fwd(AB, V);
+      delay(400);
+      motor::stop();
+      while(!(a[0]->left_outer.value < 35 || a[0]->right_outer.value < 35)){
+        motor::fwd(A, V2);
+        motor::fwd(B, 40);
+        //motor::rev(B, V2);
+        a[0]->read();
       }
-    }
-    if (color::on_black(LEFT | RIGHT)){
       shift_register::reset();
       break;
     }

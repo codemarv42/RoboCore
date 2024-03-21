@@ -1,4 +1,3 @@
-#include "esp32-hal.h"
 #include "HardwareSerial.h"
 #ifndef MOTOR_CPP
 #define MOTOR_CPP
@@ -7,7 +6,7 @@
 #include "Pins.h"
 #include "gyro.h"
 #include "motor.h"
-#include "color.h"
+//#include "color.h"
 #include "shiftregister.h"
 #include "lightsensor.h"
 #include <MPU6050_light.h>
@@ -33,11 +32,6 @@ namespace motor{
       digitalWrite(PWMB, LOW);
       shift_register::write(SR_BIN1, LOW, true);
       shift_register::write(SR_BIN2, LOW);
-    }
-    if (motor & A){
-      digitalWrite(PWMA, LOW);
-      shift_register::write(SR_AIN1, LOW, true);
-      shift_register::write(SR_AIN2, LOW);
     }
   }
   void hardstop(){ // works only when going fwd!!!
@@ -104,7 +98,7 @@ namespace motor{
     }
     stop();
   }
-  void readFwd(int motor, int v, int time, LightSensorArray* all[4]){
+  /*void readFwd(int motor, int v, int time, LightSensorArray* all[4]){
     const int timestamp = millis() + time;
     while (true){
       for (int i = 0; i < 4; i++){
@@ -119,17 +113,29 @@ namespace motor{
     fwd(A, va);
     fwd(B, vb);
     const int timestamp = millis() + time;
-    while (millis() < timestamp){
-      read();
+    while (!(color::on_black(LEFT | RIGHT))){
+      for (int i = 0; i < 4; i++){
+        if (all[i] != nullptr){all[i]->read();}
+      }
       Serial.println(all[0]->left_outer.value);
       color::update(all[0], all[1], all[2]);
-      if (color::on_black(LEFT | RIGHT)){motor::stop(); return true;}
+      if (millis() > timestamp){motor::stop(); return false;}
 
     }
     stop();
-    return false;
-  }
+    return true;
+  }*/
+  /*bool sensorFwd(int motor, int v, LightSensorArray* s, int diff, int time){
+    fwd(motor, v);
+    const int timestamp = millis() + time;
+    while (!(s->left_outer.value >= diff && s->right_outer.value >= diff)){
+      s->read();
+      if (millis() > timestamp){motor::stop(); return false;}
 
+    }
+    stop();
+    return true;
+  }*/
 }
 
 #endif
