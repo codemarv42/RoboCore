@@ -80,7 +80,7 @@
 
 #define T_L              2  //Button left
 #define T_R              14 //Button right
-#define T_M              26 //Button center
+#define M_S              26 //Metal Sensor
 
 /////////////////////Battery////////////////////////
 
