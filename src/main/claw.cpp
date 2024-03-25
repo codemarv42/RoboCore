@@ -26,7 +26,7 @@ namespace claw{
   }
 
   void down(){
-    lift.write(160);
+    lift.write(155);
     delay(2000);
   }
   void up(){
@@ -34,7 +34,7 @@ namespace claw{
     delay(2000);
   }
   void half(){
-    lift.write(180);
+    lift.write(80);
     delay(2000);
   }
 
@@ -46,6 +46,15 @@ namespace claw{
   void open(){
     grab.write(90);
     delay(1000);
+  }
+  void openwide(){
+    grab.write(180);
+    delay(1000);
+  }
+
+  void openLittle(){
+    grab.write(10);
+    delay(500);
   }
 }
 
