@@ -46,7 +46,7 @@ void evacuationZone(){
       Serial.print(" ");
       Serial.println(upper-lower);
 
-      if (upper < 1200 && upper-lower  > 90 && upper-lower < 250){ // found -> init better search
+      if (upper < 1200 && upper-lower  > 90 /*&& upper-lower < 250*/){ // found -> init better search
         
         std::vector<int16_t> distances = {};
         std::vector<int> is = {};
@@ -65,22 +65,26 @@ void evacuationZone(){
         Serial.print("Correction: "); Serial.println((correction - 90) * std::pow(2, abs(correction) / 90) * 0.5);
         shift_register::write(SR_LED_L_RED, LOW);
         if (abs(correction -90) > 5){
-          motor::gyro(V2, (correction - 90) * std::pow(2, abs(correction) / 90) * 0.5); // turn at victim
+          motor::gyro(V2, (correction - 90) * std::pow(2, abs(correction) / 90) * 0.5 - 10); // turn at victim
         }
         delay(1000);
         motor::stop();
 
         tof::rotate(0); // reset servo for security
+        claw::openwide();
         claw::down();
         claw::open();
+        
         uint16_t clawdist = tof::readClaw();
         auto timestamp = millis() + 4000;
+        int16_t clawDist;
         while (clawdist > 69) {
           clawdist = tof::readClaw();
           Serial.println(clawdist);
           motor::fwd(AB, max(min(clawdist/2, V), 60));
           if (millis() > timestamp){
-            goto after_pickup;
+            motor::stop();
+            goto after_pickup; // expanded later
           }
         }
 
@@ -90,12 +94,27 @@ void evacuationZone(){
         claw::close();
         motor::rev(AB, 60);
         delay(500);
+        motor::stop();
+
+        // check if victim has been rescued
+        claw::half();
+        Serial.print("Dist: ");
+        clawDist = tof::readClaw();
+        Serial.println(clawDist);
+        if (!digitalRead(M_S)){
+          Serial.println("Succes (MS)!");
+          shift_register::write(SR_LED_L_BLUE, LOW);
+        }
+        else if (clawDist <= 69){
+          Serial.println("Succes (Distance)!");
+          shift_register::write(SR_LED_L_GREEN, LOW);
+        }
 
         after_pickup:
-        motor::stop();
         claw::up();
-        
-      }
+        shift_register::write(SR_LED_L_RED, HIGH, true);
+        shift_register::write(SR_LED_L_GREEN, HIGH);
+        }
     }
   }
 }
