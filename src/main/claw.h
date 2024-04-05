@@ -15,7 +15,10 @@ namespace claw{
   void open();
   void openwide();
   void close();
-  void unload_victims(bool);
+
+  void closeFlap();
+  void unloadVictims(int side);
+  void divide(int side);
 }
 
 #endif

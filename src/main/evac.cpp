@@ -13,6 +13,8 @@
 #include <utility>
 #include <vector>
 #include <cmath>
+#include <cstdlib>
+
 
 #define VICTIM1 1 // dead victim
 #define VICTIM2 2
@@ -46,7 +48,7 @@ void evacuationZone(){
       Serial.print(" ");
       Serial.println(upper-lower);
 
-      if (upper < 1200 && upper-lower  > 90 /*&& upper-lower < 250*/){ // found -> init better search
+      if (upper < 1200 && upper-lower  > 99 /*&& upper-lower < 250*/){ // found -> init better search
         
         std::vector<int16_t> distances = {};
         std::vector<int> is = {};
@@ -65,7 +67,7 @@ void evacuationZone(){
         Serial.print("Correction: "); Serial.println((correction - 90) * std::pow(2, abs(correction) / 90) * 0.5);
         shift_register::write(SR_LED_L_RED, LOW);
         if (abs(correction -90) > 5){
-          motor::gyro(V2, (correction - 90) * std::pow(2, abs(correction) / 90) * 0.5 - 10); // turn at victim
+          motor::gyro(V2, (correction - 90) * std::pow(2, abs(correction) / 90) * 0.5); // turn at victim
         }
         delay(1000);
         motor::stop();
@@ -78,6 +80,8 @@ void evacuationZone(){
         uint16_t clawdist = tof::readClaw();
         auto timestamp = millis() + 4000;
         int16_t clawDist;
+        bool isLiving = false;
+        bool succes = false;
         while (clawdist > 69) {
           clawdist = tof::readClaw();
           Serial.println(clawdist);
@@ -101,17 +105,28 @@ void evacuationZone(){
         Serial.print("Dist: ");
         clawDist = tof::readClaw();
         Serial.println(clawDist);
+
+        // check if metal sensor is being activated
         if (!digitalRead(M_S)){
           Serial.println("Succes (MS)!");
           shift_register::write(SR_LED_L_BLUE, LOW);
+          isLiving = true;
+          succes = true;
         }
         else if (clawDist <= 69){
           Serial.println("Succes (Distance)!");
           shift_register::write(SR_LED_L_GREEN, LOW);
+          succes = true;
+        }
+
+        if(succes){
+          claw::divide(int(isLiving) + 1);
         }
 
         after_pickup:
         claw::up();
+        claw::open();
+
         shift_register::write(SR_LED_L_RED, HIGH, true);
         shift_register::write(SR_LED_L_GREEN, HIGH);
         }

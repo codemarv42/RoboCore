@@ -10,23 +10,41 @@ namespace claw{
   Servo grab;
   Servo lift;
   Servo push;
+  Servo flap;
   
   void setup(){
     grab.attach(16);
     lift.attach(19);
     push.attach(17);
+    flap.attach(SR_DE2);
   }
-  void unload_victims(bool pushv=false){
-    //shift_register::write(SR_SOLONOID, HIGH);
-    delay(2000);
-    //shift_register::write(SR_SOLONOID, LOW);
-    push.write(0);
-    delay(1000);
-    push.write(180);
+  void divide(int side){
+    if (side == LEFT) {
+        push.write(135);
+    }
+    else if(side == RIGHT){
+        push.write(45);
+    }
+  }
+
+  void closeFlap(){
+    flap.write(90);
+  }
+
+  void unloadVictims(int side){
+    if (side == LEFT){
+      flap.write(5);
+    }
+    else if(side == RIGHT){
+      flap.write(175);
+    }
+    else{
+      Serial.println("WARNING: unloadVictims called with invalid side parameter - skipping");
+    }
   }
 
   void down(){
-    lift.write(155);
+    lift.write(140);
     delay(2000);
   }
   void up(){

@@ -67,7 +67,7 @@
 #define SR_XSHT3         17
 #define SR_XSHT4         18
 #define SR_DE1           19
-#define SR_DE2           20
+#define SR_DE2           26
 #define SR_DE3      21 //External Digital Pins
 
 /////////////////Rotary Encoder/////////////////////
@@ -80,7 +80,7 @@
 
 #define T_L              2  //Button left
 #define T_R              14 //Button right
-#define M_S              26 //Metal Sensor
+#define M_S              20 //Metal Sensor swapped with DE2
 
 /////////////////////Battery////////////////////////
 

@@ -37,7 +37,7 @@ void HardwareInit(){
   Serial.println("Seting up button pins..");
   pinMode(T_L, INPUT);
   pinMode(T_R, INPUT);
-  pinMode(T_M, INPUT);
+  pinMode(M_S, INPUT);
   Serial.println("Fetching Tof servo pin...");
 
   Serial.println("Resetting shiftregister pins...");
@@ -85,7 +85,8 @@ void setup(){
   menu::showWaiting("Resetting claw...");
   Serial.println("Resetting claw...");
   claw::up();
-  claw::close();
+  claw::open();
+  claw::closeFlap();
 
   // setup SPIFFS file system for light values
   eeprom::setup();
@@ -119,6 +120,7 @@ void setup(){
     shift_register::write(SR_LED_L_BLUE, LOW, true);
     shift_register::write(SR_PT_GREEN, HIGH); // turn on cool green LED's
     post("In Menu...");
+    delay(500);
     int option = menu::menu(); // run displayMenu
     if (option == MENU_CALIBRATE){ // handle results
 
@@ -143,6 +145,7 @@ void setup(){
       delay(500);*/
       attachInterrupt(ENC_SW, isr, RISING);
       evacuationZone();
+      detachInterrupt(ENC_SW);
       /*int dir = 90;
       bool last_RE_state = analogRead(ENC_B); // used for rotary encoder detection
       while (true){
