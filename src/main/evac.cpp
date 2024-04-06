@@ -28,7 +28,8 @@ TaskHandle_t loop0;
 
 void evacuationZone(){
   uint8_t transporting = 0; // which victims are transported
-  
+  std::srand(millis());
+
   //motor::fwd(AB, V); // go into the room
   //delay(1500);
   //motor::stop();
@@ -48,12 +49,12 @@ void evacuationZone(){
       Serial.print(" ");
       Serial.println(upper-lower);
 
-      if (upper < 1200 && upper-lower  > 99 /*&& upper-lower < 250*/){ // found -> init better search
+      if (upper < 1200 && upper-lower  > 60 /*&& upper-lower < 250*/){ // found -> init better search
         
         std::vector<int16_t> distances = {};
         std::vector<int> is = {};
         
-        for (int j = i-7; j < i+6; j++){
+        for (int j = i-15; j < i+14; j++){
           tof::rotate(j - 90);
           uint16_t upper_r = tof::readUpper();
           uint16_t lower_r = tof::readLower();
@@ -67,7 +68,7 @@ void evacuationZone(){
         Serial.print("Correction: "); Serial.println((correction - 90) * std::pow(2, abs(correction) / 90) * 0.5);
         shift_register::write(SR_LED_L_RED, LOW);
         if (abs(correction -90) > 5){
-          motor::gyro(V2, (correction - 90) * std::pow(2, abs(correction) / 90) * 0.5); // turn at victim
+          motor::gyro(V2, (correction - 90) * std::pow(2, abs(correction) / 90) * 0.65); // turn at victim
         }
         delay(1000);
         motor::stop();
@@ -107,7 +108,7 @@ void evacuationZone(){
         Serial.println(clawDist);
 
         // check if metal sensor is being activated
-        if (!digitalRead(M_S)){
+        if (!(ADCRead(M_S) + ADCRead(M_S) + ADCRead(M_S))){ // Read 3 times to confirm => 0 means living victim
           Serial.println("Succes (MS)!");
           shift_register::write(SR_LED_L_BLUE, LOW);
           isLiving = true;
@@ -159,6 +160,24 @@ void navRoom(LightSensorArray* a[4]){
       motor::fwd(B, 200);
       delay(5000);
       motor::stop();
+      // read RGB-sensor
+      shift_register::write(SR_PT_RED, HIGH);
+      int16_t green = ADCRead(ADC_PT_RGB);
+      shift_register::write(SR_PT_RED, LOW, true);
+      shift_register::write(SR_PT_GREEN, HIGH);
+      int16_t red = ADCRead(ADC_PT_RGB);
+      shift_register::write(SR_PT_GREEN, LOW);
+      if (green - red >= 150){
+        motor::rev(AB, 70);
+        delay(500);
+        motor::gyro(V, 180);  
+      }
+      else if (green - red >= 100){
+        motor::rev(AB, 70);
+        delay(500);
+        motor::gyro(V, 180);
+      }
+
       motor::rev(AB, 70);
       delay(500);
       motor::gyro(V, -90);
@@ -196,74 +215,3 @@ void navRoom(LightSensorArray* a[4]){
     }
   }
 }
-
-
-/*
-int32_t rdist, upper;
-void navRoom(LightSensorArray* white){
-  motor::fwd(AB, V);
-  delay(1100);
-  motor::stop();
-  motor::gyro(V, 90);
-  motor::fwd(AB, V);
-
-  uint16_t dist;
-  do { // go fwd until outside the gap
-    dist = tof::readLeft();
-  } while (dist > 250);
-  shift_register::write(SR_LED_R_BLUE, LOW);
-
-  // follow the wall
-  rottof.write(180);
-  LightSensorArray* a[4] = {white, nullptr, nullptr, nullptr};
-  vTaskDelete(loop0);
-  xTaskCreatePinnedToCore(core0evac, "Core0Evac", 10000, NULL, 0, &loop0, 0);
-  while (true){
-    motor::fwd(A, (V+(rdist-upper)));
-    motor::fwd(B, (V-(rdist-upper)));
-    white->read();
-    if (white->left_outer.value < 30 || white->right_outer.value < 30){ //break on black detected
-      break;
-    }
-    if (!(bool(digitalRead(T_L)) || bool(digitalRead(T_R)))){ // turn on wall
-      vTaskDelete(loop0);
-      delay(500);
-      shift_register::write(SR_LED_R_GREEN, LOW);
-      motor::rev(AB, V);
-      delay(400);
-      mpu.begin();
-      motor::gyro(V, -90);
-      xTaskCreatePinnedToCore(core0evac, "Core0Evac", 10000, NULL, 0, &loop0, 0);
-      }
-    if (upper >= 400){
-      motor::fwd(AB, V);
-      delay(1000);
-      motor::gyro(V, 90);
-      if (motor::sensorFwd(V2, V2, 4000, a)){
-        shift_register::reset();
-        break;
-      }
-      else{
-        motor::rev(AB, V);
-        delay(2000);
-        motor::gyro(V, -90);
-      }
-    }
-  }
-
-  motor::stop();
-  shift_register::write(SR_LED_R_BLUE, HIGH);
-  motor::fwd(AB, V);
-  delay(500);
-  motor::stop();
-
-  
-}
-
-void core0evac( void * pvParameters){
-  while(true){
-    rdist = tof::readLeft();
-    upper = tof::readUpper();
-  }
-}
-*/
