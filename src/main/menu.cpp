@@ -114,6 +114,7 @@ namespace menu {
           selected++;
           if (selected >= menuOptions){selected = 0;}
         }
+        Serial.println(texts[selected]);
       }
       last_RE_state = enc;
 
