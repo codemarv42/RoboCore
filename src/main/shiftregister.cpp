@@ -56,7 +56,7 @@ int ADCRead(int pin) {  //Reads out the inputs of the analog multiplexer
 bool ADCDigitalRead(int pin){
   ADCMULTI.channel(pin);
   delayMicroseconds(10);
-  return digitalRead(ADC_MULTI);
+  return analogRead(ADC_MULTI) > 0;
 }
 
 
