@@ -54,7 +54,7 @@ void evacuationZone(){
         std::vector<int16_t> distances = {};
         std::vector<int> is = {};
         
-        for (int j = i-15; j < i+14; j++){
+        for (int j = i-9; j < i+8; j++){
           tof::rotate(j - 90);
           uint16_t upper_r = tof::readUpper();
           uint16_t lower_r = tof::readLower();
@@ -68,10 +68,8 @@ void evacuationZone(){
         Serial.print("Correction: "); Serial.println((correction - 90) * std::pow(2, abs(correction) / 90) * 0.5);
         shift_register::write(SR_LED_L_RED, LOW);
         if (abs(correction -90) > 5){
-          motor::gyro(V2, (correction - 90) * std::pow(2, abs(correction) / 90) * 0.65); // turn at victim
+          motor::gyro(V2, (correction - 90) * std::pow(2, abs(correction) / 90) * 0.5); // turn at victim
         }
-        delay(1000);
-        motor::stop();
 
         tof::rotate(0); // reset servo for security
         claw::openwide();
@@ -79,7 +77,7 @@ void evacuationZone(){
         claw::open();
         
         uint16_t clawdist = tof::readClaw();
-        auto timestamp = millis() + 4000;
+        auto timestamp = millis() + 10 * (*std::max_element(distances.begin(), distances.end()).base());
         int16_t clawDist;
         bool isLiving = false;
         bool succes = false;
@@ -113,14 +111,21 @@ void evacuationZone(){
           shift_register::write(SR_LED_L_BLUE, LOW);
           isLiving = true;
           succes = true;
+          if (transporting & VICTIM2){ // update transporting
+            transporting |= VICTIM3;
+          }
+          else{
+            transporting |= VICTIM2; 
+          }
         }
         else if (clawDist <= 69){
           Serial.println("Succes (Distance)!");
           shift_register::write(SR_LED_L_GREEN, LOW);
           succes = true;
+          transporting |= VICTIM1; // update transporting
         }
 
-        if(succes){
+        if(succes){ // divide the victims living / dead
           claw::divide(int(isLiving) + 1);
         }
 
@@ -130,7 +135,22 @@ void evacuationZone(){
 
         shift_register::write(SR_LED_L_RED, HIGH, true);
         shift_register::write(SR_LED_L_GREEN, HIGH);
+        break; // break for loop and restart searching
         }
+    }
+    if (transporting == VICTIM1 + VICTIM2 + VICTIM3){ // => all victims rescued
+      break;
+    }
+    motor::gyro(V, std::rand() % 360 - 180); // turn a random amount
+    motor::fwd(AB, V);
+    delay(std::rand() % 20 * 100); 
+    motor::stop();
+    tof::rotate(0);
+    if (tof::readUpper() < 100){ // => In front of a Wall
+      motor::rev(AB, V);
+      delay(500);
+      motor::stop();
+      motor::gyro(V, 180);
     }
   }
 }
@@ -146,15 +166,14 @@ void navRoom(LightSensorArray* a[4]){
   uint16_t dist;
   do { // go fwd until outside the gap
     dist = tof::readLeft();
-  } while (dist > 250);
+  } while (dist > 250 && !((!bool(digitalRead(T_L))) || bool(digitalRead(T_R))));
   shift_register::write(SR_LED_R_BLUE, LOW);
 
   while(true){
     a[0]->read();
-    //color::update(a[0], a[1], a[2]);
     motor::fwd(AB, V2);
-    if (!(bool(digitalRead(T_L))))/* || bool(digitalRead(T_R))))*/{
-      //motor::stop();
+    if ( (!bool(digitalRead(T_L))) || bool(digitalRead(T_R))){ // Corner/Wall
+      // align with wall
       delay(500);
       motor::stop();
       motor::fwd(B, 200);
@@ -162,44 +181,46 @@ void navRoom(LightSensorArray* a[4]){
       motor::stop();
       // read RGB-sensor
       shift_register::write(SR_PT_RED, HIGH);
+      delayMicroseconds(100);
       int16_t green = ADCRead(ADC_PT_RGB);
       shift_register::write(SR_PT_RED, LOW, true);
       shift_register::write(SR_PT_GREEN, HIGH);
+      delayMicroseconds(100);
       int16_t red = ADCRead(ADC_PT_RGB);
       shift_register::write(SR_PT_GREEN, LOW);
-      if (green - red >= 150){
-        motor::rev(AB, 70);
-        delay(500);
-        motor::gyro(V, 180);  
-      }
-      else if (green - red >= 100){
-        motor::rev(AB, 70);
+      if (red - green >= 150){
+        motor::rev(AB, V2);
         delay(500);
         motor::gyro(V, 180);
+        motor::rev(AB, V2);
+        delay(500);
+        motor::stop();
+        claw::unloadVictims(LEFT);
       }
-
-      motor::rev(AB, 70);
+      else if (green - red >= 100){
+        motor::rev(AB, V2);
+        delay(500);
+        motor::gyro(V, 180);
+        motor::rev(AB, V2);
+        delay(500);
+        motor::stop();
+        claw::unloadVictims(RIGHT);
+      }
+      else{
+        goto ignore_rgb;
+      }
+      motor::rev(AB, V2);
       delay(500);
       motor::gyro(V, -90);
     }
+    ignore_rgb:
     if (tof::readLeft() > 500){
       motor::fwd(AB, V);
       delay(700);
       motor::gyro(V, 90);
       motor::sensorFwd(V2, V2, 2000, a);
-      break;
-
-      
-      /*if (motor::sensorFwd(V2, V2, 3000, a)){
-        shift_register::reset();
-        break;*/
-      }
-      /*else{
-        motor::rev(AB, V);
-        delay(400);
-        motor::gyro(V, -90);
-      }*/
-    //}
+      break; 
+    }
     if (a[0]->left_outer.value < 35 || a[0]->right_outer.value < 35){
       motor::fwd(AB, V);
       delay(400);
