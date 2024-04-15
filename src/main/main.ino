@@ -35,9 +35,9 @@ void HardwareInit(){
   // Set Encoder pin
   pinMode(ENC_SW, INPUT);
   Serial.println("Seting up button pins..");
-  pinMode(T_L, INPUT);
+  pinMode(T_L, INPUT_PULLUP);
   pinMode(T_R, INPUT);
-  pinMode(M_S, INPUT);
+  //pinMode(M_S, INPUT);
   Serial.println("Fetching Tof servo pin...");
 
   Serial.println("Resetting shiftregister pins...");
@@ -141,31 +141,24 @@ void setup(){
     }
     else if (option == 2){ // Test in Menu - put test code here
       shift_register::reset();
-      /*tof::rotate(90);
-      delay(500);*/
+      
+      /*while(true){
+        shift_register::write(SR_PT_RED, HIGH);
+        delayMicroseconds(40);
+        int16_t green = ADCRead(ADC_PT_RGB);
+        shift_register::write(SR_PT_RED, LOW, true);
+        shift_register::write(SR_PT_GREEN, HIGH);
+        delayMicroseconds(40);
+        int16_t red = ADCRead(ADC_PT_RGB);
+        shift_register::write(SR_PT_GREEN, LOW);
+
+        Serial.print("green: "); Serial.print(green); Serial.print("\tred: "); Serial.println(red);
+      }*/
+      delay(1000);
       attachInterrupt(ENC_SW, isr, RISING);
       evacuationZone();
       detachInterrupt(ENC_SW);
-      /*int dir = 90;
-      bool last_RE_state = analogRead(ENC_B); // used for rotary encoder detection
-      while (true){
-        bool enc = analogRead(ENC_B); // rotary encoder turn detection
-        if (enc != last_RE_state && enc == HIGH){
-          if (analogRead(ENC_A) == LOW){
-            dir += 10;
-            if (dir >= 270){dir = 0;}
-            dir -= 10;
-            if (dir < 0){dir = 270;}
-          }
-          else{
-            dir -= 10;
-            if (dir < 0){dir = 270;}  
-          }
-          rottof.write(dir);
-        }
-        last_RE_state = enc;
-      }*/
-
+      //motor::sensorFwd(V,V, 7000, ls);
     }
   }
 
@@ -266,7 +259,7 @@ void loop() {
 
           delay(1000);
           if(right || left){
-            motor::sensorFwd(V/2, V/2 , 300, ls); // go fwd, until there is no green
+            motor::sensorFwd(V/2, V/2 , 600, ls); // go fwd, until there is no green
             motor::stop();
             left = left   || color::on_green(LEFT);
             right = right || color::on_green(RIGHT);
@@ -275,7 +268,7 @@ void loop() {
             white.read();
             if((white.left_outer.value < 50 && left) || (white.right_outer.value < 50 && right)){ // check for black line
               motor::fwd(AB, V2);
-              delay(500);
+              delay(600);
               if(left != right){ // only do if not turning 180 degrees
                 delay(150);
               }
@@ -294,7 +287,63 @@ void loop() {
       #endif
       ////// LINE FOLLOWING //////
       // look at linefollower.cpp / linefollower.h for details
-      lf();
+      //lf();
+      static int16_t last = 0;
+  #ifdef LF_USE_BLACK_INTRO
+    static int black_timestamp;
+  #endif
+  
+  #ifdef LF_ACTIVE
+    #define diff_outer_factor 4 // Factor for the outer light 
+    #define mul 2
+    
+    int16_t mot_diff;
+    #ifdef LF_USE_BACK
+      int16_t diff_back = back.left.value - back.right.value;
+    #endif
+    int16_t diff = (white.left.value - white.center.value) - (white.right.value - white.center.value);
+    int16_t diff_green = (green.left.value-red.left.value)-(green.right.value-red.right.value); // difference to ignore green value
+    int16_t diff_outer = white.left_outer.value - white.right_outer.value;
+    mot_diff = ((diff + diff_green*2)*2 + diff_outer*diff_outer_factor) * mul;  // calculate inner to outer mult
+    diff_interchange = mot_diff;
+    #ifdef LF_USE_BLACK_INTRO
+      //shift_register::write(SR_LED_R_BLUE, LOW, true);
+      bool right = color::on_black(RIGHT);
+      bool left  = color::on_black(LEFT);
+      if (left || right){
+        black_timestamp = millis();
+        //mot_diff += -int(right)*150 + int(left)*150;
+      }
+      else{
+        int t = millis();
+        if (black_timestamp + 400 < t && black_timestamp + 2000 > t){
+          shift_register::write(SR_LED_R_BLUE, !left, true);
+          mot_diff += int(right)*150 - int(left)*150;
+        }
+      }
+
+    #endif
+
+    #ifndef NOMOTORS
+      int16_t v = min(max(V2, int(VZ-mot_diff*1.5)), VZ); // scale bas speed based on difference
+
+      #ifdef LF_USE_BACK
+        float scale = 1/(max(abs(mot_diff), 1)*0.5); // only use back LS if no difference
+
+        int16_t vback_a = min(0, int(diff_back)) * scale;
+        int16_t vback_b = max(0, int(diff_back)) * scale;
+      #else
+        #define vback_a 0
+        #define vback_b 0
+      #endif
+
+      // start motors
+      motor::fwd(A, ( v + (mot_diff*2+last)/3) + vback_a);
+      motor::fwd(B, ( v - (mot_diff*2+last)/3) + vback_b);
+      last = mot_diff;
+    #endif
+    diff_interchange = mot_diff;
+  #endif
 
       #ifdef DEBUG  // Debug light values
         Serial.print("White: ");
@@ -334,7 +383,7 @@ void loop() {
       #endif
 
       ////// OBSTACLE HANDLING //////
-      if (!(bool(digitalRead(T_L)) || bool(digitalRead(T_R)))){ // if buttons are pressed
+      if ((!digitalRead(T_L) || !digitalRead(T_R))){ // if buttons are pressed
         motor::rev(AB, V); // reverse from the obstacle
         delay(250);
         motor::stop();
@@ -375,7 +424,7 @@ void loop() {
       }
     }
     // navigate the rescue room. check evac.cpp / evac.h for details
-    navRoom(ls);
+    navRoom();
 
 }
 ////// CORE 0 LOOP //////
@@ -384,7 +433,7 @@ Thi core is only used for debug and visualisation and doesn't contribute to the 
 */
 void core0(void * pvParameters){
   while (true){
-    menu::showDifference(diff_interchange*0.5, true);
+    //menu::showDifference(diff_interchange*0.5, true);
     #ifdef BLE
       BLELoop(
         int(white.left_outer.value),

@@ -9,5 +9,6 @@
 
 extern TaskHandle_t loop0; //used for handling the second main loop
 extern void evacuationZone();
-extern void navRoom(LightSensorArray* w[4]);
+extern void navRoom(bool skipGap=false);
+
 

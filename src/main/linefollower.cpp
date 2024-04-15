@@ -27,7 +27,7 @@ void lf(){
     int16_t diff = (white.left.value - white.center.value) - (white.right.value - white.center.value);
     int16_t diff_green = (green.left.value-red.left.value)-(green.right.value-red.right.value); // difference to ignore green value
     int16_t diff_outer = white.left_outer.value - white.right_outer.value;
-    mot_diff = ((diff+diff_green*2)*2 + diff_outer*diff_outer_factor) * mul;  // calculate inner to outer mult
+    mot_diff = ((diff + diff_green*2)*2 + diff_outer*diff_outer_factor) * mul;  // calculate inner to outer mult
     diff_interchange = mot_diff;
     #ifdef LF_USE_BLACK_INTRO
       //shift_register::write(SR_LED_R_BLUE, LOW, true);

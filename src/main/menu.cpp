@@ -26,6 +26,7 @@
 #include "shiftregister.h"
 #include "gyro.h"
 
+
 #define SCREEN_WIDTH 128 // OLED display width, in pixels
 #define SCREEN_HEIGHT 64 // OLED display height, in pixels
 
@@ -41,7 +42,7 @@ namespace menu {
 
   void DisplayInit(){
   if (!display.begin(SSD1306_SWITCHCAPVCC, OLED_ADRESS)) {
-      Serial.println("SSD1306 allocation failed!");
+      Serial.println("SSD1306 allocation failed! ");
     }
     display.display();
     display.clearDisplay();

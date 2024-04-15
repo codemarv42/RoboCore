@@ -8,6 +8,7 @@
 #include "gyro.h"
 #include "motor.h"
 #include "color.h"
+#include "shared.h"
 #include "shiftregister.h"
 #include "lightsensor.h"
 #include <MPU6050_light.h>
@@ -121,8 +122,8 @@ namespace motor{
     const int timestamp = millis() + time;
     while (millis() < timestamp){
       read();
-      Serial.println(all[0]->left_outer.value);
-      color::update(all[0], all[1], all[2]);
+      Serial.println(white.left_outer.value);
+      color::update(&white, &green, &red);
       if (color::on_black(LEFT | RIGHT)){motor::stop(); return true;}
 
     }

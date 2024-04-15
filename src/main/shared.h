@@ -3,7 +3,7 @@
 #pragma once
 
 // SPEED
-#define VZ 100
+#define VZ 150
 #define V 100
 #define V2 80
 #define V3 40
