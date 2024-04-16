@@ -386,7 +386,7 @@ void loop() {
 
       ////// OBSTACLE HANDLING //////
       if ((!digitalRead(T_L) || !digitalRead(T_R))){ // if buttons are pressed
-        if (obstacle_freeze > 0){
+        if (obstacle_freeze == 0){
           motor::rev(AB, V); // reverse from the obstacle
           delay(250);
           motor::stop();
@@ -412,7 +412,7 @@ void loop() {
             }
           }
           motor::fwd(AB, V2);
-          delay(600);
+          delay(400);
           motor::stop();
           // turn until sensor is on Black line
           motor::fwd(A, V2);
@@ -424,7 +424,7 @@ void loop() {
           delay(100);
           motor::stop();
           post("Line");
-          obstacle_freeze = 5000;
+          obstacle_freeze = 3000;
         }
         else{
           motor::rev(AB, V2);
