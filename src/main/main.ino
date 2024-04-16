@@ -19,6 +19,8 @@ view LICENSE.md for details
 
 #define GREEN_FREEZE 700
 uint16_t freeze = 0;
+uint16_t obstacle_freeze = 0;
+unsigned long timestamp = 0;
 
 
 // Function to restart the ESP32 in case of a L.o.P.
@@ -259,7 +261,7 @@ void loop() {
 
           delay(1000);
           if(right || left){
-            motor::sensorFwd(V/2, V/2 , 600, ls); // go fwd, until there is no green
+            motor::sensorFwd(V/2, V/2 , 1000, ls); // go fwd, until there is no green
             motor::stop();
             left = left   || color::on_green(LEFT);
             right = right || color::on_green(RIGHT);
@@ -289,61 +291,61 @@ void loop() {
       // look at linefollower.cpp / linefollower.h for details
       //lf();
       static int16_t last = 0;
-  #ifdef LF_USE_BLACK_INTRO
-    static int black_timestamp;
-  #endif
-  
-  #ifdef LF_ACTIVE
-    #define diff_outer_factor 4 // Factor for the outer light 
-    #define mul 2
-    
-    int16_t mot_diff;
-    #ifdef LF_USE_BACK
-      int16_t diff_back = back.left.value - back.right.value;
-    #endif
-    int16_t diff = (white.left.value - white.center.value) - (white.right.value - white.center.value);
-    int16_t diff_green = (green.left.value-red.left.value)-(green.right.value-red.right.value); // difference to ignore green value
-    int16_t diff_outer = white.left_outer.value - white.right_outer.value;
-    mot_diff = ((diff + diff_green*2)*2 + diff_outer*diff_outer_factor) * mul;  // calculate inner to outer mult
-    diff_interchange = mot_diff;
-    #ifdef LF_USE_BLACK_INTRO
-      //shift_register::write(SR_LED_R_BLUE, LOW, true);
-      bool right = color::on_black(RIGHT);
-      bool left  = color::on_black(LEFT);
-      if (left || right){
-        black_timestamp = millis();
-        //mot_diff += -int(right)*150 + int(left)*150;
-      }
-      else{
-        int t = millis();
-        if (black_timestamp + 400 < t && black_timestamp + 2000 > t){
-          shift_register::write(SR_LED_R_BLUE, !left, true);
-          mot_diff += int(right)*150 - int(left)*150;
-        }
-      }
-
-    #endif
-
-    #ifndef NOMOTORS
-      int16_t v = min(max(V2, int(VZ-mot_diff*1.5)), VZ); // scale bas speed based on difference
-
-      #ifdef LF_USE_BACK
-        float scale = 1/(max(abs(mot_diff), 1)*0.5); // only use back LS if no difference
-
-        int16_t vback_a = min(0, int(diff_back)) * scale;
-        int16_t vback_b = max(0, int(diff_back)) * scale;
-      #else
-        #define vback_a 0
-        #define vback_b 0
+      #ifdef LF_USE_BLACK_INTRO
+        static int black_timestamp;
       #endif
 
-      // start motors
-      motor::fwd(A, ( v + (mot_diff*2+last)/3) + vback_a);
-      motor::fwd(B, ( v - (mot_diff*2+last)/3) + vback_b);
-      last = mot_diff;
-    #endif
-    diff_interchange = mot_diff;
-  #endif
+      #ifdef LF_ACTIVE
+        #define diff_outer_factor 4 // Factor for the outer light 
+        #define mul 2
+        
+        int16_t mot_diff;
+        #ifdef LF_USE_BACK
+          int16_t diff_back = back.left.value - back.right.value;
+        #endif
+        int16_t diff = (white.left.value - white.center.value) - (white.right.value - white.center.value);
+        int16_t diff_green = (green.left.value-red.left.value)-(green.right.value-red.right.value); // difference to ignore green value
+        int16_t diff_outer = white.left_outer.value - white.right_outer.value;
+        mot_diff = ((diff + diff_green*2)*2 + diff_outer*diff_outer_factor) * mul;  // calculate inner to outer mult
+        diff_interchange = mot_diff;
+        #ifdef LF_USE_BLACK_INTRO
+          //shift_register::write(SR_LED_R_BLUE, LOW, true);
+          bool right = color::on_black(RIGHT);
+          bool left  = color::on_black(LEFT);
+          if (left || right){
+            black_timestamp = millis();
+            //mot_diff += -int(right)*150 + int(left)*150;
+          }
+          else{
+            int t = millis();
+            if (black_timestamp + 400 < t && black_timestamp + 2000 > t){
+              shift_register::write(SR_LED_R_BLUE, !left, true);
+              mot_diff += int(right)*150 - int(left)*150;
+            }
+          }
+
+        #endif
+
+        #ifndef NOMOTORS
+          int16_t v = min(max(V2, int(VZ-mot_diff*1.5)), VZ); // scale bas speed based on difference
+
+          #ifdef LF_USE_BACK
+            float scale = 1/(max(abs(mot_diff), 1)*0.5); // only use back LS if no difference
+
+            int16_t vback_a = min(0, int(diff_back)) * scale;
+            int16_t vback_b = max(0, int(diff_back)) * scale;
+          #else
+            #define vback_a 0
+            #define vback_b 0
+          #endif
+
+          // start motors
+          motor::fwd(A, ( v + (mot_diff*2+last)/3) + vback_a);
+          motor::fwd(B, ( v - (mot_diff*2+last)/3) + vback_b);
+          last = mot_diff;
+        #endif
+        diff_interchange = mot_diff;
+      #endif
 
       #ifdef DEBUG  // Debug light values
         Serial.print("White: ");
@@ -384,44 +386,54 @@ void loop() {
 
       ////// OBSTACLE HANDLING //////
       if ((!digitalRead(T_L) || !digitalRead(T_R))){ // if buttons are pressed
-        motor::rev(AB, V); // reverse from the obstacle
-        delay(250);
-        motor::stop();
-        Serial.println("Obstacle Detected!");
-        post("Obstacle Detected!");
-        delay(500);
-        motor::gyro(V, -90); // turn
-        motor::stop();
-        int16_t rdist;
-        while (true){ // go around the obstacle
-          rdist = -tof::readLeft(); // calc offset
-          motor::fwd(A, (V2+rdist*0.6)); // add offset to best offset
-          motor::fwd(B, (V2-rdist*0.6));
-          if (abs(rdist) > 300){ // => to near
-            motor::fwd(AB, V2);
+        if (obstacle_freeze > 0){
+          motor::rev(AB, V); // reverse from the obstacle
+          delay(250);
+          motor::stop();
+          Serial.println("Obstacle Detected!");
+          post("Obstacle Detected!");
+          delay(500);
+          motor::gyro(V, -90); // turn
+          motor::stop();
+          int16_t rdist;
+          while (true){ // go around the obstacle
+            rdist = -tof::readLeft(); // calc offset
+            motor::fwd(A, (V2+rdist*0.6)); // add offset to best offset
+            motor::fwd(B, (V2-rdist*0.6));
+            if (abs(rdist) > 300){ // => to near
+              motor::fwd(AB, V2);
+            }
+            white.read();
+            if ((white.left_outer.value < 35 || white.right_outer.value < 35)){
+              motor::fwd(AB, V2);
+              delay(500);
+              motor::stop();
+              break;
+            }
           }
-          white.read();
-          if ((white.left_outer.value < 35 || white.right_outer.value < 35)){
-            motor::fwd(AB, V2);
-            delay(500);
-            motor::stop();
-            break;
-          }
+          motor::fwd(AB, V2);
+          delay(600);
+          motor::stop();
+          // turn until sensor is on Black line
+          motor::fwd(A, V2);
+          motor::rev(B, V2);
+          do {
+            white.read();
+            color::update(&white, &green, &red);
+          } while(!(color::on_black(RIGHT)));
+          delay(100);
+          motor::stop();
+          post("Line");
+          obstacle_freeze = 5000;
         }
-        motor::fwd(AB, V2);
-        delay(500);
-        motor::stop();
-        // turn until sensor is on Black line
-        motor::fwd(A, V2);
-        motor::rev(B, V2);
-        do {
-          white.read();
-          color::update(&white, &green, &red);
-        } while(!(color::on_black(RIGHT)));
-        delay(100);
-        motor::stop();
-        post("Line");
+        else{
+          motor::rev(AB, V2);
+          delay(300);
+          motor::gyro(V, 180);
+        }
       }
+
+      obstacle_freeze = max(obstacle_freeze-1, 0);
     }
     // navigate the rescue room. check evac.cpp / evac.h for details
     navRoom();
