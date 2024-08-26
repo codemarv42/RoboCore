@@ -22,7 +22,7 @@ Parameter for PCB (RoboCoreV3):
 
 ## Light sensors PCB
 
-![RoboLightV4](https://github.com/codemarv42/RoboCore/blob/main/Hardware/RoboCore%20light%20sensor%20bar%20V1/RoboCore%20Light%20sensor%20bar_6.png?raw=true)
+![RoboLightV4](https://github.com/codemarv42/RoboCore/blob/main/Hardware/RoboCoreV3/RoboLightV4_2024-Aug-26_07-30-13PM-000_CustomizedView8316888771.png?raw=true)
 
 Parameter for PCB (RoboLightV4):
 
