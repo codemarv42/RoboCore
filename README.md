@@ -22,9 +22,9 @@ Parameter for PCB (RoboCoreV3):
 
 ## Light sensors PCB
 
-![RoboCore light sensor bar V1](https://github.com/codemarv42/RoboCore/blob/main/Hardware/RoboCore%20light%20sensor%20bar%20V1/RoboCore%20Light%20sensor%20bar_6.png?raw=true)
+![RoboLightV4](https://github.com/codemarv42/RoboCore/blob/main/Hardware/RoboCore%20light%20sensor%20bar%20V1/RoboCore%20Light%20sensor%20bar_6.png?raw=true)
 
-Parameter for PCB (RoboCore light sensor bar V1):
+Parameter for PCB (RoboLightV4):
 
 - Layer: 2
 - Thickness: 1,2mm / 1,6mm
