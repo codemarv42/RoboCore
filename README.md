@@ -10,15 +10,15 @@ The hardware of this project consists mainly of the two PCBs and the chassis.
 
 ## Arche-RoboCore PCB
 
-![Arche-RoboCore PCB V1](https://github.com/codemarv42/RoboCore/blob/main/Hardware/Arche-RoboCore%20V1/Arche-RoboCore_12.png?raw=true)
+![RoboCoreV3](https://github.com/codemarv42/RoboCore/blob/main/Hardware/RoboCoreV3/Raspberry_Pi4_Card_2024-Aug-26_06-26-57PM-000_CustomizedView41285548237.png?raw=true)
 
-Parameter for PCB (Arche-RoboCore PCB V1):
+Parameter for PCB (RoboCoreV3):
 
-- Layer: 2
+- Layer: 4
 - Thickness: 1,6mm
-- Length: 69,55mm
-- Height: 60,50mm
-- Minimum Copper Trace Width: 0,15mm
+- Length: 65,05mm
+- Height: 56,03mm
+- Minimum Copper Trace Width: 0,125mm
 
 ## Light sensors PCB
 
@@ -37,11 +37,12 @@ Parameter for PCB (RoboCore light sensor bar V1):
 Required libraries:
 
 - Adafruit_GFX.h - https://github.com/adafruit/Adafruit-GFX-Library
+- Adafruit_BusIO.h - https://github.com/adafruit/Adafruit_BusIO/tree/master
+- Adafruit_PWMServoDriver.h - https://github.com/adafruit/Adafruit-PWM-Servo-Driver-Library
 - Adafruit_SSD1306.h - https://github.com/adafruit/Adafruit_SSD1306
-- ESP32_Servo.h - https://github.com/jkb-git/ESP32Servo
 - MPU6050_light.h - https://github.com/rfetick/MPU6050_light
-- CD74HC4067.h - https://github.com/waspinator/CD74HC4067
 - VL53L1X.h - https://github.com/pololu/vl53l1x-arduino
+- 
 
 ## USB driver
 
