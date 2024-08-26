@@ -6,9 +6,9 @@ The RoboCore is basically a dual PCB solution, which is mounted on a chassis and
 
 # Hardware
 
-The hardware of this project consists mainly of the two PCBs and the chassis.
+A combination of two PCBs is used as our hardware, where the main PCB (RoboCoreV3) is plugged onto a Raspberry Pi and therefore forms the main control unit. The second circuit board (RoboLightV4) is installed on the underside of the robot and is responsible for measuring the light values on the line track. Below is our current hardware combination.
 
-## Arche-RoboCore PCB
+## Control unit PCB
 
 ![RoboCoreV3](https://github.com/codemarv42/RoboCore/blob/main/Hardware/RoboCoreV3/Raspberry_Pi4_Card_2024-Aug-26_06-26-57PM-000_CustomizedView41285548237.png?raw=true)
 
