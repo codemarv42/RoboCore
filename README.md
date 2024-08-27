@@ -13,6 +13,7 @@ A combination of two PCBs is used as our hardware, where the main PCB (RoboCoreV
 - [ ] Find Upload issue
 - [ ] Implement Boot and EN Buttons
 - [ ] Find ADC issue when using Neopixel LEDs
+- [ ] Voltage state LEDs
 
 ## Changelog
 
