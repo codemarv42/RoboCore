@@ -8,6 +8,21 @@ The RoboCore is basically a dual PCB solution, which is mounted on a chassis and
 
 A combination of two PCBs is used as our hardware, where the main PCB (RoboCoreV3) is plugged onto a Raspberry Pi and therefore forms the main control unit. The second circuit board (RoboLightV4) is installed on the underside of the robot and is responsible for measuring the light values on the line track. Below is our current hardware combination.
 
+## Changelog
+
+RoboCore:
+
+- V3: Raspberry PI hat design, external Display and buttons as user interface, ESP32-S3, two motor driver, Neopixel LED, Voltage regulator update
+- V2: MPU6050 as secound PCB, dual light sensor bar, Pullup Fix near buttons
+- V1: Inital Version
+
+RoboLight:
+
+- V4: Use Neopixel RGB LEDs instead, remove center photo transistor
+- V3: Control Leds individual via a shiftregister
+- V2: Fix distance between inner photo transistors
+- V1: Inital Version
+
 ## Control unit PCB
 
 ![RoboCoreV3](https://github.com/codemarv42/RoboCore/blob/main/Hardware/RoboCoreV3/Raspberry_Pi4_Card_2024-Aug-26_06-26-57PM-000_CustomizedView41285548237.png?raw=true)
