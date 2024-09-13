@@ -36,7 +36,7 @@ RoboLight:
 
 ![RoboCoreV3.2](https://github.com/codemarv42/RoboCore/blob/main/Hardware/RoboCoreV3.2/Raspberry_Pi4_Card_2024-Sep-13_11-44-32AM-000_CustomizedView54140633267.png)
 
-Parameter for PCB (RoboCoreV3):
+Parameter for PCB (RoboCoreV3.2):
 
 - Layer: 4
 - Thickness: 1,6mm
@@ -48,7 +48,7 @@ Parameter for PCB (RoboCoreV3):
 
 ![RoboLightV4](https://github.com/codemarv42/RoboCore/blob/main/Hardware/RoboCoreV3/RoboLightV4_2024-Aug-26_07-30-13PM-000_CustomizedView8316888771.png?raw=true)
 
-Parameter for PCB (RoboLightV4):
+Parameter for PCB (RoboLightV4.2):
 
 - Layer: 2
 - Thickness: 1,2mm / 1,6mm
