@@ -19,20 +19,22 @@ A combination of two PCBs is used as our hardware, where the main PCB (RoboCoreV
 
 RoboCore:
 
-- V3: Raspberry PI hat design, external Display and buttons as user interface, ESP32-S3, two motor driver, Neopixel LED, Voltage regulator update
+- V3.2: Remove Neopixel led because of ADC problems, better voltage regulator for motor driver
+- V3.1: Raspberry PI hat design, external Display and buttons as user interface, ESP32-S3, two motor driver, Neopixel LED, Voltage regulator update
 - V2: MPU6050 as secound PCB, dual light sensor bar, Pullup Fix near buttons
 - V1: Inital Version
 
 RoboLight:
 
-- V4: Use Neopixel RGB LEDs instead, remove center photo transistor
+- V4.2: Use regular RGB LEDs instead, better LED and phototransistor arrangement
+- V4.1: Use Neopixel RGB LEDs instead, remove center photo transistor
 - V3: Control Leds individual via a shiftregister
 - V2: Fix distance between inner photo transistors
 - V1: Inital Version
 
 ## Control unit PCB
 
-![RoboCoreV3](https://github.com/codemarv42/RoboCore/blob/main/Hardware/RoboCoreV3/Raspberry_Pi4_Card_2024-Aug-26_06-26-57PM-000_CustomizedView41285548237.png?raw=true)
+![RoboCoreV3.2](https://github.com/codemarv42/RoboCore/blob/main/Hardware/RoboCoreV3.2/Raspberry_Pi4_Card_2024-Sep-13_11-44-32AM-000_CustomizedView54140633267.png)
 
 Parameter for PCB (RoboCoreV3):
 
