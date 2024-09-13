@@ -2,7 +2,7 @@
 
 The RoboCore is basically a dual PCB solution, which is mounted on a chassis and takes over the evaluation and control of sensors and motors. Furthermore, this project was created by several people to develop the best robot for the RoboCup in the Rescue Line division. 
 
-![RoboCore V1](https://github.com/codemarv42/RoboCore/blob/main/Hardware/RoboCoreV3/Raspberry_Pi4_Card_2024-Aug-26_06-24-03PM-000_CustomizedView7502878050.png?raw=true)
+![RoboCore V3.2](https://github.com/codemarv42/RoboCore/blob/main/Hardware/RoboCoreV3.2/0e81fb66-bc18-456a-8ecc-e72bea3fe42c.PNG)
 
 # Hardware
 
