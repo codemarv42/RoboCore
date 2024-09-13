@@ -10,10 +10,10 @@ A combination of two PCBs is used as our hardware, where the main PCB (RoboCoreV
 
 ## To do list
 
-- [ ] Find Upload issue
-- [ ] Implement Boot and EN Buttons
-- [ ] Find ADC issue when using Neopixel LEDs
-- [ ] Voltage state LEDs
+- [x] Find Upload issue
+- [x] Implement Boot and EN Buttons
+- [x] Find ADC issue when using Neopixel LEDs
+- [x] Voltage state LEDs
 
 ## Changelog
 
