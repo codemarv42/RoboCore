@@ -19,7 +19,7 @@ A combination of two PCBs is used as our hardware, where the main PCB (RoboCoreV
 
 RoboCore:
 
-- V3.2: Remove Neopixel led because of ADC problems, better voltage regulator for motor driver
+- V3.2: Remove Neopixel led because of ADC problems, better voltage regulator for motor driver and further power features
 - V3.1: Raspberry PI hat design, external Display and buttons as user interface, ESP32-S3, two motor driver, Neopixel LED, Voltage regulator update
 - V2: MPU6050 as secound PCB, dual light sensor bar, Pullup Fix near buttons
 - V1: Inital Version
