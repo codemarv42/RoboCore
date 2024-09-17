@@ -67,6 +67,15 @@ Required libraries:
 - MPU6050_light.h - https://github.com/rfetick/MPU6050_light
 - VL53L1X.h - https://github.com/pololu/vl53l1x-arduino
 
+## Download Mode
+
+If no program can be uploaded to the ESP32-S3, it must be set to download mode. The following steps are necessary to do this:
+
+1. Press and hold the BOOT and RESET button
+2. Connect the RoboCore to the computer via USB
+3. Release the RESET button while still holding the BOOT button
+4. Release the BOOT button after a few seconds
+
 ## Compilation settings
 
 To compile your program and then upload it to the RoboCore, some steps are necessary:
