@@ -46,7 +46,9 @@ Parameter for PCB (RoboCoreV3.2):
 
 Pinout:
 
-![RoboLightV4](https://github.com/codemarv42/RoboCore/blob/main/Hardware/RoboCoreV3.2/ESP32S3Pinout.png)
+![RoboCorePinout](https://github.com/codemarv42/RoboCore/blob/main/Hardware/RoboCoreV3.2/ESP32S3Pinout.png)
+
+![RoboCorePinout](https://github.com/codemarv42/RoboCore/blob/main/Hardware/RoboCoreV3.2/FullPinout.png)
 
 ## Light sensors PCB
 
