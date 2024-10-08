@@ -26,6 +26,7 @@ RoboCore:
 
 RoboLight:
 
+- V4.3: Swap FCP pinout
 - V4.2: Use regular RGB LEDs instead, better LED and phototransistor arrangement
 - V4.1: Use Neopixel RGB LEDs instead, remove center photo transistor
 - V3: Control Leds individual via a shiftregister
