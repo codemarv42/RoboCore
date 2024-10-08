@@ -35,7 +35,7 @@ RoboLight:
 
 ## Control unit PCB
 
-![RoboCoreV3.2](https://github.com/codemarv42/RoboCore/blob/main/Hardware/RoboCoreV3.2/Raspberry_Pi4_Card_2024-Sep-13_11-44-32AM-000_CustomizedView54140633267.png)
+![RoboCoreV3.2](https://github.com/codemarv42/RoboCore/blob/main/Hardware/RoboCoreV3.2/20241008_113153.png)
 
 Parameter for PCB (RoboCoreV3.2):
 
