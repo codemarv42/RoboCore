@@ -65,7 +65,10 @@ Parameter for PCB (RoboLightV4.2):
 
 # Software
 
-Required libraries:
+You can find instructions for RoboCore V3.2 in PDF format here:
+https://github.com/codemarv42/RoboCore/blob/main/Hardware/RoboCoreV3.2/RoboCoreV3.2%20Manual.pdf
+
+## Required libraries
 
 - Adafruit_GFX.h - https://github.com/adafruit/Adafruit-GFX-Library
 - Adafruit_BusIO.h - https://github.com/adafruit/Adafruit_BusIO/tree/master
