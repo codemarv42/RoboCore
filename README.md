@@ -65,7 +65,7 @@ Parameter for PCB (RoboLightV4.3):
 
 # Software
 
-You can find instructions for RoboCore V3.2 in PDF format here:
+### You can find instructions for RoboCore V3.2 in PDF format here:
 https://github.com/codemarv42/RoboCore/blob/main/Hardware/RoboCoreV3.2/RoboCoreV3.2%20Manual.pdf
 
 ## Required libraries
