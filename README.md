@@ -12,7 +12,7 @@ The hardware of this project consists mainly of the two PCBs and the chassis.
 
 ## Arche-RoboCore PCB
 
-![Arche-RoboCore PCB V1](https://github.com/codemarv42/RoboCore/blob/main/Hardware/Arche-RoboCore%20V1/Arche-RoboCore_12.png?raw=true)
+![Arche-RoboCore PCB V1](https://github.com/codemarv42/RoboCore/blob/b476d112ce37b31f3146e63bffe8169a28b1d740/Hardware/Arche-RoboCore%20V1/Arche-RoboCore_12.png?raw=true)
 
 Parameter for PCB (Arche-RoboCore PCB V1):
 
@@ -24,7 +24,7 @@ Parameter for PCB (Arche-RoboCore PCB V1):
 
 ## Light sensors PCB
 
-![RoboCore light sensor bar V1](https://github.com/codemarv42/RoboCore/blob/main/Hardware/RoboCore%20light%20sensor%20bar%20V1/RoboCore%20Light%20sensor%20bar_6.png?raw=true)
+![RoboCore light sensor bar V1](https://github.com/codemarv42/RoboCore/blob/b476d112ce37b31f3146e63bffe8169a28b1d740/Hardware/RoboCore%20light%20sensor%20bar%20V1/RoboCore%20Light%20sensor%20bar_6.png?raw=true)
 
 Parameter for PCB (RoboCore light sensor bar V1):
 
@@ -73,7 +73,7 @@ To compile your own program and then upload it to the RoboCore, some steps are n
 
 The RoboCore is basically a dual PCB solution, which is mounted on a chassis and takes over the evaluation and control of sensors and motors. Furthermore, this project was created by several people to develop the best robot for the RoboCup in the Rescue Line division. 
 
-![RoboCore V1](https://github.com/codemarv42/RoboCore/blob/main/Hardware/Arche-RoboCore%20V1/Arche-RoboCore_10.png?raw=true)
+![RoboCore V1](https://github.com/codemarv42/RoboCore/blob/b476d112ce37b31f3146e63bffe8169a28b1d740/Hardware/Arche-RoboCore%20V1/Arche-RoboCore_10.png?raw=true)
 
 # Hardware
 
@@ -81,7 +81,7 @@ The hardware of this project consists mainly of the two PCBs and the chassis.
 
 ## Arche-RoboCore PCB
 
-![Arche-RoboCore PCB V1](https://github.com/codemarv42/RoboCore/blob/main/Hardware/Arche-RoboCore%20V1/Arche-RoboCore_12.png?raw=true)
+![Arche-RoboCore PCB V1](https://github.com/codemarv42/RoboCore/blob/b476d112ce37b31f3146e63bffe8169a28b1d740/Hardware/Arche-RoboCore%20V1/Arche-RoboCore_12.png?raw=true)
 
 Parameter for PCB (Arche-RoboCore PCB V1):
 
@@ -93,7 +93,7 @@ Parameter for PCB (Arche-RoboCore PCB V1):
 
 ## Light sensors PCB
 
-![RoboCore light sensor bar V1](https://github.com/codemarv42/RoboCore/blob/main/Hardware/RoboCore%20light%20sensor%20bar%20V1/RoboCore%20Light%20sensor%20bar_6.png?raw=true)
+![RoboCore light sensor bar V1](https://github.com/codemarv42/RoboCore/blob/b476d112ce37b31f3146e63bffe8169a28b1d740/Hardware/RoboCore%20light%20sensor%20bar%20V1/RoboCore%20Light%20sensor%20bar_6.png?raw=true)
 
 Parameter for PCB (RoboCore light sensor bar V1):
 
