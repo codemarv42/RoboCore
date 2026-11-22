@@ -1,106 +1,147 @@
 # RoboCore
 
-The RoboCore is basically a dual PCB solution, which is mounted on a chassis and takes over the evaluation and control of sensors and motors. Furthermore, this project was created by several people to develop the best robot for the RoboCup in the Rescue Line division. 
+[![License: MIT](https://img.shields.io/badge/code-MIT-blue.svg)](LICENSE)
+[![License: CC BY 4.0](https://img.shields.io/badge/hardware-CC%20BY%204.0-lightgrey.svg)](hardware/LICENSE)
 
-![RoboCore V3.2](https://github.com/codemarv42/RoboCore/blob/main/Hardware/RoboCoreV3.2/0e81fb66-bc18-456a-8ecc-e72bea3fe42c.PNG)
+**Open-source control electronics for RoboCup Junior Rescue Line robots: a Raspberry Pi HAT with ESP32-S3, four motor channels, servo / LED driver and a matching light sensor bar.**
 
-![RoboCore embedded](https://github.com/codemarv42/RoboCore/blob/main/Hardware/20241108_163355.png)
+![RoboCore robot](docs/images/hero.jpg)
 
-# Hardware
+RoboCore started in 2023 as a main board for RoboCup Rescue Line robots, and student teams have built their competition robots on it. It has gone through three generations, from a stand-alone ESP32 board to a 4-layer HAT that pairs the real-time control on the ESP32-S3 with a Raspberry Pi for image processing.
 
-A combination of two PCBs is used as our hardware, where the main PCB (RoboCoreV3.2) is plugged onto a Raspberry Pi and therefore forms the main control unit. The second circuit board (RoboLightV4.2) is installed on the underside of the robot and is responsible for measuring the light values on the line track. Below is our current hardware combination.
+![Board evolution](docs/images/evolution.jpg)
 
-## To do list
+## RoboCore V3.2 – current version
 
-- [x] Find Upload issue
-- [x] Implement Boot and EN Buttons
-- [x] Find ADC issue when using Neopixel LEDs
-- [x] Voltage state LEDs
-- [x] Inconsistent red-green difference of the LEDs
+<table>
+  <tr>
+    <td width="50%"><img src="docs/images/robocore_v3.2_render.jpg" alt="RoboCore V3.2 on a Raspberry Pi"></td>
+    <td width="50%"><img src="docs/images/robocore_v3.2_photo.jpg" alt="Assembled RoboCore V3.2"></td>
+  </tr>
+</table>
 
-## Changelog
+| | |
+|---|---|
+| **MCU** | ESP32-S3-MINI-1-N8 (dual core, 8 MB flash, Wi-Fi / BLE), USB-C with native USB |
+| **Host** | Raspberry Pi HAT form factor (40-pin header): the Pi can take over image processing while the ESP32 runs the real-time control |
+| **Motors** | 2 × TB6612FNG → 4 DC motor channels, direction and standby via 74HC595 shift registers |
+| **Servos / LEDs** | PCA9685 16-channel PWM: 5 servo ports + 2 RGB status LEDs |
+| **Sensors** | MPU6050 IMU, up to 4 × VL53L1X ToF (individually enabled), flex sensor input, battery voltage |
+| **Light sensors** | 2 × FFC connectors for the RoboLight bar (front and back) |
+| **Power** | 2S Li-Po (8.4 V) via XT30, two buck converters (TPS54302, LM61480) for the 6.5 V and 5 V rails, AMS1117 for 3.3 V, polyfuse, USB ESD protection |
+| **UI** | User button, inputs for four external buttons, I²C OLED port, status LED for every supply rail |
+| **PCB** | 4 layers, 1.6 mm, 65.05 × 56.03 mm, min. trace 0.125 mm, Tag-Connect TC2050 programming port |
 
-RoboCore:
+### RoboLight V4.3 – light sensor bar
 
-- V3.2: Remove Neopixel led because of ADC problems, better voltage regulator for motor driver and further power management features
-- V3.1: Raspberry PI hat design, external Display and buttons as user interface, ESP32-S3, two motor driver, Neopixel LED, Voltage regulator update
-- V2: MPU6050 as secound PCB, dual light sensor bar, Pullup Fix near buttons
-- V1: Inital Version
+![RoboLight](docs/images/robolight_v4.jpg)
 
-RoboLight:
+Six phototransistors (four line sensors plus two reflection sensors) with white, red, green and RGB illumination, for detecting the black line, the green junction markers and the silver strip. The bar connects through a 14-pin FFC cable. 2 layers, 72.0 × 15.23 mm.
 
-- V4.3: Swap FCP pinout
-- V4.2: Use regular RGB LEDs instead, better LED and phototransistor arrangement
-- V4.1: Use Neopixel RGB LEDs instead, remove center photo transistor
-- V3: Control Leds individual via a shiftregister
-- V2: Fix distance between inner photo transistors
-- V1: Inital Version
+### Pinout
 
-## Control unit PCB
+![Pinout](docs/images/robocore_v3.2_pinout.jpg)
 
-![RoboCoreV3.2](https://github.com/codemarv42/RoboCore/blob/main/Hardware/RoboCoreV3.2/20241008_113153.png)
+The complete GPIO table, shift-register and PWM channel mapping are in the [manual (PDF)](hardware/robocore-v3.2/RoboCore-V3.2_manual.pdf) and in [`Pins.h`](firmware/examples/ButtonTest/Pins.h).
 
-Parameter for PCB (RoboCoreV3.2):
+## Repository layout
 
-- Layer: 4
-- Thickness: 1,6mm
-- Length: 65,05mm
-- Height: 56,03mm
-- Minimum Copper Trace Width: 0,125mm
+```
+hardware/robocore-v3.2/     Main board: schematic, BOM, interactive BOM, ODB++ fab data, Fusion source, STEP, manual
+hardware/robolight-v4.3/    Light sensor bar: schematic, BOM, ODB++ fab data, Fusion source, STEP
+hardware/mechanical/        3D-printed parts (light shield, gyro protection), chassis renders
+hardware/archive/           All previous revisions (Arche-RoboCore V1, RoboCore V2 / V3.1, light bars, RGB sensor)
+firmware/examples/          Test sketches for every subsystem of RoboCore V3.2
+docs/images/                Pictures used in this README
+```
 
-Pinout:
+## Getting started
 
-![RoboCorePinout](https://github.com/codemarv42/RoboCore/blob/main/Hardware/RoboCoreV3.2/ESP32S3Pinout.png)
+### Order the boards
 
-![RoboCorePinout](https://github.com/codemarv42/RoboCore/blob/main/Hardware/RoboCoreV3.2/FullPinout.png)
+The fabrication data in `hardware/*/fabrication/` is exported as **ODB++** (accepted e.g. by AISLER). All parts are listed in the BOM. For assembly, open the **[interactive BOM](hardware/robocore-v3.2/RoboCore-V3.2_interactive_BOM.html)**: download it and open it in a browser. It highlights every part on the board.
 
-## Light sensors PCB
+> ⚠️ If you use high-current batteries, add a large capacitor at the input. Always disconnect the battery before re-plugging anything, and check the pinout every time you change a connection.
 
-![RoboLightV4](https://github.com/codemarv42/RoboCore/blob/main/Hardware/RoboCoreV3.1/RoboLightV4_2024-Aug-26_07-30-13PM-000_CustomizedView8316888771.png)
+### Flash the examples
 
-Parameter for PCB (RoboLightV4.3):
+1. Install the [ESP32 Arduino core](https://docs.espressif.com/projects/arduino-esp32/en/latest/installing.html) (tested with 2.0.17).
+2. Install the libraries: Adafruit GFX, Adafruit BusIO, Adafruit SSD1306, Adafruit PWM Servo Driver, MPU6050_light, VL53L1X (Pololu).
+3. Select **ESP32S3 Dev Module** with these settings:
 
-- Layer: 2
-- Thickness: 1,2mm / 1,6mm
-- Length: 72,0mm
-- Height: 15,23mm
-- Minimum Copper Trace Width: 0,15mm
+   | Setting | Value |
+   |---|---|
+   | USB CDC On Boot | Enabled |
+   | CPU Frequency | 240 MHz (WiFi/BT) |
+   | Flash Mode | QIO 120 MHz |
+   | Flash Size | 8 MB (64 Mb) |
+   | Partition Scheme | 8M with SPIFFS |
+   | Upload Speed | 921600 |
 
-# Software
+4. Open a sketch from [`firmware/examples`](firmware/examples) and upload it.
 
-### You can find instructions for RoboCore V3.2 in PDF format here:
-https://github.com/codemarv42/RoboCore/blob/main/Hardware/RoboCoreV3.2/RoboCoreV3.2%20Manual.pdf
+Or with arduino-cli:
 
-## Required libraries
+```bash
+arduino-cli compile --upload -p /dev/ttyACM0 \
+  --fqbn esp32:esp32:esp32s3:CDCOnBoot=cdc,FlashSize=8M,PartitionScheme=default_8MB \
+  firmware/examples/MotorTest
+```
 
-- Adafruit_GFX.h - https://github.com/adafruit/Adafruit-GFX-Library
-- Adafruit_BusIO.h - https://github.com/adafruit/Adafruit_BusIO/tree/master
-- Adafruit_PWMServoDriver.h - https://github.com/adafruit/Adafruit-PWM-Servo-Driver-Library
-- Adafruit_SSD1306.h - https://github.com/adafruit/Adafruit_SSD1306
-- MPU6050_light.h - https://github.com/rfetick/MPU6050_light
-- VL53L1X.h - https://github.com/pololu/vl53l1x-arduino
+| Example | What it tests |
+|---|---|
+| `ButtonTest` | on-board and external buttons |
+| `DisplayTest` | I²C OLED incl. line-follower status icons |
+| `DualCore` | one FreeRTOS task per CPU core |
+| `GyroTest` | MPU6050 angles |
+| `I2CScanner` | lists all devices on the I²C bus |
+| `MotorTest` | all four motor channels in both directions |
+| `ReadBattery` | battery voltage via the on-board divider |
+| `ReadLightValues` | raw values of the RoboLight bar |
+| `ServoTest` | servos on the PCA9685 |
+| `ShiftregisterTest` | all 16 shift-register outputs |
 
-## Download Mode
+**Download mode:** if an upload fails, hold BOOT and RESET, plug in USB, release RESET, then release BOOT after a few seconds.
 
-If no program can be uploaded to the ESP32-S3, it must be set to download mode. The following steps are necessary to do this:
+## Team branches
 
-1. Press and hold the BOOT and RESET button
-2. Connect the RoboCore to the computer via USB
-3. Release the RESET button while still holding the BOOT button
-4. Release the BOOT button after a few seconds
+Student teams built their RoboCup robots on RoboCore. Each team keeps its competition software in its own branch:
 
-## Compilation settings
+| Branch | Team / contributors | Content |
+|---|---|---|
+| [`Arche-Rescue`](https://github.com/codemarv42/RoboCore/tree/Arche-Rescue) | Team Arche Rescue: [Salkin-Niklas](https://github.com/Salkin-Niklas), Valentin Schaar, Vincent von Schmidt | Competition code for Arche-RoboCore V1 and a Godot-based simulator of the RoboCup rescue room (2023–2024) |
+| [`ImmernochKeinName`](https://github.com/codemarv42/RoboCore/tree/ImmernochKeinName) | Team ImmernochKeinName: [MasterOktagon](https://github.com/MasterOktagon) | Line-follower software and OKTAGON chassis for Arche-RoboCore V1 (2023–2024) |
+| [`ImmernochKeinName-Rework`](https://github.com/codemarv42/RoboCore/tree/ImmernochKeinName-Rework) | Team ImmernochKeinName: [MasterOktagon](https://github.com/MasterOktagon) | Reworked code base with obstacle handling and a new line module (2024) |
 
-To compile your program and then upload it to the RoboCore, some steps are necessary:
+The software in these branches belongs to the respective teams and keeps its own license (GPL-3.0).
 
-1. First you have to install the kernel of the ESP32 in Arduino: https://docs.espressif.com/projects/arduino-esp32/en/latest/installing.html
-2. Next, the compilation settings must be specified. To do this, first select "ESP32S3 Dev Module" under Tools --> Board.
-3. In the last step, the parameters of the ESP32 on the RoboCore must be set. To do this, select the following under Tools: 
-- Board: "ESP32S3 Dev Module"
-- USB CDC On Boot: "Enabled"
-- CPU Frequency: "240MHz (WiFi/BT)"
-- Flash Mode: "QIO 120MHz"
-- Flash Size: "8MB (32Mb)"
-- Partition Scheme: "8MB with SPIFFS"
-- Erase all flash: "Disabled"
-- Upload Speed: "921600"
+## Hardware changelog
+
+**RoboCore**
+
+| Version | Changes |
+|---|---|
+| V3.2 | Neopixel LEDs removed (ADC interference), better regulator for the motor driver, extended power management |
+| V3.1 | Raspberry Pi HAT design, ESP32-S3, external display and buttons, two motor drivers, new regulators |
+| V2 | MPU6050 on a separate board, dual light sensor bar, pull-up fix for the buttons |
+| V1 | Arche-RoboCore – first version, ESP32 |
+
+**RoboLight**
+
+| Version | Changes |
+|---|---|
+| V4.3 | FFC pinout swapped |
+| V4.2 | Regular RGB LEDs, improved LED / phototransistor arrangement |
+| V4.1 | Neopixel RGB LEDs, centre phototransistor removed |
+| V3 | LEDs individually switchable via shift register |
+| V2 | Corrected spacing of the inner phototransistors |
+| V1 | First version |
+
+## License
+
+© 2023–2025 Marvin Ramm. Open source with attribution:
+
+- Code (`firmware/`): [MIT](LICENSE)
+- Hardware and documentation: [CC BY 4.0](hardware/LICENSE)
+
+Commercial use is allowed. Credit "RoboCore by Marvin Ramm" with a link to this repository. Details are in [LICENSING.md](LICENSING.md).
