@@ -194,7 +194,6 @@
 <layer number="255" name="routoute" color="7" fill="1" visible="no" active="no"/>
 </layers>
 <board>
-<fusionsync huburn="a.YnVzaW5lc3M6Z29vZ2xlbWFpbDY3MTg" projecturn="a.YnVzaW5lc3M6Z29vZ2xlbWFpbDY3MTgjMjAyMDA2MTEzMDY5MjMwNzY" f3durn="urn:adsk.wipprod:dm.lineage:6vJaHCXoThWI0drWU4c0Xg" pcbguid="" lastpulledtime="" lastsyncedchangeguid="" latestrevisionid="e23dc6fa-e144-4111-84da-e0fc63fdfb9c" lastsyncedrevisionid="e23dc6fa-e144-4111-84da-e0fc63fdfb9c" lastboardhashguid="638c98f4-c38f-dc1b-d221-d9b8995cffb2" lastpushedtime="2023-05-22T00:47:56Z" linktopcb3d="true"/>
 <plain>
 <hole x="2.25" y="2.25" drill="2.6"/>
 <hole x="2.25" y="58.3" drill="2.6"/>

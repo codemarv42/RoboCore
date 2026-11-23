@@ -194,7 +194,6 @@
 <layer number="255" name="routoute" color="7" fill="1" visible="no" active="no"/>
 </layers>
 <board>
-<fusionsync huburn="a.YnVzaW5lc3M6Z29vZ2xlbWFpbDY3MTg" projecturn="a.YnVzaW5lc3M6Z29vZ2xlbWFpbDY3MTgjMjAyMDA2MTEzMDY5MjMwNzY" f3durn="urn:adsk.wipprod:dm.lineage:LNjPkJUrSvCLNvue-z4ehA" pcbguid="051a5d5f-e87c-4960-813e-ae5e2344105a" lastpulledtime="" lastsyncedchangeguid="" latestrevisionid="4c61b356-4a6c-4ae5-8511-08fdffa02359" lastsyncedrevisionid="4c61b356-4a6c-4ae5-8511-08fdffa02359" lastboardhashguid="23854518-a8a9-5732-93a5-5e2d58839e13" lastpushedtime="2023-09-17T18:18:20Z" linktopcb3d="true"/>
 <plain>
 <circle x="17.75" y="6.1" radius="1.364734375" width="0.2032" layer="22"/>
 <wire x1="72" y1="9.9" x2="72" y2="14.9" width="0.0001" layer="20"/>
